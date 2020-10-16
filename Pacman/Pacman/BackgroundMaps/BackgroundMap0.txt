@@ -1,0 +1,16 @@
+0
+
+
+
+
+
+
+// First state a number of what type of piece it is then state its flip states, horizontal true then vertical true: eg 1 0 1 - is a bottom left corner
+0 = curved closed corner 
+1 = curved open corner
+2 = sharp corner
+3 = sharp wall end
+4 = closed wall
+5 = open wall
+6 = ghost entrance
+7 = blank base colour for the level
