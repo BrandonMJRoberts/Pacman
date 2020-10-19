@@ -2,6 +2,7 @@
 #define _GAME_MANAGER_H_
 
 #include "S2D/S2D.h"
+#include "Commons.h"
 
 class GameManager
 {
@@ -35,7 +36,11 @@ public:
 	bool GetIsAlreadySettingGamePaused()       { return mSettingGamePausedState; }
 	void SetIsPausedButtonPressed(bool newVal) { mSettingGamePausedState = newVal; }
 
+	PLAYER_CHARACTER_TYPE GetPlayerCurrentCharacter()      { return mPlayerCharacterType; }
+	void SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
+
 	void RestartLevel();
+
 
 private:
 	GameManager();
@@ -52,6 +57,8 @@ private:
 	unsigned int        mCurrentScore;
 
 	float               mTimeRemainingInPoweredUpState;
+
+	PLAYER_CHARACTER_TYPE   mPlayerCharacterType;
 
 	bool                mPlayerIsPoweredUp;
 	bool			    mPlayerIsAlive;

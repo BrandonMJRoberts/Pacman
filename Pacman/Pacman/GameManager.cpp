@@ -16,6 +16,7 @@ GameManager::GameManager()
 	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
 	mPlayerIsAlive                 = true;
 	mGameIsPaused				   = false;
+	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
 }
 
 // ---------------------------------------------------------------- //

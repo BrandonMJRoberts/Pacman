@@ -72,9 +72,13 @@ void Pacman::Update(int elapsedTime)
 			// Selected to go into the highscores menu
 			mInHighscoreMenu = true;
 		}
+		else if (returnOption == SELECTION_OPTIONS::CHANGE_PLAYER)
+		{
+			GameManager::Instance()->SetPlayerCharacter(PLAYER_CHARACTER_TYPE::BLUE_GHOST);
+		}
 		else if (returnOption == SELECTION_OPTIONS::QUIT)
 		{
-
+			std::cout << "Quitting the program." << std::endl;
 		}
 	}
 	else if (mInHighscoreMenu)
@@ -129,7 +133,7 @@ void Pacman::Draw(int elapsedTime)
 		// Make sure we are rendering the correct content
 		if (mInStartMenu)
 		{
-			mStartMenu->Render();
+			mStartMenu->Render(_frameCount);
 		}
 		else if (mInHighscoreMenu)
 		{
@@ -150,14 +154,15 @@ void Pacman::Draw(int elapsedTime)
 			// Render the player
 			mPlayer->Render(_frameCount);
 
-			_frameCount++;
-
-			if (_frameCount >= 60)
-				_frameCount = 0;
-
 			// Draws String
 			//SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
 		}
+
+		// Increment the frame count
+		_frameCount++;
+
+		if (_frameCount >= 60)
+			_frameCount = 0;
 
 	SpriteBatch::EndDraw(); // Ends Drawing
 }

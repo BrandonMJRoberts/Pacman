@@ -1,6 +1,7 @@
 #include "StartMenu.h"
 
 #include "Constants.h"
+#include "GameManager.h"
 
 #include <iostream>
 
@@ -26,18 +27,26 @@ StartMenu::StartMenu()
 		return;
 	}
 
-	mSelectorRenderRect       = new S2D::Rect(0, 0, mSelectorSprite->GetWidth(), mSelectorSprite->GetHeight());
+	mAmountOfSpitesOnSelectorWidth  = 2;
+	mAmountOfSpitesOnSelectorHeight = 5;
 
-	mCurrentlySelectedOption  = SELECTION_OPTIONS::START_GAME;
-	mButtonCurrentlyPressed   = false;
+	mSelectorRenderRect             = new S2D::Rect(0, 
+		                                            0, 
+		                                            mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth, 
+		                                            mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+
+	mCurrentlySelectedOption        = SELECTION_OPTIONS::START_GAME;
+	mButtonCurrentlyPressed         = false;
 
 	// Initialse the positions for the text to be rendered in the start menu
-	mStartOptionPosition      = new S2D::Vector2(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT + 40);
-	mHighScoresOptionPosition = new S2D::Vector2(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT + 80);
-	mQuitOptionPosition       = new S2D::Vector2(HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT + 120);
-	mStartMenuLabelPosition   = new S2D::Vector2(HALF_SCREEN_WIDTH - 60, QUATER_SCREEN_HEIGHT);
+	mStartOptionPosition            = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 40);
+	mHighScoresOptionPosition       = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 80);
+	mChangeCharacterOptionPosition  = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 120);
+	mQuitOptionPosition			    = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 160);
+	mStartMenuLabelPosition		    = new S2D::Vector2     (HALF_SCREEN_WIDTH - 60, QUATER_SCREEN_HEIGHT);
 
-	mSelectorPosition         = new S2D::Vector2(mStartOptionPosition->X - 50, mStartOptionPosition->Y - mSelectorSprite->GetWidth());
+	mSelectorPosition               = new S2D::Vector2(mStartOptionPosition->X - (2 * (mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth)),
+		                                               mStartOptionPosition->Y -      (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight));
 }
 
 // -------------------------------------------------------- //
@@ -65,25 +74,63 @@ StartMenu::~StartMenu()
 	delete mQuitOptionPosition;
 		mQuitOptionPosition = nullptr;
 
+	delete mChangeCharacterOptionPosition;
+		delete mChangeCharacterOptionPosition;
+
 	delete mStartMenuLabelPosition;
 		mStartMenuLabelPosition = nullptr;
 }
 
 // -------------------------------------------------------- //
 
-void StartMenu::Render()
+void StartMenu::Render(unsigned int frameCount)
 {
 	if(mBackgroundSprite && mBackgroundRenderRect)
 		S2D::SpriteBatch::Draw(mBackgroundSprite, mBackgroundRenderRect);
 
-	if(mSelectorSprite && mSelectorPosition && mSelectorRenderRect)
+	if (mSelectorSprite && mSelectorPosition && mSelectorRenderRect)
+	{
+		// Handle which frame of animation the sprite is on
+		if (frameCount % 20 < 10)
+			mSelectorRenderRect->X = 0.0f;
+		else 
+			mSelectorRenderRect->X = mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth;
+
+		// Now handle which sprite representation should be shown
+		switch (GameManager::Instance()->GetPlayerCurrentCharacter())
+		{
+		case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+			mSelectorRenderRect->Y = 2 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case PLAYER_CHARACTER_TYPE::RED_GHOST:
+			mSelectorRenderRect->Y = 0.0f;
+		break;
+
+		case PLAYER_CHARACTER_TYPE::PINK_GHOST:
+			mSelectorRenderRect->Y = (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
+			mSelectorRenderRect->Y = 3 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case PLAYER_CHARACTER_TYPE::PACMAN:
+			mSelectorRenderRect->Y = 4 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+		}
+
 		S2D::SpriteBatch::Draw(mSelectorSprite, mSelectorPosition, mSelectorRenderRect);
+	}
 
 	if(mStartOptionPosition)
 		S2D::SpriteBatch::DrawString("START GAME", mStartOptionPosition, S2D::Color::White);
 
 	if(mHighScoresOptionPosition)
 		S2D::SpriteBatch::DrawString("HIGH SCORES", mHighScoresOptionPosition, S2D::Color::White);
+
+	if(mChangeCharacterOptionPosition)
+		S2D::SpriteBatch::DrawString("CHANGE CHARACTER", mChangeCharacterOptionPosition, S2D::Color::White);
 
 	if(mQuitOptionPosition)
 		S2D::SpriteBatch::DrawString("QUIT", mQuitOptionPosition, S2D::Color::White);
@@ -98,71 +145,13 @@ SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
 {
 	// Check for any relevent button inputs
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::DOWN) && !mButtonCurrentlyPressed)
-	{
-		switch (mCurrentlySelectedOption)
-		{
-		case SELECTION_OPTIONS::START_GAME:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
 
-			mSelectorPosition->Y     = mHighScoresOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
+	HandleDownPress(keyboardState);
+	HandleUpPress(keyboardState);
 
-		case SELECTION_OPTIONS::HIGHSCORES:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
-
-			mSelectorPosition->Y     = mQuitOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-
-		case SELECTION_OPTIONS::QUIT:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
-
-			mSelectorPosition->Y     = mStartOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-
-		default:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
-
-			mSelectorPosition->Y = mQuitOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-		}
-
-		mButtonCurrentlyPressed = true;
-		return SELECTION_OPTIONS::NONE;
-		//
-	}
-	else if (keyboardState->IsKeyDown(S2D::Input::Keys::UP) && !mButtonCurrentlyPressed)
-	{
-		switch (mCurrentlySelectedOption)
-		{
-		case SELECTION_OPTIONS::START_GAME:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
-
-			mSelectorPosition->Y     = mQuitOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-
-		case SELECTION_OPTIONS::HIGHSCORES:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
-
-			mSelectorPosition->Y     = mStartOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-
-		case SELECTION_OPTIONS::QUIT:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
-
-			mSelectorPosition->Y     = mHighScoresOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-
-		default:
-			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
-
-			mSelectorPosition->Y     = mQuitOptionPosition->Y - mSelectorSprite->GetWidth();
-		break;
-		}
-
-		mButtonCurrentlyPressed = true;
-		return SELECTION_OPTIONS::NONE;
-	}
+	SELECTION_OPTIONS buttonPress = HandleReturnPress(keyboardState);
+	if (buttonPress != SELECTION_OPTIONS::NONE)
+		return buttonPress;
 
 	if (keyboardState->IsKeyDown(S2D::Input::Keys::RETURN) && !mButtonCurrentlyPressed)
 	{
@@ -176,6 +165,101 @@ SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
 	if (keyboardState->IsKeyUp(S2D::Input::Keys::DOWN) && keyboardState->IsKeyUp(S2D::Input::Keys::UP) && keyboardState->IsKeyUp(S2D::Input::Keys::RETURN))
 	{
 		mButtonCurrentlyPressed = false;
+	}
+
+	return SELECTION_OPTIONS::NONE;
+}
+
+// -------------------------------------------------------- //
+
+void StartMenu::HandleDownPress(S2D::Input::KeyboardState* keyboardState)
+{
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::DOWN) && !mButtonCurrentlyPressed)
+	{
+		switch (mCurrentlySelectedOption)
+		{
+		case SELECTION_OPTIONS::START_GAME:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
+
+			mSelectorPosition->Y = mHighScoresOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::HIGHSCORES:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::CHANGE_PLAYER;
+
+			mSelectorPosition->Y = mChangeCharacterOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::CHANGE_PLAYER:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
+
+			mSelectorPosition->Y = mQuitOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::QUIT:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
+
+			mSelectorPosition->Y = mStartOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		default:
+		break;
+		}
+
+		mButtonCurrentlyPressed = true;
+	}
+}
+
+// -------------------------------------------------------- //
+
+void StartMenu::HandleUpPress(S2D::Input::KeyboardState* keyboardState)
+{
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::UP) && !mButtonCurrentlyPressed)
+	{
+		switch (mCurrentlySelectedOption)
+		{
+		case SELECTION_OPTIONS::START_GAME:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
+
+			mSelectorPosition->Y = mQuitOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::HIGHSCORES:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
+
+			mSelectorPosition->Y = mStartOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::CHANGE_PLAYER:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
+
+			mSelectorPosition->Y = mHighScoresOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		case SELECTION_OPTIONS::QUIT:
+			mCurrentlySelectedOption = SELECTION_OPTIONS::CHANGE_PLAYER;
+
+			mSelectorPosition->Y = mChangeCharacterOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		break;
+
+		default:
+		break;
+		}
+
+		mButtonCurrentlyPressed = true;
+	}
+}
+
+// -------------------------------------------------------- //
+
+SELECTION_OPTIONS StartMenu::HandleReturnPress(S2D::Input::KeyboardState* keyboardState)
+{
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::RETURN) && !mButtonCurrentlyPressed)
+	{
+		// Return the currently selected option
+		mButtonCurrentlyPressed = true;
+
+		return mCurrentlySelectedOption;
 	}
 
 	return SELECTION_OPTIONS::NONE;

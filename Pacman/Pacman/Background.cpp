@@ -24,7 +24,10 @@ Background::Background()
 		std::cout << "Failed to load the background sprite: " << GameManager::Instance()->GetCurrentLevel() << std::endl;
 	}
 
-	mRenderRect = new S2D::Rect(GameManager::Instance()->GetGridOffset().X, GameManager::Instance()->GetGridOffset().Y, mBackgroundSprite->GetWidth(), mBackgroundSprite->GetHeight());
+	mRenderRect = new S2D::Rect(GameManager::Instance()->GetGridOffset().X, 
+		                        GameManager::Instance()->GetGridOffset().Y, 
+		                        mBackgroundSprite->GetWidth(), 
+		                        mBackgroundSprite->GetHeight());
 
 	LoadInCollisionMap();
 }
