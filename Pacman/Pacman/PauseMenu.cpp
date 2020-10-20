@@ -41,7 +41,7 @@ void PauseMenu::Render()
 
 // ---------------------------------------------------------------------- //
 
-void PauseMenu::Update(const float deltaTime)
+bool PauseMenu::Update(const float deltaTime)
 {
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
@@ -50,12 +50,14 @@ void PauseMenu::Update(const float deltaTime)
 	{
 		GameManager::Instance()->SetGameIsPaused(false);
 		GameManager::Instance()->SetIsPausedButtonPressed(true);
-		return;
+		return true;
 	}
 	else if (keyboardState->IsKeyUp(S2D::Input::Keys::P))
 	{
 		GameManager::Instance()->SetIsPausedButtonPressed(false);
 	}
+
+	return false;
 }
 
 // ---------------------------------------------------------------------- //

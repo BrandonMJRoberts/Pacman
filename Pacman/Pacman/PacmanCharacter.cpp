@@ -112,14 +112,14 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	switch (mCurrentFacingDirection)
 	{
 	case FACING_DIRECTION::DOWN:
-		if (mCollisionMap[(unsigned int)mPosition.X][(unsigned int)mPosition.Y + 1] == '0')
+		if (mCollisionMap[(unsigned int)mPosition.Y + 1][(unsigned int)mPosition.X] == '0')
 		{
 			mPosition.Y += PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
 		break;
 
 	case FACING_DIRECTION::UP:
-		if (mCollisionMap[(unsigned int)mPosition.X][(unsigned int)mPosition.Y - 1] == '0')
+		if (mCollisionMap[(unsigned int)mPosition.Y - 1][(unsigned int)mPosition.X] == '0')
 		{
 			mPosition.Y -= PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
@@ -128,7 +128,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	case FACING_DIRECTION::LEFT:
 		if (mPosition.X > 1)
 		{
-			if (mCollisionMap[(unsigned int)mPosition.X - 1][(unsigned int)mPosition.Y] == '0')
+			if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X - 1] == '0')
 			{
 				mPosition.X -= PACMAN_MOVEMENT_SPEED * deltaTime;
 			}
@@ -142,7 +142,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	case FACING_DIRECTION::RIGHT:
 		if (mPosition.X < mCollisionWidth - 1)
 		{
-			if (mCollisionMap[(unsigned int)mPosition.X + 1][(unsigned int)mPosition.Y] == '0')
+			if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X + 1] == '0')
 			{
 				mPosition.X += PACMAN_MOVEMENT_SPEED * deltaTime;
 				return;
@@ -182,7 +182,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::DOWN:
 			if (mPosition.Y < mCollisionHeight - 1)
 			{
-				if (mCollisionMap[(unsigned int)mPosition.X][(unsigned int)mPosition.Y + 1] == '0')
+				if (mCollisionMap[(unsigned int)mPosition.Y + 1][(unsigned int)mPosition.X] == '0')
 				{
 					mCurrentFacingDirection = mRequestedFacingDirection;
 
@@ -196,7 +196,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::UP:
 			if (mPosition.Y > 0)
 			{
-				if (mCollisionMap[(unsigned int)mPosition.X][(unsigned int)mPosition.Y - 1] == '0')
+				if (mCollisionMap[(unsigned int)mPosition.Y - 1][(unsigned int)mPosition.X] == '0')
 				{
 					mCurrentFacingDirection = mRequestedFacingDirection;
 
@@ -209,7 +209,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::LEFT:
 			if (mPosition.X >= 1)
 			{
-				if (mCollisionMap[(unsigned int)mPosition.X - 1][(unsigned int)mPosition.Y] == '0')
+				if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X - 1] == '0')
 				{
 					mCurrentFacingDirection = mRequestedFacingDirection;
 
@@ -222,7 +222,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::RIGHT:
 			if (mPosition.X < mCollisionWidth - 1)
 			{
-				if (mCollisionMap[(unsigned int)mPosition.X + 1][(unsigned int)mPosition.Y] == '0')
+				if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X + 1] == '0')
 				{
 					mCurrentFacingDirection = mRequestedFacingDirection;
 

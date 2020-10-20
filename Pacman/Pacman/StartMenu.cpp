@@ -94,13 +94,13 @@ void StartMenu::Render(unsigned int frameCount)
 		if (frameCount % 20 < 10)
 			mSelectorRenderRect->X = 0.0f;
 		else 
-			mSelectorRenderRect->X = mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth;
+			mSelectorRenderRect->X = float(mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth);
 
 		// Now handle which sprite representation should be shown
 		switch (GameManager::Instance()->GetPlayerCurrentCharacter())
 		{
 		case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
-			mSelectorRenderRect->Y = 2 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorRenderRect->Y = 2 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 		break;
 
 		case PLAYER_CHARACTER_TYPE::RED_GHOST:
@@ -108,15 +108,15 @@ void StartMenu::Render(unsigned int frameCount)
 		break;
 
 		case PLAYER_CHARACTER_TYPE::PINK_GHOST:
-			mSelectorRenderRect->Y = (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorRenderRect->Y = float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 		break;
 
 		case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
-			mSelectorRenderRect->Y = 3 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorRenderRect->Y = 3 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 		break;
 
 		case PLAYER_CHARACTER_TYPE::PACMAN:
-			mSelectorRenderRect->Y = 4 * (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorRenderRect->Y = 4 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 		break;
 		}
 

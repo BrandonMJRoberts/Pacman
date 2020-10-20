@@ -44,6 +44,11 @@ public:
 	void virtual Draw(int elapsedTime);
 
 private:
+	void StartMenuUpdate(const float deltaTime);
+	void PauseMenuUpdate(const float deltaTime);
+	void HighScoreMenuUpdate();
+	void InGameUpdate(const float deltaTime);
+
 	PacmanCharacter* mPlayer;
 
 	PauseMenu*       mPauseMenu;
@@ -61,4 +66,5 @@ private:
 	
 	bool           mInStartMenu;
 	bool           mInHighscoreMenu;
+	bool           mInMainGame;
 };

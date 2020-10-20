@@ -10,15 +10,13 @@ public:
 	~PauseMenu();
 
 	void Render();
-	void Update(const float deltaTime);
+	bool Update(const float deltaTime);
 
 private:
 	S2D::Texture2D* mBackgroundSprite;
 	S2D::Rect*      mRenderRectangle;
 	S2D::Vector2*   mStringPosition;
 };
-
-
 
 #endif // !_PAUSE_MENU_H_
 

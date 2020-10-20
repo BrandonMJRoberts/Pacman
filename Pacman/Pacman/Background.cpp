@@ -11,24 +11,21 @@
 
 // ----------------------------------------------------------- //
 
-Background::Background()
+Background::Background(unsigned int backgroundColourIndex, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
 {
-	mBackgroundSprite = new S2D::Texture2D();
-	std::string filePath = "Textures/Backgrounds/Background";
-	filePath.append(to_string(GameManager::Instance()->GetCurrentLevel()));
-	filePath.append(".png");
+	mSpriteSheetDestRenderRect   = new S2D::Rect(0, 0, 0, 0);
+	mSpriteSheetSourceRenderRect = new S2D::Rect(0, 0, 0, 0);
 
-	mBackgroundSprite->Load(filePath.c_str(), false);
-	if (!mBackgroundSprite)
-	{
-		std::cout << "Failed to load the background sprite: " << GameManager::Instance()->GetCurrentLevel() << std::endl;
-	}
+	mAmountOfSpritesOnSpriteSheetWidth  = spritesOnWidth;
+	mAmountOfSpritesOnSpriteSheetHeight = spritesOnHeight;
 
-	mRenderRect = new S2D::Rect(GameManager::Instance()->GetGridOffset().X, 
-		                        GameManager::Instance()->GetGridOffset().Y, 
-		                        mBackgroundSprite->GetWidth(), 
-		                        mBackgroundSprite->GetHeight());
+	mButtonCurrentlyPressed              = false;
 
+	// First setup the background sprites sheet
+	mColourIndex = backgroundColourIndex;
+	ChangeColourIndex(mColourIndex);
+
+	LoadInBackgroundSpriteMap();
 	LoadInCollisionMap();
 }
 
@@ -36,15 +33,52 @@ Background::Background()
 
 Background::~Background()
 {
-	delete mBackgroundSprite;
-	mBackgroundSprite = nullptr;
+	delete mTileSpriteSheet;
+	mTileSpriteSheet = nullptr;
+
+	delete mSpriteSheetSourceRenderRect;
+	mSpriteSheetSourceRenderRect = nullptr;
+
+	delete mSpriteSheetDestRenderRect;
+	mSpriteSheetDestRenderRect = nullptr;
+
+	for (unsigned int row = 0; row < mHeight; row++)
+	{
+		delete[] mBackgroundSpriteMap;
+		delete[] mCollisionMap;
+	}
+
+	delete mBackgroundSpriteMap;
+	mBackgroundSpriteMap = nullptr;
+
+	delete mCollisionMap;
+	mCollisionMap = nullptr;
+
 }
 
 // ----------------------------------------------------------- //
 
 void Background::Render()
 {
-	S2D::SpriteBatch::Draw(mBackgroundSprite, mRenderRect);
+	mSpriteSheetDestRenderRect->Y = GameManager::Instance()->GetGridOffset().Y;
+	mSpriteSheetDestRenderRect->X = GameManager::Instance()->GetGridOffset().X;
+
+	// Loop through the entire grid and render
+	for (unsigned int row = 0; row < mHeight; row++)
+	{
+		for (unsigned int col = 0; col < mWidth; col++)
+		{
+			mSpriteSheetSourceRenderRect->X =    (mBackgroundSpriteMap[row][col] % mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION;
+			mSpriteSheetSourceRenderRect->Y = int(mBackgroundSpriteMap[row][col] / mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION;
+
+			S2D::SpriteBatch::Draw(mTileSpriteSheet, mSpriteSheetDestRenderRect, mSpriteSheetSourceRenderRect);
+
+			mSpriteSheetDestRenderRect->X += mSingleTileWidth;
+		}
+
+		mSpriteSheetDestRenderRect->Y += mSingleTileHeight;
+		mSpriteSheetDestRenderRect->X = 0;
+	}
 }
 
 // ----------------------------------------------------------- //
@@ -82,22 +116,130 @@ void Background::LoadInCollisionMap()
 
 		if (!mCollisionMap)
 		{
-			mCollisionMap = new char* [mWidth];
+			mCollisionMap = new char* [mHeight];
 
-			for (unsigned int i = 0; i < mWidth; i++)
+			for (unsigned int i = 0; i < mHeight; i++)
 			{
-				mCollisionMap[i] = new char[mHeight];
+				mCollisionMap[i] = new char[mWidth];
 			}
 		}
 
-		for (unsigned int charID = 0; charID < sLine.size(); charID++)
+		if (mCollisionMap && currentRow < mHeight)
 		{
-			mCollisionMap[charID][currentRow] = sLine[charID];
+			for (unsigned int charID = 0; charID < sLine.size(); charID++)
+			{
+				mCollisionMap[currentRow][charID] = sLine[charID];
+			}
+
+			currentRow++;
+			continue;
+		}
+	}
+}
+
+// ----------------------------------------------------------- //
+
+void Background::ChangeColourIndex(unsigned int newIndex)
+{
+	delete mTileSpriteSheet;
+
+	mTileSpriteSheet = new S2D::Texture2D();
+	mTileSpriteSheet->Load(std::string("Textures/Backgrounds/MazeParts" + to_string(newIndex) + ".png").c_str(), false);
+
+	if (!mTileSpriteSheet)
+	{
+		std::cout << "Failed to load in the sprite sheet for the background sprites" << std::endl;
+	}
+}
+
+// ----------------------------------------------------------- //
+
+void Background::LoadInBackgroundSpriteMap()
+{
+	// First open the correct file
+	std::ifstream file("BackgroundMaps/BackgroundMap.txt");
+
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open the background sprite map." << std::endl;
+		return;
+	}
+
+	// Now we need to load in the data stored in the map
+	char* cLine        = new char[200];
+
+	unsigned int width = 0, height = 0, currentRow = 0;
+	std::string stringVersionOfNumber;
+
+	while (file.getline(cLine, 200))
+	{
+		// The first two lines are the width and height so read them in first
+		if (width == 0 || height == 0)
+		{
+			std::stringstream ssLine(cLine);
+			ssLine >> width >> height;
+
+			mSingleTileHeight = mTileSpriteSheet->GetHeight() / mAmountOfSpritesOnSpriteSheetHeight;
+			mSingleTileWidth  = mTileSpriteSheet->GetWidth()  / mAmountOfSpritesOnSpriteSheetWidth;
+
+			mSpriteSheetSourceRenderRect->Width  = mSingleTileWidth;
+			mSpriteSheetSourceRenderRect->Height = mSingleTileHeight;
+
+			mSpriteSheetDestRenderRect->Width  = mSingleTileWidth;
+			mSpriteSheetDestRenderRect->Height = mSingleTileHeight;
+
+			continue;
 		}
 
-		currentRow++;
-		continue;
+		if (!mBackgroundSpriteMap)
+		{
+			// Now we need to allocate the correct amount of memory required
+			mBackgroundSpriteMap = new unsigned int* [height];
+
+			for (unsigned int i = 0; i < height; i++)
+			{
+				mBackgroundSpriteMap[i] = new unsigned int[width];
+			}
+		}
+
+		// Now we need to load in the actual data
+		if (mBackgroundSpriteMap && currentRow < height)
+		{
+			std::stringstream ssLine(cLine);
+			for (unsigned int i = 0; i < width; i++)
+			{
+				ssLine >> stringVersionOfNumber;
+				std::stringstream(stringVersionOfNumber) >> mBackgroundSpriteMap[currentRow][i];
+			}
+
+			currentRow++;
+			continue;
+		}
 	}
+}
+
+// ----------------------------------------------------------- //
+
+void Background::Update()
+{
+	// Check if the player selects to change the colour of the background (just for testing purpouses)
+	if(S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::I) && !mButtonCurrentlyPressed)
+	{
+		mButtonCurrentlyPressed = true;
+
+		if (mColourIndex >= 2)
+			mColourIndex = 0;
+		else
+			mColourIndex++;
+
+		ChangeColourIndex(mColourIndex);
+	}
+
+	if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::I))
+	{
+		mButtonCurrentlyPressed = false;
+	}
+
 }
 
 // ----------------------------------------------------------- //
