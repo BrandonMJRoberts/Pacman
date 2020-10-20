@@ -9,8 +9,8 @@ public:
 	PauseMenu();
 	~PauseMenu();
 
-	void Render();
-	bool Update(const float deltaTime);
+	void            Render();
+	bool            Update(const float deltaTime);
 
 private:
 	S2D::Texture2D* mBackgroundSprite;

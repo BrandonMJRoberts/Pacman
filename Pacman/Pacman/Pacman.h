@@ -44,10 +44,10 @@ public:
 	void virtual Draw(int elapsedTime);
 
 private:
-	void StartMenuUpdate(const float deltaTime);
-	void PauseMenuUpdate(const float deltaTime);
-	void HighScoreMenuUpdate();
-	void InGameUpdate(const float deltaTime);
+	void             StartMenuUpdate(const float deltaTime);
+	void             PauseMenuUpdate(const float deltaTime);
+	void             HighScoreMenuUpdate();
+	void             InGameUpdate(const float deltaTime);
 
 	PacmanCharacter* mPlayer;
 
@@ -56,13 +56,13 @@ private:
 	HighScoresMenu*  mHighScoreMenu;
 
 	// Data to represent Munchie
-	int        _frameCount;
+	int              _frameCount;
 
 	Background*     mBackground;
 	DotsHandler*    mDotHandler;
 
 	// Position for String
-	Vector2*  _stringPosition;
+	Vector2*       _stringPosition;
 	
 	bool           mInStartMenu;
 	bool           mInHighscoreMenu;

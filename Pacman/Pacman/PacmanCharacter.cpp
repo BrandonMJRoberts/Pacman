@@ -20,14 +20,14 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int collisionMapW
 		return;
 	}
 
-	mSpriteWidth  = mPacmanTexture->GetWidth();
-	mSpriteHeight = mPacmanTexture->GetHeight();
+	mSpriteWidth        = mPacmanTexture->GetWidth();
+	mSpriteHeight       = mPacmanTexture->GetHeight();
 
 	mSingleSpriteWidth  = mSpriteWidth  / 3;
 	mSingleSpriteHeight = mSpriteHeight / 4;
 
 	// Setup the rendering rectangle
-	mPacmanSourceRect = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
+	mPacmanSourceRect   = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
 	if (!mPacmanSourceRect)
 	{
 		std::cout << "Failed to setup the pacman render rectangle." << std::endl;
@@ -51,10 +51,10 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int collisionMapW
 PacmanCharacter::~PacmanCharacter()
 {
 	delete mPacmanSourceRect;
-	mPacmanSourceRect = nullptr;
+		mPacmanSourceRect = nullptr;
 
 	delete mPacmanTexture;
-	mPacmanTexture = nullptr;
+		mPacmanTexture = nullptr;
 
 	mCollisionMap = nullptr;
 }

@@ -18,31 +18,31 @@ public:
 	unsigned int GetCollisionHeight() { return mHeight; }
 
 	void         ChangeColourIndex(unsigned int newIndex);
-	void         LoadInBackgroundSpriteMap();
 
 private:
-	void LoadInCollisionMap();
+	void         LoadInCollisionMap();
+	void         LoadInBackgroundSpriteMap();
 
 	char**          mCollisionMap;
-	unsigned int** mBackgroundSpriteMap;
+	unsigned int**  mBackgroundSpriteMap;
 
-	S2D::Rect* mSpriteSheetSourceRenderRect;
-	S2D::Rect* mSpriteSheetDestRenderRect;
+	S2D::Rect*      mSpriteSheetSourceRenderRect;
+	S2D::Rect*      mSpriteSheetDestRenderRect;
 
-	unsigned int mSingleTileWidth;
-	unsigned int mSingleTileHeight;
+	unsigned int    mSingleTileWidth;
+	unsigned int    mSingleTileHeight;
 
 	S2D::Texture2D* mTileSpriteSheet;
 
 	unsigned int    mHeight;
 	unsigned int    mWidth;
 
-	unsigned int mAmountOfSpritesOnSpriteSheetWidth;
-	unsigned int mAmountOfSpritesOnSpriteSheetHeight;
+	unsigned int    mAmountOfSpritesOnSpriteSheetWidth;
+	unsigned int    mAmountOfSpritesOnSpriteSheetHeight;
 
-	unsigned int mColourIndex;
+	unsigned int    mColourIndex;
 
-	bool mButtonCurrentlyPressed;
+	bool            mButtonCurrentlyPressed;
 };
 
 #endif

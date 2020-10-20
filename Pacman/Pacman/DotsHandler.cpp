@@ -43,16 +43,16 @@ DotsHandler::~DotsHandler()
 	mDots.clear();
 
 	delete mLargeDotSpriteSheet;
-	mLargeDotSpriteSheet = nullptr;
+		mLargeDotSpriteSheet = nullptr;
 
 	delete mSmallDotSpriteSheet;
-	mSmallDotSpriteSheet = nullptr;
+		mSmallDotSpriteSheet = nullptr;
 
 	delete mSourceRectLargeDot;
-	mSourceRectLargeDot = nullptr;
+		mSourceRectLargeDot = nullptr;
 
 	delete mSourceRectSmallDot;
-	mSourceRectSmallDot = nullptr;
+		mSourceRectSmallDot = nullptr;
 }
 
 // ----------------------------------------------------------------- //
@@ -95,8 +95,8 @@ void DotsHandler::LoadInDotData()
 	}
 
 	// Now we know the file is open loop through and read in the data
-	char* charLine = new char[100];
-	std::string sLine = "";
+	char*             charLine = new char[100];
+	std::string       sLine = "";
 	std::stringstream ssLine;
 	int xPos, yPos, typeOfDot;
 

@@ -13,8 +13,8 @@
 
 Background::Background(unsigned int backgroundColourIndex, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
 {
-	mSpriteSheetDestRenderRect   = new S2D::Rect(0, 0, 0, 0);
-	mSpriteSheetSourceRenderRect = new S2D::Rect(0, 0, 0, 0);
+	mSpriteSheetDestRenderRect          = new S2D::Rect(0, 0, 0, 0);
+	mSpriteSheetSourceRenderRect        = new S2D::Rect(0, 0, 0, 0);
 
 	mAmountOfSpritesOnSpriteSheetWidth  = spritesOnWidth;
 	mAmountOfSpritesOnSpriteSheetHeight = spritesOnHeight;
@@ -34,13 +34,13 @@ Background::Background(unsigned int backgroundColourIndex, unsigned int spritesO
 Background::~Background()
 {
 	delete mTileSpriteSheet;
-	mTileSpriteSheet = nullptr;
+		mTileSpriteSheet = nullptr;
 
 	delete mSpriteSheetSourceRenderRect;
-	mSpriteSheetSourceRenderRect = nullptr;
+		mSpriteSheetSourceRenderRect = nullptr;
 
 	delete mSpriteSheetDestRenderRect;
-	mSpriteSheetDestRenderRect = nullptr;
+		mSpriteSheetDestRenderRect = nullptr;
 
 	for (unsigned int row = 0; row < mHeight; row++)
 	{
@@ -49,10 +49,10 @@ Background::~Background()
 	}
 
 	delete mBackgroundSpriteMap;
-	mBackgroundSpriteMap = nullptr;
+		mBackgroundSpriteMap = nullptr;
 
 	delete mCollisionMap;
-	mCollisionMap = nullptr;
+		mCollisionMap = nullptr;
 
 }
 
@@ -93,11 +93,11 @@ void Background::LoadInCollisionMap()
 		return;
 	}
 
-	char* charLine = new char[100];
-	std::string sLine = "";
+	char*             charLine = new char[100];
+	std::string       sLine    = "";
 	std::stringstream ssLine;
 	
-	unsigned int currentRow = 0;
+	unsigned int      currentRow = 0;
 
 	// Now loop through all the lines in the file and get the data required
 	while (sLine != "END")

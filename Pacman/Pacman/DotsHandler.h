@@ -7,10 +7,10 @@
 
 // ------------------------------------------------------------------------- //
 
-enum class DOT_TYPE 
+enum class DOT_TYPE : char
 {
-	SMALL = 0,
-	LARGE
+	SMALL = 0x00,
+	LARGE = 0x01
 };
 
 // ------------------------------------------------------------------------- //
@@ -21,12 +21,12 @@ public:
 	Dot(S2D::Vector2* startPos, DOT_TYPE DotType) { mPosition = startPos; mDotType = DotType; }
 	~Dot()                                        { delete mPosition; mPosition = nullptr; }
 
-	DOT_TYPE GetDotType()       { return mDotType; }
-	S2D::Vector2* GetPosition() { return mPosition; }
+	DOT_TYPE      GetDotType()                    { return mDotType; }
+	S2D::Vector2* GetPosition()                   { return mPosition; }
 
 private:
-	DOT_TYPE      mDotType;
 	S2D::Vector2* mPosition;
+	DOT_TYPE      mDotType;
 };
 
 // ------------------------------------------------------------------------- //
@@ -45,11 +45,11 @@ private:
 
 	std::vector<Dot*> mDots;
 
-	S2D::Texture2D* mSmallDotSpriteSheet;
-	S2D::Texture2D* mLargeDotSpriteSheet;
+	S2D::Texture2D*   mSmallDotSpriteSheet;
+	S2D::Texture2D*   mLargeDotSpriteSheet;
 
-	S2D::Rect*      mSourceRectSmallDot;
-	S2D::Rect*      mSourceRectLargeDot;
+	S2D::Rect*        mSourceRectSmallDot;
+	S2D::Rect*        mSourceRectLargeDot;
 };
 
 #endif

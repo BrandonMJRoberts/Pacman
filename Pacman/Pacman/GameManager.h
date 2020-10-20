@@ -11,44 +11,44 @@ public:
 
 	static GameManager* Instance();
 
-	void Update(const float deltaTime);
+	void                Update(const float deltaTime);
 
-	unsigned int GetRemainingDots()			  { return mRemainingDots; }
-	unsigned int GetStartingDots()			  { return mStartingDots; }
+	unsigned int        GetRemainingDots()			         { return mRemainingDots; }
+	unsigned int        GetStartingDots()			         { return mStartingDots; }
 
-	void SetStartingLevel(unsigned int newID) { mCurrentLevelID = newID; SetDotCounts(); }
-	unsigned int GetCurrentLevel()            { return mCurrentLevelID; }
+	void                SetStartingLevel(unsigned int newID) { mCurrentLevelID = newID; SetDotCounts(); }
+	unsigned int        GetCurrentLevel()                    { return mCurrentLevelID; }
 
-	void AddToScore(unsigned int addition)    { mCurrentScore += addition;  }
-	unsigned int GetCurrentScore()			  { return mCurrentScore; }
+	void                AddToScore(unsigned int addition)    { mCurrentScore += addition;  }
+	unsigned int        GetCurrentScore()			         { return mCurrentScore; }
 
-	void SetPlayerPoweredUp(bool playerState);
-	bool GetIsPlayerPoweredUp()               { return mPlayerIsPoweredUp; }
+	void                SetPlayerPoweredUp(bool playerState);
+	bool                GetIsPlayerPoweredUp()               { return mPlayerIsPoweredUp; }
 
-	S2D::Vector2 GetGridOffset()              { return mGridOffsetFromTopLeft; }
+	S2D::Vector2        GetGridOffset()                      { return mGridOffsetFromTopLeft; }
 
-	bool GetPlayerIsAlive()					  { return mPlayerIsAlive; }
-	void SetPlayerIsAlive(bool newVal)        { mPlayerIsAlive = newVal; }
+	bool                GetPlayerIsAlive()					 { return mPlayerIsAlive; }
+	void                SetPlayerIsAlive(bool newVal)        { mPlayerIsAlive = newVal; }
 
-	bool GetGameIsPaused()                    { return mGameIsPaused; }
-	void SetGameIsPaused(bool newVal)         { mGameIsPaused = newVal; }
+	bool                GetGameIsPaused()                    { return mGameIsPaused; }
+	void                SetGameIsPaused(bool newVal)         { mGameIsPaused = newVal; }
 
-	bool GetIsAlreadySettingGamePaused()       { return mSettingGamePausedState; }
-	void SetIsPausedButtonPressed(bool newVal) { mSettingGamePausedState = newVal; }
+	bool                GetIsAlreadySettingGamePaused()       { return mSettingGamePausedState; }
+	void                SetIsPausedButtonPressed(bool newVal) { mSettingGamePausedState = newVal; }
 
-	PLAYER_CHARACTER_TYPE GetPlayerCurrentCharacter()      { return mPlayerCharacterType; }
-	void SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
+	PLAYER_CHARACTER_TYPE GetPlayerCurrentCharacter()         { return mPlayerCharacterType; }
+	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
 
-	void RestartLevel();
+	void                  RestartLevel();
 
 
 private:
 	GameManager();
-	void SetDotCounts();
+	void                SetDotCounts();
 
 	static GameManager* mInstance;
 
-	S2D::Vector2 mGridOffsetFromTopLeft;
+	S2D::Vector2        mGridOffsetFromTopLeft;
 
 	unsigned int	    mRemainingDots;
 	unsigned int		mStartingDots;

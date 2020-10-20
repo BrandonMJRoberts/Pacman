@@ -9,8 +9,8 @@ public:
 	HighScoresMenu();
 	~HighScoresMenu();
 
-	void Render();
-	bool Update();
+	void            Render();
+	bool            Update();
 
 private:
 	S2D::Texture2D* mBackgroundSprite;
