@@ -7,12 +7,13 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int collisionMapWidth, unsigned int collisionMapHeight)
+PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
 {
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
-	mPacmanTexture = new S2D::Texture2D();
+	// Load in the texture
+	mPacmanTexture            = new S2D::Texture2D();
 	mPacmanTexture->Load("Textures/Pacman/PacmanAnimations.png", false);
 	if (!mPacmanTexture)
 	{
@@ -20,29 +21,24 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int collisionMapW
 		return;
 	}
 
-	mSpriteWidth        = mPacmanTexture->GetWidth();
-	mSpriteHeight       = mPacmanTexture->GetHeight();
+	// Set the width and height variables
+	mSingleSpriteWidth  = mPacmanTexture->GetWidth()  / spritesOnWidth;
+	mSingleSpriteHeight = mPacmanTexture->GetHeight() / spritesOnHeight;
 
-	mSingleSpriteWidth  = mSpriteWidth  / 3;
-	mSingleSpriteHeight = mSpriteHeight / 4;
+	// Set the centre position
+	mCentrePosition          = S2D::Vector2(24.0f, 24.0f);
 
 	// Setup the rendering rectangle
-	mPacmanSourceRect   = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
+	mPacmanSourceRect      = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
 	if (!mPacmanSourceRect)
 	{
 		std::cout << "Failed to setup the pacman render rectangle." << std::endl;
 		return;
 	}
 
-	// Default pacman's position to being the top left of the grid
-	mPosition				 = S2D::Vector2(3.0f, 1.0f);
-
 	if (collisionMap)
 	{
 		mCollisionMap    = collisionMap;
-
-		mCollisionWidth  = collisionMapWidth;
-		mCollisionHeight = collisionMapHeight;
 	}
 }
 
@@ -78,10 +74,16 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 		mPacmanSourceRect->X = (float)mSingleSpriteWidth * 2;
 	}
 
-	if(mPacmanSourceRect && mPacmanTexture)
-		S2D::SpriteBatch::Draw(mPacmanTexture, new S2D::Vector2(GameManager::Instance()->GetGridOffset().X + (mPosition.X * SPRITE_RESOLUTION), 
-			                                                    GameManager::Instance()->GetGridOffset().Y + (mPosition.Y * SPRITE_RESOLUTION)), 
-			                                                    mPacmanSourceRect); // Draws Pacman
+	if (mPacmanSourceRect && mPacmanTexture)
+	{
+		// Calculate the render position
+		mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
+
+		// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
+		S2D::SpriteBatch::Draw(mPacmanTexture,
+			                   new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                   mPacmanSourceRect); // Draws Pacman
+	}
 }
 
 // ------------------------------------------------------------- //
@@ -89,15 +91,15 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 bool PacmanCharacter::EdgeCheck()
 {
 	// First check if pacman is going to go off the screen
-	if (mPosition.X <= -1 && mCurrentFacingDirection == FACING_DIRECTION::LEFT)
+	if (mCentrePosition.X <= 0 && mCurrentFacingDirection == FACING_DIRECTION::LEFT)
 	{
-		mPosition.X = (float)mCollisionWidth;
+		mCentrePosition.X = SCREEN_WIDTH - 1.0f;
 		return true;
 	}
 
-	if (mPosition.X >= mCollisionWidth && mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
+	if (mCentrePosition.X + (mSingleSpriteWidth / 2.0f)> SCREEN_WIDTH && mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
 	{
-		mPosition.X = -1;
+		mCentrePosition.X = -1;
 		return true;
 	}
 
@@ -108,54 +110,68 @@ bool PacmanCharacter::EdgeCheck()
 
 void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 {
+	S2D::Vector2 gridPos = ConvertPositionToGridPosition(mCentrePosition);
+
+	// First lock the opposite axis to which we are moving in
+	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
+	{
+		// If going downwards then we need to lock the player's X position
+		mCentrePosition.X = SPRITE_RESOLUTION * ((int)gridPos.X + 0.5f);
+	}
+	else if (mCurrentFacingDirection == FACING_DIRECTION::LEFT || mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
+	{
+		mCentrePosition.Y = SPRITE_RESOLUTION * ((int)gridPos.Y + 0.5f);
+	}
+
 	// Now we need to move pacman in the direction selected, if we can
 	switch (mCurrentFacingDirection)
 	{
+
 	case FACING_DIRECTION::DOWN:
-		if (mCollisionMap[(unsigned int)mPosition.Y + 1][(unsigned int)mPosition.X] == '0')
+		// Convert the projected position of pacman into a grid position - now with the projection in his direction
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight / 2.0f));
+
+		// If we are free to move in this direction then move in the direction
+		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
 		{
-			mPosition.Y += PACMAN_MOVEMENT_SPEED * deltaTime;
+			mCentrePosition.Y     += PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
-		break;
+	break;
 
 	case FACING_DIRECTION::UP:
-		if (mCollisionMap[(unsigned int)mPosition.Y - 1][(unsigned int)mPosition.X] == '0')
+		// Convert the projected position of pacman into a grid position
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * (mSingleSpriteHeight / 2.0f)));
+
+		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
 		{
-			mPosition.Y -= PACMAN_MOVEMENT_SPEED * deltaTime;
+			mCentrePosition.Y     -= PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
-		break;
+	break;
 
 	case FACING_DIRECTION::LEFT:
-		if (mPosition.X > 1)
+
+		// Convert the projected position of pacman into a grid position
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth / 2.0f), 0.0f));
+
+		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
 		{
-			if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X - 1] == '0')
-			{
-				mPosition.X -= PACMAN_MOVEMENT_SPEED * deltaTime;
-			}
-		}
-		else
-		{
-			mPosition.X -= PACMAN_MOVEMENT_SPEED * deltaTime;
+			mCentrePosition.X     -= PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
 	break;
 
 	case FACING_DIRECTION::RIGHT:
-		if (mPosition.X < mCollisionWidth - 1)
+
+		// Convert the projected position of pacman into a grid position
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth / 2.0f, 0.0f));
+
+		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
 		{
-			if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X + 1] == '0')
-			{
-				mPosition.X += PACMAN_MOVEMENT_SPEED * deltaTime;
-				return;
-			}
-		}
-		else
-		{
-			mPosition.X += PACMAN_MOVEMENT_SPEED * deltaTime;
+			mCentrePosition.X     += PACMAN_MOVEMENT_SPEED * deltaTime;
 		}
 	break;
 
 	case FACING_DIRECTION::NONE:
-		break;
+	break;
 
 	default:
 		std::cout << "In an error movement state!" << std::endl;
@@ -168,72 +184,59 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 
 void PacmanCharacter::CheckForDirectionChange()
 {
+	// There is the inclusion of a plus one before casting to a uInt in some cases so that the point of collision referenced is always the back of pacman, instead of the front
+
 	// Now check to see if the player can change direction 
 	if (mRequestedFacingDirection == FACING_DIRECTION::NONE)
 	{
+		// Quick out if the player has not entered anything
 		return;
 	}
 	else
 	{
-		//unsigned int DoubleSpriteRes = SPRITE_RESOLUTION * 2;
+		// Variable to hold the grid position of the projected positon
+		S2D::Vector2 gridPos;
+		float        yPosOfSpriteSheet = 0.0f;
 
 		switch (mRequestedFacingDirection)
 		{
 		case FACING_DIRECTION::DOWN:
-			if (mPosition.Y < mCollisionHeight - 1)
-			{
-				if (mCollisionMap[(unsigned int)mPosition.Y + 1][(unsigned int)mPosition.X] == '0')
-				{
-					mCurrentFacingDirection = mRequestedFacingDirection;
+			// Calculate the correctly projected direction
+			gridPos           = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight / 2.0f));
 
-					// And setup the new source rect
-					delete mPacmanSourceRect;
-					mPacmanSourceRect = new S2D::Rect(0, (float)mSingleSpriteHeight * 3, mSingleSpriteWidth, mSingleSpriteHeight);
-				}
-			}
+			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 3;
 		break;
 
 		case FACING_DIRECTION::UP:
-			if (mPosition.Y > 0)
-			{
-				if (mCollisionMap[(unsigned int)mPosition.Y - 1][(unsigned int)mPosition.X] == '0')
-				{
-					mCurrentFacingDirection = mRequestedFacingDirection;
+			// Calculate the correctly projected direction
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * (mSingleSpriteHeight / 2.0f)));
 
-					delete mPacmanSourceRect;
-					mPacmanSourceRect = new S2D::Rect(0, (float)mSingleSpriteHeight * 2, mSingleSpriteWidth, mSingleSpriteHeight);
-				}
-			}
+			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 2;
 		break;
 
 		case FACING_DIRECTION::LEFT:
-			if (mPosition.X >= 1)
-			{
-				if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X - 1] == '0')
-				{
-					mCurrentFacingDirection = mRequestedFacingDirection;
+			// Calculate the correctly projected direction
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth / 2), 0.0f));
 
-					delete mPacmanSourceRect;
-					mPacmanSourceRect = new S2D::Rect(0, (float)mSingleSpriteHeight, mSingleSpriteWidth, mSingleSpriteHeight);
-				}
-			}
+			yPosOfSpriteSheet = (float)mSingleSpriteHeight;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
-			if (mPosition.X < mCollisionWidth - 1)
-			{
-				if (mCollisionMap[(unsigned int)mPosition.Y][(unsigned int)mPosition.X + 1] == '0')
-				{
-					mCurrentFacingDirection = mRequestedFacingDirection;
+			// Calculate the correctly projected direction
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth / 2, 0.0f));
 
-					delete mPacmanSourceRect;
-					mPacmanSourceRect = new S2D::Rect(0, 0, mSingleSpriteWidth, mSingleSpriteHeight);
-				}
-			}
+			yPosOfSpriteSheet = 0.0f;
 		break;
+		}
 
-		default:
-		break;
+		// Check if it is a valid direction change
+		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
+		{
+			// Set the new direction of facing
+			mCurrentFacingDirection = mRequestedFacingDirection;
+
+			// Change the sprite to represent the direction
+			ReSetupPacmanSourceRect(0, yPosOfSpriteSheet, mSingleSpriteWidth, mSingleSpriteHeight);
 		}
 	}
 }
@@ -242,29 +245,27 @@ void PacmanCharacter::CheckForDirectionChange()
 
 void PacmanCharacter::Update(const float deltaTime)
 {
-	// First handle the player's input
-	HandleInput(deltaTime);
+	// First check for input
+	HandleInput();
 
-	// First check if pacman should loop around the screen - if it should then 
+	// Now we have the requested direction to face we need to check if it is a valid change, so:
+	// Now check if the player should change facing direction
+	CheckForDirectionChange();
+
+	// Now check if the player has hit the edge of the playable area so loop
 	if (EdgeCheck())
 	{
 		return;
 	}
 
-	// Dont run any movement code if you dont have a collision map to check against
-	if (mCollisionMap)
-	{
-		MoveInCurrentDirection(deltaTime);
+	// Now move the player in the correct direction
+	MoveInCurrentDirection(deltaTime);
 
-		CheckForDirectionChange();
-	}
-
-	
 }
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::HandleInput(const float deltaTime)
+void PacmanCharacter::HandleInput()
 {
 	// Reset the requested direction
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
@@ -289,6 +290,21 @@ void PacmanCharacter::HandleInput(const float deltaTime)
 	{
 		mRequestedFacingDirection = FACING_DIRECTION::DOWN;
 	}
+}
+
+// ------------------------------------------------------------- //
+
+S2D::Vector2 PacmanCharacter::ConvertPositionToGridPosition(S2D::Vector2 position)
+{
+	return S2D::Vector2(position.X / SPRITE_RESOLUTION, position.Y / SPRITE_RESOLUTION);
+}
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, int width, int height)
+{
+	delete mPacmanSourceRect;
+	mPacmanSourceRect = new S2D::Rect(x, y, width, height);
 }
 
 // ------------------------------------------------------------- //

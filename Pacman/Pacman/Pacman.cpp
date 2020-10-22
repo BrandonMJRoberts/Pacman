@@ -41,7 +41,7 @@ void Pacman::LoadContent()
 
 	mBackground      = new Background(2);
 
-	mPlayer          = new PacmanCharacter(mBackground->GetCollisionMap(), mBackground->GetCollisionWidth(), mBackground->GetCollisionHeight());
+	mPlayer          = new PacmanCharacter(mBackground->GetCollisionMap());
 	mDotHandler      = new DotsHandler();
 
 	mPauseMenu       = new PauseMenu();

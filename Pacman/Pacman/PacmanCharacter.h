@@ -8,32 +8,34 @@
 class PacmanCharacter
 {
 public:
-	PacmanCharacter(char** collisionMap, unsigned int collisionMapWidth, unsigned int collisionMapHeight);
+	PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth = 3, unsigned int spritesOnHeight = 4);
 	~PacmanCharacter();
 
 	void             Render(unsigned int currentFrameCount);
 	void             Update(const float deltaTime);
 
-	S2D::Vector2     GetPosition() { return mPosition; }
-	S2D::Texture2D*  GetTexture()  { return mPacmanTexture; }
-	S2D::Rect*       GetRect()     { return mPacmanSourceRect; }
+	S2D::Vector2     GetTopLeftPosition()     { return mRenderPosition; }
+
+	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
+	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
 
 private:
-	void             HandleInput(const float deltaTime);
+	void             HandleInput();
 	bool             EdgeCheck();
 	void             MoveInCurrentDirection(const float deltaTime);
 	void             CheckForDirectionChange();
 
-	char**           mCollisionMap;
-	unsigned int	 mCollisionWidth;
-	unsigned int	 mCollisionHeight;
+	void             ReSetupPacmanSourceRect(float x, float y, int width, int height);
 
-	S2D::Vector2     mPosition;
+	S2D::Vector2     ConvertPositionToGridPosition(S2D::Vector2 position);
+
+	char**           mCollisionMap;
+
+	S2D::Vector2     mRenderPosition;
+	S2D::Vector2     mCentrePosition;
+
 	S2D::Texture2D*  mPacmanTexture;
 	S2D::Rect*       mPacmanSourceRect; // Required for the sprite batch rendering
-
-	unsigned int	 mSpriteWidth;
-	unsigned int	 mSpriteHeight;
 
 	unsigned int	 mSingleSpriteWidth;
 	unsigned int	 mSingleSpriteHeight;
