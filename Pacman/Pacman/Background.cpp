@@ -68,8 +68,8 @@ void Background::Render()
 	{
 		for (unsigned int col = 0; col < mWidth; col++)
 		{
-			mSpriteSheetSourceRenderRect->X =    (mBackgroundSpriteMap[row][col] % mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION;
-			mSpriteSheetSourceRenderRect->Y = int(mBackgroundSpriteMap[row][col] / mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION;
+			mSpriteSheetSourceRenderRect->X =    float((mBackgroundSpriteMap[row][col] % mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION);
+			mSpriteSheetSourceRenderRect->Y = float(int(mBackgroundSpriteMap[row][col] / mAmountOfSpritesOnSpriteSheetWidth) * SPRITE_RESOLUTION);
 
 			S2D::SpriteBatch::Draw(mTileSpriteSheet, mSpriteSheetDestRenderRect, mSpriteSheetSourceRenderRect);
 

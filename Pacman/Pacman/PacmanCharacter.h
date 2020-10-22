@@ -40,6 +40,8 @@ private:
 	unsigned int	 mSingleSpriteWidth;
 	unsigned int	 mSingleSpriteHeight;
 
+	float            mChangeDirectionInputDelay;
+
 	FACING_DIRECTION mCurrentFacingDirection;
 	FACING_DIRECTION mRequestedFacingDirection;
 };
