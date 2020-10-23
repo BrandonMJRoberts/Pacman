@@ -14,7 +14,8 @@ public:
 	void             Render(unsigned int currentFrameCount);
 	void             Update(const float deltaTime);
 
-	S2D::Vector2     GetTopLeftPosition()     { return mRenderPosition; }
+	//S2D::Vector2     GetTopLeftPosition()     { return mRenderPosition; }
+	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
 
 	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
 	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }

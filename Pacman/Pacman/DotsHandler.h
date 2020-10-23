@@ -18,14 +18,14 @@ enum class DOT_TYPE : char
 struct Dot
 {
 public:
-	Dot(S2D::Vector2* startPos, DOT_TYPE DotType) { mPosition = startPos; mDotType = DotType; }
-	~Dot()                                        { delete mPosition; mPosition = nullptr; }
+	Dot(S2D::Vector2 startPos, DOT_TYPE DotType) { mPosition = startPos; mDotType = DotType; }
+	~Dot() { ; }
 
 	DOT_TYPE      GetDotType()                    { return mDotType; }
-	S2D::Vector2* GetPosition()                   { return mPosition; }
+	S2D::Vector2  GetPosition()                   { return mPosition; }
 
 private:
-	S2D::Vector2* mPosition;
+	S2D::Vector2  mPosition;
 	DOT_TYPE      mDotType;
 };
 
@@ -37,7 +37,7 @@ public:
 	DotsHandler();
 	~DotsHandler();
 
-	void Update(S2D::Vector2* pacmanPosition, const unsigned int pacmanDimensions);
+	void Update(S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
 	void Render(unsigned int currentFrameCount);
 
 private:

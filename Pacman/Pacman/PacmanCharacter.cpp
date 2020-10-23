@@ -94,7 +94,7 @@ bool PacmanCharacter::EdgeCheck()
 	// First check if pacman is going to go off the screen
 	if (mCentrePosition.X + (mSingleSpriteWidth / 2) + 1 <= 0 && mCurrentFacingDirection == FACING_DIRECTION::LEFT)
 	{
-		mCentrePosition.X = SCREEN_WIDTH + (mSingleSpriteWidth / 2);
+		mCentrePosition.X = float(SCREEN_WIDTH + (mSingleSpriteWidth / 2));
 		return true;
 	}
 

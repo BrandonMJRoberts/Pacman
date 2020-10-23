@@ -187,6 +187,8 @@ void Pacman::InGameUpdate(const float deltaTime)
 
 		mBackground->Update();
 
+		mDotHandler->Update(mPlayer->GetCentrePosition(), 9);
+
 		// Check if the player has paused the game
 		if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
 		{
