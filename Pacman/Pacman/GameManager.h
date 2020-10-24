@@ -14,7 +14,9 @@ public:
 	void                Update(const float deltaTime);
 
 	unsigned int        GetRemainingDots()			         { return mRemainingDots; }
-	unsigned int        GetStartingDots()			         { return mStartingDots; }
+
+	void                SetCurrentDotCount(const unsigned int count)          { mRemainingDots = count; }
+	void                DecreaseRemainingDots(const unsigned int amount)      { mRemainingDots -= amount; }
 
 	void                SetStartingLevel(unsigned int newID) { mCurrentLevelID = newID; SetDotCounts(); }
 	unsigned int        GetCurrentLevel()                    { return mCurrentLevelID; }
@@ -40,6 +42,7 @@ public:
 	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
 
 	void                  RestartLevel();
+	void                  LoadLevel(const unsigned int newLevelID);
 
 
 private:
@@ -51,7 +54,6 @@ private:
 	S2D::Vector2        mGridOffsetFromTopLeft;
 
 	unsigned int	    mRemainingDots;
-	unsigned int		mStartingDots;
 
 	unsigned int		mCurrentLevelID;
 	unsigned int        mCurrentScore;

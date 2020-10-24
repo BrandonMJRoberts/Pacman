@@ -8,8 +8,9 @@ GameManager* GameManager::mInstance = nullptr;
 GameManager::GameManager()
 {
 	mCurrentLevelID				   = 0;
+
 	mRemainingDots				   = 0;
-	mStartingDots				   = 0;
+
 	mPlayerIsPoweredUp             = false;
 	mCurrentScore                  = 0;
 	mTimeRemainingInPoweredUpState = 0.0f;
@@ -44,14 +45,13 @@ GameManager* GameManager::Instance()
 void GameManager::SetDotCounts()
 {
 	mRemainingDots = 0;
-	mStartingDots  = 0;
 }
 
 // ---------------------------------------------------------------- //
 
 void GameManager::RestartLevel()
 {
-	mRemainingDots = mStartingDots;
+	
 }
 
 // ---------------------------------------------------------------- //
@@ -81,6 +81,19 @@ void GameManager::Update(const float deltaTime)
 	{
 		SetPlayerPoweredUp(false);
 	}
+
+	// If no dots remain then the player has completed the level and we need to move onto the next level
+	if (mRemainingDots == 0)
+	{
+		LoadLevel(GetCurrentLevel() + 1);
+	}
+}
+
+// ---------------------------------------------------------------- //
+
+void GameManager::LoadLevel(const unsigned int newLevelID)
+{
+	mCurrentLevelID = newLevelID;
 }
 
 // ---------------------------------------------------------------- //

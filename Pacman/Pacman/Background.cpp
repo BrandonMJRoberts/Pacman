@@ -149,6 +149,7 @@ void Background::ChangeColourIndex(unsigned int newIndex)
 	if (!mTileSpriteSheet)
 	{
 		std::cout << "Failed to load in the sprite sheet for the background sprites" << std::endl;
+		return;
 	}
 }
 
@@ -222,6 +223,13 @@ void Background::LoadInBackgroundSpriteMap()
 
 void Background::Update()
 {
+	if (mColourIndex != GameManager::Instance()->GetCurrentLevel())
+	{
+		mColourIndex = GameManager::Instance()->GetCurrentLevel();
+		ChangeColourIndex(mColourIndex);
+	}
+
+	/*
 	// Check if the player selects to change the colour of the background (just for testing purpouses)
 	if(S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::I) && !mButtonCurrentlyPressed)
 	{
@@ -239,7 +247,7 @@ void Background::Update()
 	{
 		mButtonCurrentlyPressed = false;
 	}
-
+	*/
 }
 
 // ----------------------------------------------------------- //

@@ -130,7 +130,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 
 	case FACING_DIRECTION::DOWN:
 		// Convert the projected position of pacman into a grid position - now with the projection in his direction
-		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight / 4.0f));
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 3.0f));
 
 		// If we are free to move in this direction then move in the direction
 		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
@@ -146,7 +146,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 
 	case FACING_DIRECTION::UP:
 		// Convert the projected position of pacman into a grid position
-		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * (mSingleSpriteHeight / 4.0f)));
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
 
 		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
 		{
@@ -162,7 +162,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	case FACING_DIRECTION::LEFT:
 
 		// Convert the projected position of pacman into a grid position
-		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth / 4.0f), 0.0f));
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * mSingleSpriteWidth * 0.4f, 0.0f)); //(mSingleSpriteWidth / 2.0f), 0.0f));
 
 		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
 		{
@@ -178,7 +178,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	case FACING_DIRECTION::RIGHT:
 
 		// Convert the projected position of pacman into a grid position
-		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth / 4.0f, 0.0f));
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f ,0.0f));//mSingleSpriteWidth / 2.0f, 0.0f));
 
 		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
 		{
@@ -225,7 +225,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::DOWN:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight / 2.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 2.0f));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 3;
 		break;
@@ -233,7 +233,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::UP:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * (mSingleSpriteHeight / 2.0f)));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 2;
 
@@ -242,7 +242,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::LEFT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth / 2.0f), 0.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.4f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight;
 		break;
@@ -250,7 +250,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::RIGHT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth / 2.0f, 0.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
 
 			yPosOfSpriteSheet = 0.0f;
 

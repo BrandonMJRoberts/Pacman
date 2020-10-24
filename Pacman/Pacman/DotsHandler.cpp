@@ -133,6 +133,8 @@ void DotsHandler::LoadInDotData()
 			continue;
 	}
 
+	GameManager::Instance()->SetCurrentDotCount(mDots.size());
+
 	delete[] charLine;
 }
 
@@ -140,6 +142,14 @@ void DotsHandler::LoadInDotData()
 
 void DotsHandler::Update(S2D::Vector2 pacmanCentrePosition, const unsigned int pacmanDimensions)
 {
+	if (mDots.size() == 0)
+	{
+		// Reset the dots in the level
+		LoadInDotData();
+
+		return;
+	}
+
 	// Loop through all positions and check if pacman has come into contact with them - only one can be in contact with 
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
@@ -163,6 +173,8 @@ void DotsHandler::Update(S2D::Vector2 pacmanCentrePosition, const unsigned int p
 				mDots[mDots.size() - 1] = mDots[i];
 				mDots[i] = placeholder;
 				mDots.pop_back();
+
+				GameManager::Instance()->DecreaseRemainingDots(1);
 
 				return;
 			}
