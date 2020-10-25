@@ -31,13 +31,13 @@ private:
 
 // ------------------------------------------------------------------------- //
 
-class DotsHandler
+class DotsHandler final
 {
 public:
 	DotsHandler();
 	~DotsHandler();
 
-	void Update(S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
+	bool Update(S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
 	void Render(unsigned int currentFrameCount);
 
 private:

@@ -6,7 +6,7 @@
 
 // ------------------------------------------------------------------------- //
 
-class StartMenu
+class StartMenu final
 {
 public:
 	StartMenu();

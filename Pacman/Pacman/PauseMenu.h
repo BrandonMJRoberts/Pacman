@@ -3,7 +3,7 @@
 
 #include "S2D/S2D.h"
 
-class PauseMenu
+class PauseMenu final
 {
 public:
 	PauseMenu();

@@ -5,7 +5,7 @@
 
 #include "Commons.h"
 
-class PacmanCharacter
+class PacmanCharacter final
 {
 public:
 	PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth = 3, unsigned int spritesOnHeight = 4);
@@ -14,11 +14,12 @@ public:
 	void             Render(unsigned int currentFrameCount);
 	void             Update(const float deltaTime);
 
-	//S2D::Vector2     GetTopLeftPosition()     { return mRenderPosition; }
 	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
 
 	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
 	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
+
+	void             ResetPosition()          { mCentrePosition = mStartPosition; mCurrentFacingDirection = FACING_DIRECTION::RIGHT; }
 
 private:
 	void             HandleInput();
@@ -34,6 +35,8 @@ private:
 
 	S2D::Vector2     mRenderPosition;
 	S2D::Vector2     mCentrePosition;
+
+	S2D::Vector2     mStartPosition;
 
 	S2D::Texture2D*  mPacmanTexture;
 	S2D::Rect*       mPacmanSourceRect; // Required for the sprite batch rendering

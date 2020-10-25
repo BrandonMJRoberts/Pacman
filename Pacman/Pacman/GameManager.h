@@ -4,7 +4,7 @@
 #include "S2D/S2D.h"
 #include "Commons.h"
 
-class GameManager
+class GameManager final
 {
 public:
 	~GameManager();

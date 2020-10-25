@@ -25,8 +25,10 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidt
 	mSingleSpriteWidth  = mPacmanTexture->GetWidth()  / spritesOnWidth;
 	mSingleSpriteHeight = mPacmanTexture->GetHeight() / spritesOnHeight;
 
-	// Set the centre position
-	mCentrePosition                    = S2D::Vector2(24.0f, 24.0f);
+	// Set the starting position
+	mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
+	ResetPosition();
+
 	mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
 
 	// Setup the rendering rectangle
@@ -225,7 +227,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::DOWN:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 2.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));// mSingleSpriteHeight / 2.0f));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 3;
 		break;
@@ -233,7 +235,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::UP:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 2;
 
@@ -242,7 +244,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::LEFT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.4f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.5f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight;
 		break;
@@ -250,7 +252,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::RIGHT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
+			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.5f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
 
 			yPosOfSpriteSheet = 0.0f;
 

@@ -3,7 +3,7 @@
 
 #include "S2D/S2D.h"
 
-class Background
+class Background final
 {
 public:
 	Background() = delete;

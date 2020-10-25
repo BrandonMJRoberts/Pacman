@@ -3,7 +3,7 @@
 
 #include "S2D/S2D.h"
 
-class HighScoresMenu
+class HighScoresMenu final
 {
 public:
 	HighScoresMenu();

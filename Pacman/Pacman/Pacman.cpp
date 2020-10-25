@@ -187,7 +187,12 @@ void Pacman::InGameUpdate(const float deltaTime)
 
 		mBackground->Update();
 
-		mDotHandler->Update(mPlayer->GetCentrePosition(), 9);
+		if (mDotHandler->Update(mPlayer->GetCentrePosition(), 9))
+		{
+			mPlayer->ResetPosition();
+
+			return;
+		}
 
 		GameManager::Instance()->Update(deltaTime);
 

@@ -92,6 +92,7 @@
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanCharacter.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
+    <ClCompile Include="Pickups.cpp" />
     <ClCompile Include="StartMenu.cpp" />
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
@@ -105,6 +106,7 @@
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="PacmanCharacter.h" />
     <ClInclude Include="PauseMenu.h" />
+    <ClInclude Include="Pickups.h" />
     <ClInclude Include="StartMenu.h" />
     <ClInclude Include="UIManager.h" />
   </ItemGroup>
