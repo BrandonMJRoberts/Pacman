@@ -30,6 +30,8 @@ Pacman::~Pacman()
 	delete mPauseMenu;
 	delete mStartMenu;
 	delete mHighScoreMenu;
+
+	delete mCollectable;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -52,6 +54,8 @@ void Pacman::LoadContent()
 	mInStartMenu     = true;
 	mInHighscoreMenu = false;
 	mInMainGame      = false;
+
+	mTimeTillNextCollectableSpawn = 10.0f;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -83,13 +87,19 @@ void Pacman::Draw(int elapsedTime)
 		if (mInMainGame)
 		{
 			// Draw the background first
-			mBackground->Render();
+			if(mBackground)
+				mBackground->Render();
 
 			// Render the dots onto the screen
-			mDotHandler->Render(_frameCount);
+			if(mDotHandler)
+				mDotHandler->Render(_frameCount);
 
 			// Render the player
-			mPlayer->Render(_frameCount);
+			if(mPlayer)
+				mPlayer->Render(_frameCount);
+
+			if (mCollectable)
+				mCollectable->Render();
 		}
 		else
 		{
@@ -182,11 +192,24 @@ void Pacman::InGameUpdate(const float deltaTime)
 {
 	if (mInMainGame)
 	{
+		mTimeTillNextCollectableSpawn -= deltaTime;
+
+		if (mTimeTillNextCollectableSpawn <= 0.0f && mCollectable == nullptr)
+		{
+			// Spawn the collectable
+			SpawnNextCollectable();
+
+			// Reset the time to a random amount
+			mTimeTillNextCollectableSpawn = (rand() % 40) + 15;
+		}
+
 		//mDotHandler->Update(new S2D::Vector2(mPlayer->GetPosition()), 2 * SPRITE_RESOLUTION);
 		mPlayer->Update(deltaTime);
 
+		// Update the background to see if it should change colour
 		mBackground->Update();
 
+		// Update the dots in the level
 		if (mDotHandler->Update(mPlayer->GetCentrePosition(), 9))
 		{
 			mPlayer->ResetPosition();
@@ -194,7 +217,18 @@ void Pacman::InGameUpdate(const float deltaTime)
 			return;
 		}
 
+		// Update the game manager
 		GameManager::Instance()->Update(deltaTime);
+
+		if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8))
+		{
+			// Add the relevent score
+			GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
+
+			// Delete this collectable
+			delete mCollectable;
+			mCollectable = nullptr;
+		}
 
 		// Check if the player has paused the game
 		if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
@@ -215,6 +249,14 @@ void Pacman::InGameUpdate(const float deltaTime)
 			return;
 		}
 	}
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+void Pacman::SpawnNextCollectable()
+{
+	// Spawn in a new random collectable
+	mCollectable = new PickUps((PICKUP_TYPES) (rand() % 8));
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

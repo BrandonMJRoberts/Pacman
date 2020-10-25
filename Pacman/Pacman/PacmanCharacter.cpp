@@ -9,9 +9,6 @@
 
 PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
 {
-	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
-	mRequestedFacingDirection = FACING_DIRECTION::NONE;
-
 	// Load in the texture
 	mPacmanTexture            = new S2D::Texture2D();
 	mPacmanTexture->Load("Textures/Pacman/PacmanAnimations.png", false);
@@ -28,6 +25,9 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidt
 	// Set the starting position
 	mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
 	ResetPosition();
+
+	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
+	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
 	mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
 
@@ -229,7 +229,7 @@ void PacmanCharacter::CheckForDirectionChange()
 			// Calculate the correctly projected direction
 			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));// mSingleSpriteHeight / 2.0f));
 
-			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 3;
+			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 3);
 		break;
 
 		case FACING_DIRECTION::UP:
@@ -237,7 +237,7 @@ void PacmanCharacter::CheckForDirectionChange()
 			// Calculate the correctly projected direction
 			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
 
-			yPosOfSpriteSheet = (float)mSingleSpriteHeight * 2;
+			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 2);
 
 		break;
 
@@ -331,7 +331,7 @@ S2D::Vector2 PacmanCharacter::ConvertPositionToGridPosition(S2D::Vector2 positio
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, int width, int height)
+void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height)
 {
 	delete mPacmanSourceRect;
 	mPacmanSourceRect = new S2D::Rect(x, y, width, height);

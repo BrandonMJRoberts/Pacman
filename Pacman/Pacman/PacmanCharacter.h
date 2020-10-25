@@ -19,7 +19,7 @@ public:
 	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
 	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
 
-	void             ResetPosition()          { mCentrePosition = mStartPosition; mCurrentFacingDirection = FACING_DIRECTION::RIGHT; }
+	void             ResetPosition()          { mCentrePosition = mStartPosition; mCurrentFacingDirection = FACING_DIRECTION::RIGHT; mRequestedFacingDirection = FACING_DIRECTION::RIGHT; }
 
 private:
 	void             HandleInput();
@@ -27,7 +27,7 @@ private:
 	void             MoveInCurrentDirection(const float deltaTime);
 	void             CheckForDirectionChange();
 
-	void             ReSetupPacmanSourceRect(float x, float y, int width, int height);
+	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);
 
 	S2D::Vector2     ConvertPositionToGridPosition(S2D::Vector2 position);
 

@@ -22,6 +22,8 @@ using namespace S2D;
 #include "StartMenu.h"
 #include "HighScoresMenu.h"
 
+#include "Pickups.h"
+
 // Declares the Pacman class which inherits from the Game class.
 // This allows us to overload the Game class methods to help us
 // load content, draw and update our game.
@@ -49,7 +51,10 @@ private:
 	void             HighScoreMenuUpdate();
 	void             InGameUpdate(const float deltaTime);
 
+	void             SpawnNextCollectable();
+
 	PacmanCharacter* mPlayer;
+	PickUps*         mCollectable;
 
 	PauseMenu*       mPauseMenu;
 	StartMenu*       mStartMenu;
@@ -57,6 +62,8 @@ private:
 
 	// Data to represent Munchie
 	int              _frameCount;
+
+	float            mTimeTillNextCollectableSpawn;
 
 	Background*     mBackground;
 	DotsHandler*    mDotHandler;
