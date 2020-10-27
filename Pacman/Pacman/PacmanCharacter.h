@@ -8,10 +8,10 @@
 class PacmanCharacter final
 {
 public:
-	PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth = 3, unsigned int spritesOnHeight = 4);
+	PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth = 3, const unsigned int spritesOnHeight = 4);
 	~PacmanCharacter();
 
-	void             Render(unsigned int currentFrameCount);
+	void             Render(const unsigned int currentFrameCount);
 	void             Update(const float deltaTime);
 
 	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
@@ -19,7 +19,9 @@ public:
 	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
 	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
 
-	void             ResetPosition()          { mCentrePosition = mStartPosition; mCurrentFacingDirection = FACING_DIRECTION::RIGHT; mRequestedFacingDirection = FACING_DIRECTION::RIGHT; }
+	FACING_DIRECTION GetFacingDirection()     { return mCurrentFacingDirection; }
+
+	void             ResetCharacter();
 
 private:
 	void             HandleInput();

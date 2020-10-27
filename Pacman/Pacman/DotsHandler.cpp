@@ -59,25 +59,17 @@ DotsHandler::~DotsHandler()
 
 void DotsHandler::Render(unsigned int currentFrameCount)
 {
-	// Setup the flashing animations
-	/*
-	if (currentFrameCount > 30)
-	{
-
-	}
-	else
-	{
-
-	}
-	*/
-
 	// Loop through all dots and render them in the correct position using the correct sprite sheet
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
+		S2D::Vector2* position = new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition());
+
 		if (mDots[i]->GetDotType() == DOT_TYPE::SMALL)
-			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectSmallDot);
+			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, position, mSourceRectSmallDot);
 		else
-			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectLargeDot);
+			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, position, mSourceRectLargeDot);
+
+		delete position;
 	}
 }
 
@@ -140,7 +132,7 @@ void DotsHandler::LoadInDotData()
 
 // ----------------------------------------------------------------- //
 
-bool DotsHandler::Update(S2D::Vector2 pacmanCentrePosition, const unsigned int pacmanDimensions)
+bool DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned int pacmanDimensions)
 {
 	if (mDots.size() == 0)
 	{
@@ -161,11 +153,11 @@ bool DotsHandler::Update(S2D::Vector2 pacmanCentrePosition, const unsigned int p
 				// Add score to the player's score based on the type of dot it is
 				if (mDots[i]->GetDotType() == DOT_TYPE::SMALL)
 				{
-					GameManager::Instance()->AddToScore(100);
+					GameManager::Instance()->AddToScore(10);
 				}
 				else
 				{
-					GameManager::Instance()->AddToScore(300);
+					GameManager::Instance()->AddToScore(50);
 					GameManager::Instance()->SetPlayerPoweredUp(true);
 				}
 

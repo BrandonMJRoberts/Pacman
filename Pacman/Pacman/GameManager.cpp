@@ -9,6 +9,8 @@ GameManager::GameManager()
 {
 	mCurrentLevelID				   = 0;
 
+	mExtraLifeCount                = 2;
+
 	mRemainingDots				   = 0;
 
 	mPlayerIsPoweredUp             = false;
@@ -51,7 +53,7 @@ void GameManager::SetDotCounts()
 
 void GameManager::RestartLevel()
 {
-	
+	mExtraLifeCount = 2;
 }
 
 // ---------------------------------------------------------------- //
@@ -94,6 +96,38 @@ void GameManager::Update(const float deltaTime)
 void GameManager::LoadLevel(const unsigned int newLevelID)
 {
 	mCurrentLevelID = newLevelID;
+}
+
+// ---------------------------------------------------------------- //
+
+void GameManager::IncrementPlayerCharacter()
+{
+	switch (mPlayerCharacterType)
+	{
+	case PLAYER_CHARACTER_TYPE::PACMAN:
+		mPlayerCharacterType = PLAYER_CHARACTER_TYPE::BLUE_GHOST;
+	break;
+
+	case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+		mPlayerCharacterType = PLAYER_CHARACTER_TYPE::ORANGE_GHOST;
+	break;
+
+	case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
+		mPlayerCharacterType = PLAYER_CHARACTER_TYPE::RED_GHOST;
+	break;
+
+	case PLAYER_CHARACTER_TYPE::RED_GHOST:
+		mPlayerCharacterType = PLAYER_CHARACTER_TYPE::PINK_GHOST;
+	break;
+
+	case PLAYER_CHARACTER_TYPE::PINK_GHOST:
+		mPlayerCharacterType = PLAYER_CHARACTER_TYPE::PACMAN;
+	break;
+
+	default:
+	break;
+
+	}
 }
 
 // ---------------------------------------------------------------- //

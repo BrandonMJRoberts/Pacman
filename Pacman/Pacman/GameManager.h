@@ -40,6 +40,9 @@ public:
 
 	PLAYER_CHARACTER_TYPE GetPlayerCurrentCharacter()         { return mPlayerCharacterType; }
 	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
+	void                  IncrementPlayerCharacter();
+
+	unsigned int GetExtraLivesCount()                         { return mExtraLifeCount; }
 
 	void                  RestartLevel();
 	void                  LoadLevel(const unsigned int newLevelID);
@@ -57,6 +60,8 @@ private:
 
 	unsigned int		mCurrentLevelID;
 	unsigned int        mCurrentScore;
+
+	unsigned int        mExtraLifeCount;
 
 	float               mTimeRemainingInPoweredUpState;
 

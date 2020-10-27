@@ -11,7 +11,7 @@
 
 // ----------------------------------------------------------- //
 
-Background::Background(unsigned int backgroundColourIndex, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
+Background::Background(const unsigned int spritesOnWidth, const unsigned int spritesOnHeight)
 {
 	mSpriteSheetDestRenderRect          = new S2D::Rect(0, 0, 0, 0);
 	mSpriteSheetSourceRenderRect        = new S2D::Rect(0, 0, 0, 0);
@@ -22,8 +22,7 @@ Background::Background(unsigned int backgroundColourIndex, unsigned int spritesO
 	mButtonCurrentlyPressed              = false;
 
 	// First setup the background sprites sheet
-	mColourIndex = backgroundColourIndex;
-	ChangeColourIndex(mColourIndex);
+	ChangeColourIndex(0);
 
 	LoadInBackgroundSpriteMap();
 	LoadInCollisionMap();
@@ -139,7 +138,7 @@ void Background::LoadInCollisionMap()
 
 // ----------------------------------------------------------- //
 
-void Background::ChangeColourIndex(unsigned int newIndex)
+void Background::ChangeColourIndex(const unsigned int newIndex)
 {
 	delete mTileSpriteSheet;
 
@@ -228,26 +227,6 @@ void Background::Update()
 		mColourIndex = GameManager::Instance()->GetCurrentLevel();
 		ChangeColourIndex(mColourIndex);
 	}
-
-	/*
-	// Check if the player selects to change the colour of the background (just for testing purpouses)
-	if(S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::I) && !mButtonCurrentlyPressed)
-	{
-		mButtonCurrentlyPressed = true;
-
-		if (mColourIndex >= 2)
-			mColourIndex = 0;
-		else
-			mColourIndex++;
-
-		ChangeColourIndex(mColourIndex);
-	}
-
-	if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::I))
-	{
-		mButtonCurrentlyPressed = false;
-	}
-	*/
 }
 
 // ----------------------------------------------------------- //

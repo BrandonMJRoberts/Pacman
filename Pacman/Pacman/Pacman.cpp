@@ -2,6 +2,8 @@
 #include "GameManager.h"
 #include "Constants.h"
 
+#include "UIManager.h"
+
 #include <sstream>
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -25,7 +27,6 @@ Pacman::~Pacman()
 	delete mBackground;
 	delete mPlayer;
 	delete mDotHandler;
-	delete _stringPosition;
 
 	delete mPauseMenu;
 	delete mStartMenu;
@@ -38,10 +39,7 @@ Pacman::~Pacman()
 
 void Pacman::LoadContent()
 {
-	// Set string position
-	_stringPosition  = new Vector2(10.0f, 25.0f);
-
-	mBackground      = new Background(2);
+	mBackground      = new Background(14, 3);
 
 	mPlayer          = new PacmanCharacter(mBackground->GetCollisionMap());
 	mDotHandler      = new DotsHandler();
@@ -64,42 +62,30 @@ void Pacman::Update(int elapsedTime)
 {
 	float deltaTime = ((float)elapsedTime / 1000.0f);
 
-	StartMenuUpdate(deltaTime);
-	HighScoreMenuUpdate();
-	PauseMenuUpdate(deltaTime);
+	if (mInStartMenu)
+		StartMenuUpdate(deltaTime);
 
-	InGameUpdate(deltaTime);
+	if (mInHighscoreMenu)
+		HighScoreMenuUpdate();
 
+	if(GameManager::Instance()->GetGameIsPaused())
+		PauseMenuUpdate(deltaTime);
+
+	if(mInMainGame)
+		InGameUpdate(deltaTime);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
 
 void Pacman::Draw(int elapsedTime)
 {
-	// Allows us to easily create a string
-	//std::stringstream stream;
-	//stream << "Pacman X: " << mPlayer->GetPosition()->X << " Y: " << mPlayer->GetPosition()->Y;
-
 	// Starts Drawing
 	SpriteBatch::BeginDraw();
 
 		// Make sure we are rendering the correct content
 		if (mInMainGame)
 		{
-			// Draw the background first
-			if(mBackground)
-				mBackground->Render();
-
-			// Render the dots onto the screen
-			if(mDotHandler)
-				mDotHandler->Render(_frameCount);
-
-			// Render the player
-			if(mPlayer)
-				mPlayer->Render(_frameCount);
-
-			if (mCollectable)
-				mCollectable->Render();
+			MainGameRender();
 		}
 		else
 		{
@@ -130,33 +116,30 @@ void Pacman::Draw(int elapsedTime)
 
 void Pacman::StartMenuUpdate(const float deltaTime)
 {
-	if (mInStartMenu)
-	{
-		mInMainGame = false;
+	mInMainGame = false;
 
-		SELECTION_OPTIONS returnOption = mStartMenu->Update(deltaTime);
-		if (returnOption == SELECTION_OPTIONS::START_GAME)
-		{
-			mInMainGame = true;
-			mInStartMenu = false;
-			mInHighscoreMenu = false;
-		}
-		else if (returnOption == SELECTION_OPTIONS::HIGHSCORES)
-		{
-			// Selected to go into the highscores menu
-			mInMainGame = false;
-			mInStartMenu = false;
-			mInHighscoreMenu = true;
-		}
-		else if (returnOption == SELECTION_OPTIONS::CHANGE_PLAYER)
-		{
-			GameManager::Instance()->SetPlayerCharacter(PLAYER_CHARACTER_TYPE::BLUE_GHOST);
-			mInMainGame = false;
-		}
-		else if (returnOption == SELECTION_OPTIONS::QUIT)
-		{
-			std::cout << "Quitting the program." << std::endl;
-		}
+	SELECTION_OPTIONS returnOption = mStartMenu->Update(deltaTime);
+	if (returnOption == SELECTION_OPTIONS::START_GAME)
+	{
+		mInMainGame      = true;
+		mInStartMenu     = false;
+		mInHighscoreMenu = false;
+	}
+	else if (returnOption == SELECTION_OPTIONS::HIGHSCORES)
+	{
+		// Selected to go into the highscores menu
+		mInMainGame      = false;
+		mInStartMenu     = false;
+		mInHighscoreMenu = true;
+	}
+	else if (returnOption == SELECTION_OPTIONS::CHANGE_PLAYER)
+	{
+		GameManager::Instance()->IncrementPlayerCharacter();
+		mInMainGame = false;
+	}
+	else if (returnOption == SELECTION_OPTIONS::QUIT)
+	{
+		std::cout << "Quitting the program." << std::endl;
 	}
 }
 
@@ -164,7 +147,7 @@ void Pacman::StartMenuUpdate(const float deltaTime)
 
 void Pacman::PauseMenuUpdate(const float deltaTime)
 {
-	if (GameManager::Instance()->GetGameIsPaused() && mPauseMenu)
+	if (mPauseMenu)
 	{
 		mInMainGame = mPauseMenu->Update(deltaTime);
 	}
@@ -174,15 +157,12 @@ void Pacman::PauseMenuUpdate(const float deltaTime)
 
 void Pacman::HighScoreMenuUpdate()
 {
-	if (mInHighscoreMenu)
-	{
-		mInMainGame = false;
+	mInMainGame = false;
 
-		if (!mHighScoreMenu->Update())
-		{
-			mInHighscoreMenu = false;
-			mInStartMenu = true;
-		}
+	if (!mHighScoreMenu->Update())
+	{
+		mInHighscoreMenu = false;
+		mInStartMenu = true;
 	}
 }
 
@@ -190,65 +170,93 @@ void Pacman::HighScoreMenuUpdate()
 
 void Pacman::InGameUpdate(const float deltaTime)
 {
-	if (mInMainGame)
+	// Collectable update
+	mTimeTillNextCollectableSpawn -= deltaTime;
+
+	if (mTimeTillNextCollectableSpawn <= 0.0f && mCollectable == nullptr)
 	{
-		mTimeTillNextCollectableSpawn -= deltaTime;
+		// Spawn the collectable
+		SpawnNextCollectable();
 
-		if (mTimeTillNextCollectableSpawn <= 0.0f && mCollectable == nullptr)
-		{
-			// Spawn the collectable
-			SpawnNextCollectable();
-
-			// Reset the time to a random amount
-			mTimeTillNextCollectableSpawn = (rand() % 40) + 15;
-		}
-
-		//mDotHandler->Update(new S2D::Vector2(mPlayer->GetPosition()), 2 * SPRITE_RESOLUTION);
-		mPlayer->Update(deltaTime);
-
-		// Update the background to see if it should change colour
-		mBackground->Update();
-
-		// Update the dots in the level
-		if (mDotHandler->Update(mPlayer->GetCentrePosition(), 9))
-		{
-			mPlayer->ResetPosition();
-
-			return;
-		}
-
-		// Update the game manager
-		GameManager::Instance()->Update(deltaTime);
-
-		if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8))
-		{
-			// Add the relevent score
-			GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
-
-			// Delete this collectable
-			delete mCollectable;
-			mCollectable = nullptr;
-		}
-
-		// Check if the player has paused the game
-		if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
-		{
-			GameManager::Instance()->SetGameIsPaused(true);
-			GameManager::Instance()->SetIsPausedButtonPressed(true);
-			return;
-		}
-		else if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::P))
-		{
-			GameManager::Instance()->SetIsPausedButtonPressed(false);
-		}
-
-		// If we want to return back to the start menu then the player must press escape
-		if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::ESCAPE))
-		{
-			mInStartMenu = true;
-			return;
-		}
+		// Reset the time to a random amount
+		mTimeTillNextCollectableSpawn = float((rand() % 40) + 15);
 	}
+
+	// Player update
+	mPlayer->Update(deltaTime);
+
+	// Background Update
+	mBackground->Update();
+
+	// Update the dots in the level
+	if (mDotHandler->Update(mPlayer->GetCentrePosition(), 9))
+	{
+		mPlayer->ResetCharacter();
+		return;
+	}
+
+	// Update the game manager
+	GameManager::Instance()->Update(deltaTime);
+
+	// Collectable collision
+	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8, mPlayer->GetFacingDirection()))
+	{
+		// Add the relevent score
+		GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
+
+		// Delete this collectable
+		delete mCollectable;
+		mCollectable = nullptr;
+	}
+
+	// Input
+	InGameInputCheck();
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+void Pacman::InGameInputCheck()
+{
+	// Check if the player has paused the game
+	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
+	{
+		GameManager::Instance()->SetGameIsPaused(true);
+		GameManager::Instance()->SetIsPausedButtonPressed(true);
+		return;
+	}
+	else if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::P))
+	{
+		GameManager::Instance()->SetIsPausedButtonPressed(false);
+	}
+
+	// If we want to return back to the start menu then the player must press escape
+	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::ESCAPE))
+	{
+		mInStartMenu = true;
+		return;
+	}
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+void Pacman::MainGameRender()
+{
+	// Draw the background first
+	if (mBackground)
+		mBackground->Render();
+
+	// Render the dots onto the screen
+	if (mDotHandler)
+		mDotHandler->Render(_frameCount);
+
+	if (mCollectable)
+		mCollectable->Render();
+
+	// Render the player
+	if (mPlayer)
+		mPlayer->Render(_frameCount);
+
+	UIManager::GetInstance()->Render();
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

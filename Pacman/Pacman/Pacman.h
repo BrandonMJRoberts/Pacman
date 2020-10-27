@@ -50,7 +50,10 @@ private:
 	void             PauseMenuUpdate(const float deltaTime);
 	void             HighScoreMenuUpdate();
 	void             InGameUpdate(const float deltaTime);
-
+	void             InGameInputCheck();
+	
+	void             MainGameRender();
+	
 	void             SpawnNextCollectable();
 
 	PacmanCharacter* mPlayer;
@@ -60,18 +63,15 @@ private:
 	StartMenu*       mStartMenu;
 	HighScoresMenu*  mHighScoreMenu;
 
+	Background*      mBackground;
+	DotsHandler*     mDotHandler;
+
 	// Data to represent Munchie
 	int              _frameCount;
 
 	float            mTimeTillNextCollectableSpawn;
-
-	Background*     mBackground;
-	DotsHandler*    mDotHandler;
-
-	// Position for String
-	Vector2*       _stringPosition;
 	
-	bool           mInStartMenu;
-	bool           mInHighscoreMenu;
-	bool           mInMainGame;
+	bool             mInStartMenu;
+	bool             mInHighscoreMenu;
+	bool             mInMainGame;
 };

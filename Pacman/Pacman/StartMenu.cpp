@@ -83,7 +83,7 @@ StartMenu::~StartMenu()
 
 // -------------------------------------------------------- //
 
-void StartMenu::Render(unsigned int frameCount)
+void StartMenu::Render(const unsigned int frameCount)
 {
 	if(mBackgroundSprite && mBackgroundRenderRect)
 		S2D::SpriteBatch::Draw(mBackgroundSprite, mBackgroundRenderRect);
@@ -146,10 +146,10 @@ SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
 	// Check for any relevent button inputs
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
-	HandleDownPress(keyboardState);
-	HandleUpPress(keyboardState);
+	HandleDownPress(*keyboardState);
+	HandleUpPress(*keyboardState);
 
-	SELECTION_OPTIONS buttonPress = HandleReturnPress(keyboardState);
+	SELECTION_OPTIONS buttonPress = HandleReturnPress(*keyboardState);
 	if (buttonPress != SELECTION_OPTIONS::NONE)
 		return buttonPress;
 
@@ -172,9 +172,9 @@ SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
 
 // -------------------------------------------------------- //
 
-void StartMenu::HandleDownPress(S2D::Input::KeyboardState* keyboardState)
+void StartMenu::HandleDownPress(S2D::Input::KeyboardState& keyboardState)
 {
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::DOWN) && !mButtonCurrentlyPressed)
+	if (keyboardState.IsKeyDown(S2D::Input::Keys::DOWN) && !mButtonCurrentlyPressed)
 	{
 		switch (mCurrentlySelectedOption)
 		{
@@ -212,9 +212,9 @@ void StartMenu::HandleDownPress(S2D::Input::KeyboardState* keyboardState)
 
 // -------------------------------------------------------- //
 
-void StartMenu::HandleUpPress(S2D::Input::KeyboardState* keyboardState)
+void StartMenu::HandleUpPress(S2D::Input::KeyboardState& keyboardState)
 {
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::UP) && !mButtonCurrentlyPressed)
+	if (keyboardState.IsKeyDown(S2D::Input::Keys::UP) && !mButtonCurrentlyPressed)
 	{
 		switch (mCurrentlySelectedOption)
 		{
@@ -252,9 +252,9 @@ void StartMenu::HandleUpPress(S2D::Input::KeyboardState* keyboardState)
 
 // -------------------------------------------------------- //
 
-SELECTION_OPTIONS StartMenu::HandleReturnPress(S2D::Input::KeyboardState* keyboardState)
+SELECTION_OPTIONS StartMenu::HandleReturnPress(S2D::Input::KeyboardState& keyboardState)
 {
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::RETURN) && !mButtonCurrentlyPressed)
+	if (keyboardState.IsKeyDown(S2D::Input::Keys::RETURN) && !mButtonCurrentlyPressed)
 	{
 		// Return the currently selected option
 		mButtonCurrentlyPressed = true;

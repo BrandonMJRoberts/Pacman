@@ -37,8 +37,8 @@ public:
 	DotsHandler();
 	~DotsHandler();
 
-	bool Update(S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
-	void Render(unsigned int currentFrameCount);
+	bool Update(const S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
+	void Render(const unsigned int currentFrameCount);
 
 private:
 	void LoadInDotData();

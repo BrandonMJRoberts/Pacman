@@ -12,13 +12,13 @@ public:
 	StartMenu();
 	~StartMenu();
 
-	void              Render(unsigned int frameCount);
+	void              Render(const unsigned int frameCount);
 	SELECTION_OPTIONS Update(const float deltaTime);
 
 private:
-	void              HandleDownPress(S2D::Input::KeyboardState* keyboardState);
-	void              HandleUpPress(S2D::Input::KeyboardState* keyboardState);
-	SELECTION_OPTIONS HandleReturnPress(S2D::Input::KeyboardState* keyboardState);
+	void              HandleDownPress  (S2D::Input::KeyboardState& keyboardState);
+	void              HandleUpPress    (S2D::Input::KeyboardState& keyboardState);
+	SELECTION_OPTIONS HandleReturnPress(S2D::Input::KeyboardState& keyboardState);
 
 	S2D::Texture2D*   mBackgroundSprite;
 	S2D::Rect*        mBackgroundRenderRect;

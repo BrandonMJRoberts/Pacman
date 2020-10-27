@@ -7,10 +7,10 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidth, unsigned int spritesOnHeight)
+PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight)
 {
 	// Load in the texture
-	mPacmanTexture            = new S2D::Texture2D();
+	mPacmanTexture                     = new S2D::Texture2D();
 	mPacmanTexture->Load("Textures/Pacman/PacmanAnimations.png", false);
 	if (!mPacmanTexture)
 	{
@@ -19,30 +19,27 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, unsigned int spritesOnWidt
 	}
 
 	// Set the width and height variables
-	mSingleSpriteWidth  = mPacmanTexture->GetWidth()  / spritesOnWidth;
-	mSingleSpriteHeight = mPacmanTexture->GetHeight() / spritesOnHeight;
+	mSingleSpriteWidth                 = mPacmanTexture->GetWidth()  / spritesOnWidth;
+	mSingleSpriteHeight                = mPacmanTexture->GetHeight() / spritesOnHeight;
 
 	// Set the starting position
 	mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
-	ResetPosition();
+	ResetCharacter();
 
-	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
-	mRequestedFacingDirection = FACING_DIRECTION::NONE;
+	mCurrentFacingDirection            = FACING_DIRECTION::NONE;
+	mRequestedFacingDirection          = FACING_DIRECTION::NONE;
 
 	mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
 
 	// Setup the rendering rectangle
-	mPacmanSourceRect      = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
+	mPacmanSourceRect                  = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
 	if (!mPacmanSourceRect)
 	{
 		std::cout << "Failed to setup the pacman render rectangle." << std::endl;
 		return;
 	}
 
-	if (collisionMap)
-	{
-		mCollisionMap    = collisionMap;
-	}
+	mCollisionMap = collisionMap;
 }
 
 // ------------------------------------------------------------- //
@@ -82,10 +79,14 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 		// Calculate the render position
 		mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
 
-		// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
-		S2D::SpriteBatch::Draw(mPacmanTexture,
-			                   new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mRenderPosition),
-			                   mPacmanSourceRect); // Draws Pacman
+		S2D::Vector2* position = new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mRenderPosition);
+
+			// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
+			S2D::SpriteBatch::Draw(mPacmanTexture,
+								   position,
+								   mPacmanSourceRect); // Draws Pacman
+
+		delete position;
 	}
 }
 
@@ -338,3 +339,12 @@ void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, unsigned int wid
 }
 
 // ------------------------------------------------------------- //
+
+void PacmanCharacter::ResetCharacter()
+{
+	mCentrePosition           = mStartPosition; 
+	mCurrentFacingDirection   = FACING_DIRECTION::RIGHT; 
+	mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+
+	ReSetupPacmanSourceRect(0, 0, mSingleSpriteWidth, mSingleSpriteHeight);
+}

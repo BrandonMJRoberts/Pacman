@@ -10,11 +10,13 @@ class PickUps final
 {
 public:
 	PickUps();
-	PickUps(PICKUP_TYPES type = PICKUP_TYPES::APPLE, S2D::Vector2 spawnPosition = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION));
+	PickUps(const PICKUP_TYPES type = PICKUP_TYPES::APPLE, const S2D::Vector2 spawnPosition = S2D::Vector2(14 * SPRITE_RESOLUTION, 17.5 * SPRITE_RESOLUTION));
 	~PickUps();
 
 	void Render();
-	bool CheckForCollision(const S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
+	void Render(const S2D::Vector2 positionToRender);
+
+	bool CheckForCollision(const S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions, const FACING_DIRECTION pacmanFacingDirection);
 
 	PICKUP_TYPES GetType() { return mThisPickupType; }
 
@@ -31,6 +33,9 @@ private:
 
 	S2D::Texture2D* mSpriteSheet;
 	S2D::Rect*      mSourceRect;
+
+	bool            mCollidedWith;
+	bool            mCollidedFromLeft;
 };
 
 #endif // !_PICKUPS_H_

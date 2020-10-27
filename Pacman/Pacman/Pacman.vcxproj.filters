@@ -54,10 +54,10 @@
     <ClCompile Include="StartMenu.cpp">
       <Filter>Source Files\Game Components</Filter>
     </ClCompile>
-    <ClCompile Include="HighScoresMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Pickups.cpp">
+      <Filter>Source Files\Game Components</Filter>
+    </ClCompile>
+    <ClCompile Include="HighScoresMenu.cpp">
       <Filter>Source Files\Game Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,10 +92,10 @@
     <ClInclude Include="StartMenu.h">
       <Filter>Header Files\Game Components</Filter>
     </ClInclude>
-    <ClInclude Include="HighScoresMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Pickups.h">
+      <Filter>Header Files\Game Components</Filter>
+    </ClInclude>
+    <ClInclude Include="HighScoresMenu.h">
       <Filter>Header Files\Game Components</Filter>
     </ClInclude>
   </ItemGroup>

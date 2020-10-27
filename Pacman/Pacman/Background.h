@@ -7,21 +7,21 @@ class Background final
 {
 public:
 	Background() = delete;
-	Background(unsigned int backgroundColourIndex = 0, unsigned int spritesOnWidth = 14, unsigned int spritesOnHeight = 3);
+	Background(const unsigned int spritesOnWidth = 14, const unsigned int spritesOnHeight = 3);
 	~Background();
 
-	void Render();
-	void Update();
+	void			Render();
+	void		    Update();
 
-	char**       GetCollisionMap()    { return mCollisionMap; }
-	unsigned int GetCollisionWidth()  { return mWidth;  }
-	unsigned int GetCollisionHeight() { return mHeight; }
+	char**          GetCollisionMap()    { return mCollisionMap; }
+	unsigned int    GetCollisionWidth()  { return mWidth;  }
+	unsigned int    GetCollisionHeight() { return mHeight; }
 
-	void         ChangeColourIndex(unsigned int newIndex);
+	void            ChangeColourIndex(const unsigned int newIndex);
 
 private:
-	void         LoadInCollisionMap();
-	void         LoadInBackgroundSpriteMap();
+	void            LoadInCollisionMap();
+	void            LoadInBackgroundSpriteMap();
 
 	char**          mCollisionMap;
 	unsigned int**  mBackgroundSpriteMap;
