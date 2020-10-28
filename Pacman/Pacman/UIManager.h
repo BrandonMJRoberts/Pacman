@@ -11,12 +11,14 @@ public:
 	static UIManager* GetInstance();
 	void Render();
 
+	void AddCollectedPickup(PICKUP_TYPES typeToAdd);
+
 private:
 	UIManager();
 
 	static UIManager* mInstance;
 
-	std::vector<PickUps>   mCollectedPickups;
+	std::vector<PickUps*>  mCollectedPickups;
 	S2D::Vector2		   mCollectedPickUpsPosition;
 
 	S2D::Vector2	       mExtraLivesStartTopRightPos;

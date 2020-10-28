@@ -79,14 +79,10 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 		// Calculate the render position
 		mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
 
-		S2D::Vector2* position = new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mRenderPosition);
-
 			// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
-			S2D::SpriteBatch::Draw(mPacmanTexture,
-								   position,
-								   mPacmanSourceRect); // Draws Pacman
-
-		delete position;
+		S2D::SpriteBatch::Draw(mPacmanTexture,
+							   &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+							   mPacmanSourceRect); // Draws Pacman
 	}
 }
 

@@ -32,8 +32,8 @@ UIManager::UIManager()
 		std::cout << "Failed to load in the font sprite sheet for the UI manager." << std::endl;
 
 	// Set the display positions
-	mCollectedPickUpsPosition    = S2D::Vector2();
-	mExtraLivesStartTopRightPos  = S2D::Vector2(125, 600);
+	mCollectedPickUpsPosition    = S2D::Vector2(400, 600);
+	mExtraLivesStartTopRightPos  = S2D::Vector2(150, 604);
 	mHighScoreDisplayPosition    = S2D::Vector2();
 	mCurrentScoreDisplayPosition = S2D::Vector2();
 
@@ -59,6 +59,13 @@ UIManager::~UIManager()
 
 	delete mInstance;
 	mInstance = nullptr;
+
+	for(unsigned int i = 0; i < mCollectedPickups.size(); i++)
+	{
+		delete mCollectedPickups[i];
+	}
+
+	mCollectedPickups.clear();
 }
 
 // ---------------------------------------------------------------- //
@@ -75,19 +82,18 @@ void UIManager::Render()
 	// Now render the extra lives icons
 	for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
 	{
-		S2D::Vector2* position = new S2D::Vector2(mExtraLivesStartTopRightPos - S2D::Vector2(35.0f * lifeID, 0.0f));
+		//S2D::Vector2* position = new S2D::Vector2(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f));
 
 		S2D::SpriteBatch::Draw(mExtraLivesSpriteSheet, 
-							   position,
+							   &(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f)),
 			                   mExtraLifeRenderRect);
-
-		delete position;
 	}
 
-	// Now render the collected fruit icons
-	for (unsigned int i = 0; i < mCollectedPickups.size(); i++)
+	unsigned int startPoint = mCollectedPickups.size() < 7 ? 0: mCollectedPickups.size() - 7;
+
+	for (unsigned int i = startPoint; i < mCollectedPickups.size(); i++)
 	{
-		mCollectedPickups[i].Render(mCollectedPickUpsPosition - S2D::Vector2(50, 0.0f));
+		mCollectedPickups[i]->Render(mCollectedPickUpsPosition - S2D::Vector2(float(30 * (i - startPoint)), 0.0f));
 	}
 }
 
@@ -99,6 +105,13 @@ UIManager* UIManager::GetInstance()
 		mInstance = new UIManager;
 
 	return mInstance;
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::AddCollectedPickup(PICKUP_TYPES typeToAdd)
+{
+	mCollectedPickups.push_back(new PickUps(typeToAdd));
 }
 
 // ---------------------------------------------------------------- //

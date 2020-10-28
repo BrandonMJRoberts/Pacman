@@ -25,6 +25,30 @@
     <Filter Include="Source Files\Game Components">
       <UniqueIdentifier>{5c4c0ddb-60ad-4ba3-898c-76c4c54f9699}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game Components\Menus">
+      <UniqueIdentifier>{1af387c5-866e-4976-857f-620c60ae0c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Components\Menus">
+      <UniqueIdentifier>{2546dd75-5333-4d93-b823-c9c6abacd05e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Components\Collectables">
+      <UniqueIdentifier>{5e3940c0-3bed-46ae-b5c4-750d237aabab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game Components\Collectables">
+      <UniqueIdentifier>{25eb2431-4572-49ba-a036-0ce761b59ab4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game Components\Characters">
+      <UniqueIdentifier>{ae7b4774-885e-42c6-8d23-1c11135540cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Components\Characters">
+      <UniqueIdentifier>{eff0b017-1c23-490d-bfba-0dba655f3555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Components\Visuals">
+      <UniqueIdentifier>{13b83bc5-92a7-4fb4-bcaf-0b393d1c76d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game Components\Visuals">
+      <UniqueIdentifier>{c0f1c422-d14e-475a-9f6e-fd0046abc978}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pacman.cpp">
@@ -39,26 +63,29 @@
     <ClCompile Include="UIManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="PacmanCharacter.cpp">
-      <Filter>Source Files\Game Components</Filter>
+    <ClCompile Include="HighScoresMenu.cpp">
+      <Filter>Source Files\Game Components\Menus</Filter>
     </ClCompile>
     <ClCompile Include="PauseMenu.cpp">
-      <Filter>Source Files\Game Components</Filter>
-    </ClCompile>
-    <ClCompile Include="DotsHandler.cpp">
-      <Filter>Source Files\Game Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Background.cpp">
-      <Filter>Source Files\Game Components</Filter>
+      <Filter>Source Files\Game Components\Menus</Filter>
     </ClCompile>
     <ClCompile Include="StartMenu.cpp">
-      <Filter>Source Files\Game Components</Filter>
+      <Filter>Source Files\Game Components\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="DotsHandler.cpp">
+      <Filter>Source Files\Game Components\Collectables</Filter>
     </ClCompile>
     <ClCompile Include="Pickups.cpp">
-      <Filter>Source Files\Game Components</Filter>
+      <Filter>Source Files\Game Components\Collectables</Filter>
     </ClCompile>
-    <ClCompile Include="HighScoresMenu.cpp">
-      <Filter>Source Files\Game Components</Filter>
+    <ClCompile Include="PacmanCharacter.cpp">
+      <Filter>Source Files\Game Components\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="Background.cpp">
+      <Filter>Source Files\Game Components\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderer.cpp">
+      <Filter>Source Files\Game Components\Visuals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,26 +104,29 @@
     <ClInclude Include="UIManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Background.h">
-      <Filter>Header Files\Game Components</Filter>
-    </ClInclude>
-    <ClInclude Include="DotsHandler.h">
-      <Filter>Header Files\Game Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PacmanCharacter.h">
-      <Filter>Header Files\Game Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PauseMenu.h">
-      <Filter>Header Files\Game Components</Filter>
+    <ClInclude Include="HighScoresMenu.h">
+      <Filter>Header Files\Game Components\Menus</Filter>
     </ClInclude>
     <ClInclude Include="StartMenu.h">
-      <Filter>Header Files\Game Components</Filter>
+      <Filter>Header Files\Game Components\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseMenu.h">
+      <Filter>Header Files\Game Components\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="DotsHandler.h">
+      <Filter>Header Files\Game Components\Collectables</Filter>
     </ClInclude>
     <ClInclude Include="Pickups.h">
-      <Filter>Header Files\Game Components</Filter>
+      <Filter>Header Files\Game Components\Collectables</Filter>
     </ClInclude>
-    <ClInclude Include="HighScoresMenu.h">
-      <Filter>Header Files\Game Components</Filter>
+    <ClInclude Include="PacmanCharacter.h">
+      <Filter>Header Files\Game Components\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Header Files\Game Components\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderer.h">
+      <Filter>Header Files\Game Components\Visuals</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

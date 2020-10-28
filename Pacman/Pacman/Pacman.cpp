@@ -33,6 +33,7 @@ Pacman::~Pacman()
 	delete mHighScoreMenu;
 
 	delete mCollectable;
+	delete mTextRenderer;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -54,6 +55,8 @@ void Pacman::LoadContent()
 	mInMainGame      = false;
 
 	mTimeTillNextCollectableSpawn = 10.0f;
+
+	mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -170,16 +173,19 @@ void Pacman::HighScoreMenuUpdate()
 
 void Pacman::InGameUpdate(const float deltaTime)
 {
-	// Collectable update
-	mTimeTillNextCollectableSpawn -= deltaTime;
-
-	if (mTimeTillNextCollectableSpawn <= 0.0f && mCollectable == nullptr)
+	if (mCollectable == nullptr)
 	{
-		// Spawn the collectable
-		SpawnNextCollectable();
+		// Collectable update
+		mTimeTillNextCollectableSpawn -= deltaTime;
 
-		// Reset the time to a random amount
-		mTimeTillNextCollectableSpawn = float((rand() % 40) + 15);
+		if (mTimeTillNextCollectableSpawn <= 0.0f)
+		{
+			// Spawn the collectable
+			SpawnNextCollectable();
+
+			// Reset the time to a random amount
+			mTimeTillNextCollectableSpawn = 5; //= float((rand() % 40) + 15);
+		}
 	}
 
 	// Player update
@@ -257,6 +263,8 @@ void Pacman::MainGameRender()
 		mPlayer->Render(_frameCount);
 
 	UIManager::GetInstance()->Render();
+
+	RenderScores();
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -265,6 +273,20 @@ void Pacman::SpawnNextCollectable()
 {
 	// Spawn in a new random collectable
 	mCollectable = new PickUps((PICKUP_TYPES) (rand() % 8));
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+void Pacman::RenderScores()
+{
+	// First render the text at the top
+	mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2(HALF_SCREEN_WIDTH - 80, 20), 7);
+
+	// Now render the player's current score
+	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, S2D::Vector2(32, 50), 0);
+
+	// Now render the currently saved highscore
+	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, S2D::Vector2(HALF_SCREEN_WIDTH, 50), 0);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

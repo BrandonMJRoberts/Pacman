@@ -62,14 +62,10 @@ void DotsHandler::Render(unsigned int currentFrameCount)
 	// Loop through all dots and render them in the correct position using the correct sprite sheet
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
-		S2D::Vector2* position = new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition());
-
 		if (mDots[i]->GetDotType() == DOT_TYPE::SMALL)
-			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, position, mSourceRectSmallDot);
+			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectSmallDot);
 		else
-			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, position, mSourceRectLargeDot);
-
-		delete position;
+			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectLargeDot);
 	}
 }
 

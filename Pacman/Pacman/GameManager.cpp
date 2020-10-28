@@ -9,16 +9,20 @@ GameManager::GameManager()
 {
 	mCurrentLevelID				   = 0;
 
-	mExtraLifeCount                = 2;
-
 	mRemainingDots				   = 0;
 
+	mExtraLifeCount                = 2;
 	mPlayerIsPoweredUp             = false;
 	mCurrentScore                  = 0;
+	mCurrentHighScore              = 0;
+
 	mTimeRemainingInPoweredUpState = 0.0f;
+
 	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
+
 	mPlayerIsAlive                 = true;
 	mGameIsPaused				   = false;
+
 	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
 }
 
@@ -88,6 +92,25 @@ void GameManager::Update(const float deltaTime)
 	if (mRemainingDots == 0)
 	{
 		LoadLevel(GetCurrentLevel() + 1);
+	}
+
+	// Check if the current score has beaten the current highscore
+	if (mCurrentScore > mCurrentHighScore)
+		mCurrentHighScore = mCurrentScore;
+
+	// You get an extra life after collecting 10,000 points
+	if (mCurrentScore != 0)
+	{
+		if (mCurrentScore % POINTS_PER_EXTRA_LIFE == 0)
+		{
+			if (!mAllocatedExtraLife)
+			{
+				AddExtraLife();
+				mAllocatedExtraLife = true;
+			}
+		}
+		else
+			mAllocatedExtraLife = false;
 	}
 }
 

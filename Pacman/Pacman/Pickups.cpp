@@ -1,6 +1,7 @@
 #include "Pickups.h"
 
 #include "GameManager.h"
+#include "UIManager.h"
 
 #include <iostream>
 
@@ -54,7 +55,7 @@ void PickUps::Render()
 	{
 		S2D::Vector2 mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
 
-		S2D::SpriteBatch::Draw(mSpriteSheet, new S2D::Vector2(GameManager::Instance()->GetGridOffset() + mRenderPosition), mSourceRect);
+		S2D::SpriteBatch::Draw(mSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mRenderPosition), mSourceRect);
 	}
 }
 
@@ -64,7 +65,7 @@ void PickUps::Render(const S2D::Vector2 positionToRender)
 {
 	if (mSpriteSheet && mSourceRect)
 	{
-		S2D::SpriteBatch::Draw(mSpriteSheet, new S2D::Vector2(positionToRender), mSourceRect);
+		S2D::SpriteBatch::Draw(mSpriteSheet, &positionToRender, mSourceRect);
 	}
 }
 
@@ -152,6 +153,8 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const u
 				GameManager::Instance()->AddToScore(300);
 			break;
 			}
+
+			UIManager::GetInstance()->AddCollectedPickup(mThisPickupType);
 
 			// We have been passed over so return this to the higher function call
 			return true;

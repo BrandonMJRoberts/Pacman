@@ -24,6 +24,9 @@ public:
 	void                AddToScore(unsigned int addition)    { mCurrentScore += addition;  }
 	unsigned int        GetCurrentScore()			         { return mCurrentScore; }
 
+	unsigned int        SetCurrentHighScore(unsigned int score) { mCurrentHighScore = score; }
+	unsigned int        GetCurrentHighScore()                { return mCurrentHighScore; }
+
 	void                SetPlayerPoweredUp(bool playerState);
 	bool                GetIsPlayerPoweredUp()               { return mPlayerIsPoweredUp; }
 
@@ -42,7 +45,9 @@ public:
 	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
 	void                  IncrementPlayerCharacter();
 
-	unsigned int GetExtraLivesCount()                         { return mExtraLifeCount; }
+	unsigned int          GetExtraLivesCount()                         { return mExtraLifeCount; }
+	void                  AddExtraLife()                               { if(mExtraLifeCount < 5) mExtraLifeCount++; }
+	void                  RemoveLife()                                 { if (mExtraLifeCount > 0) mExtraLifeCount--; }
 
 	void                  RestartLevel();
 	void                  LoadLevel(const unsigned int newLevelID);
@@ -60,6 +65,7 @@ private:
 
 	unsigned int		mCurrentLevelID;
 	unsigned int        mCurrentScore;
+	unsigned int        mCurrentHighScore;
 
 	unsigned int        mExtraLifeCount;
 
@@ -72,6 +78,8 @@ private:
 
 	bool                mGameIsPaused;
 	bool                mSettingGamePausedState;
+
+	bool                mAllocatedExtraLife;
 };
 
 #endif // !_GAME_MANAGER_H_

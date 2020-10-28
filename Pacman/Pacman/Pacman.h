@@ -24,6 +24,8 @@ using namespace S2D;
 
 #include "Pickups.h"
 
+#include "TextRenderer.h"
+
 // Declares the Pacman class which inherits from the Game class.
 // This allows us to overload the Game class methods to help us
 // load content, draw and update our game.
@@ -53,6 +55,7 @@ private:
 	void             InGameInputCheck();
 	
 	void             MainGameRender();
+	void             RenderScores();
 	
 	void             SpawnNextCollectable();
 
@@ -65,6 +68,7 @@ private:
 
 	Background*      mBackground;
 	DotsHandler*     mDotHandler;
+	TextRenderer*    mTextRenderer;
 
 	// Data to represent Munchie
 	int              _frameCount;
