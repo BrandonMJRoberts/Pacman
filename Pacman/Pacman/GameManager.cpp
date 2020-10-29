@@ -78,6 +78,13 @@ void GameManager::SetPlayerPoweredUp(bool playerState)
 
 void GameManager::Update(const float deltaTime)
 {
+	// If no dots remain then the player has completed the level and we need to move onto the next level
+	if (mRemainingDots == 0)
+	{
+		LoadLevel(GetCurrentLevel() + 1);
+		return;
+	}
+
 	if (mTimeRemainingInPoweredUpState > 0)
 	{
 		mTimeRemainingInPoweredUpState -= deltaTime;
@@ -86,12 +93,6 @@ void GameManager::Update(const float deltaTime)
 	if (mTimeRemainingInPoweredUpState <= 0 && mPlayerIsPoweredUp)
 	{
 		SetPlayerPoweredUp(false);
-	}
-
-	// If no dots remain then the player has completed the level and we need to move onto the next level
-	if (mRemainingDots == 0)
-	{
-		LoadLevel(GetCurrentLevel() + 1);
 	}
 
 	// Check if the current score has beaten the current highscore

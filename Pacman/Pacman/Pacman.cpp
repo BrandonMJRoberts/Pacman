@@ -280,13 +280,13 @@ void Pacman::SpawnNextCollectable()
 void Pacman::RenderScores()
 {
 	// First render the text at the top
-	mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2(HALF_SCREEN_WIDTH - 80, 20), 7);
+	mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2((QUATER_SCREEN_WIDTH * 3) - 48, 50), 7);
 
 	// Now render the player's current score
-	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, S2D::Vector2(32, 50), 0);
+	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, S2D::Vector2(96, 80), 0);
 
 	// Now render the currently saved highscore
-	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, S2D::Vector2(HALF_SCREEN_WIDTH, 50), 0);
+	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, S2D::Vector2(HALF_SCREEN_WIDTH, 80), 0);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

@@ -41,32 +41,33 @@ TextRenderer::TextRenderer(std::string filePath, const unsigned int spritesOnWid
 
 // ------------------------------------------------------------------------------------------------------------------------------------------ //
 
-void TextRenderer::Render(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topLeftPos, unsigned int colourIndex)
+void TextRenderer::Render(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex)
 {
-	mDestRect->X = topLeftPos.X;
-	mDestRect->Y = topLeftPos.Y;
+	mDestRect->X = topRightPos.X;
+	mDestRect->Y = topRightPos.Y;
 
 	// Make sure that the colour of the text is a valid index
 	colourIndex %= 7;
 
 	// Loop through all of the text we need to render
-	for (unsigned int charID = 0; charID < textToRender.size(); charID++)
+	for (int charID = textToRender.size() - 1; charID >= 0; charID--)
 	{
-		if (charID % amountOfCharactersPerLine == 0 && charID != 0)
+		if ((textToRender.size() - charID) % amountOfCharactersPerLine == 0 && charID != textToRender.size() - 1)
 		{
+			// Reset to the starting render position
 			mDestRect->Y += mSingleSpriteHeight;
-			mDestRect->X  = topLeftPos.X;
+			mDestRect->X  = topRightPos.X;
 		}
 
 		// Now calculate the source render rect based on the current character
-		mSourceRect->X =    float( (mConversionMap[textToRender[charID]] % mSpritesOnWidth)  * mSingleSpriteWidth);
+		mSourceRect->X =    float(     (mConversionMap[textToRender[charID]] % mSpritesOnWidth)  * mSingleSpriteWidth);
 		mSourceRect->Y =    float(((int(mConversionMap[textToRender[charID]] / mSpritesOnWidth)) * mSingleSpriteHeight) + (colourIndex * (3 * mSingleSpriteHeight)));
 
 		// Now do the draw call
 		S2D::SpriteBatch::Draw(mSpriteSheet, mDestRect, mSourceRect);
 
 		// Increment the render position
-		mDestRect->X += mSingleSpriteWidth;
+		mDestRect->X -= mSingleSpriteWidth;
 	}
 }
 
