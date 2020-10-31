@@ -40,7 +40,7 @@ Pacman::~Pacman()
 
 void Pacman::LoadContent()
 {
-	mBackground      = new Background(14, 3);
+	mBackground      = new Background(14, 4);
 
 	mPlayer          = new PacmanCharacter(mBackground->GetCollisionMap());
 	mDotHandler      = new DotsHandler();

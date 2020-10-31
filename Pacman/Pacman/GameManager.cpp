@@ -131,7 +131,7 @@ void GameManager::Update(const float deltaTime)
 
 void GameManager::LoadLevel(const unsigned int newLevelID)
 {
-	mCurrentLevelID = newLevelID;
+	mCurrentLevelID = newLevelID % AMOUNT_OF_LEVELS;
 
 	// Re-allocate a ramdom collectable type for this level
 	mThisLevelCollectableSpawnType = (PICKUP_TYPES)(rand() % 8);
