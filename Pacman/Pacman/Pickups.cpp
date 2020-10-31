@@ -154,7 +154,7 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const u
 			break;
 			}
 
-			UIManager::GetInstance()->AddCollectedPickup(mThisPickupType);
+			// UIManager::GetInstance()->AddCollectedPickup(mThisPickupType);
 
 			// We have been passed over so return this to the higher function call
 			return true;

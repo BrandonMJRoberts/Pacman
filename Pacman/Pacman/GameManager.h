@@ -49,10 +49,12 @@ public:
 	void                  AddExtraLife()                               { if(mExtraLifeCount < 5) mExtraLifeCount++; }
 	void                  RemoveLife()                                 { if (mExtraLifeCount > 0) mExtraLifeCount--; }
 
+	PICKUP_TYPES          GetThisLevelCollectableType()                { return mThisLevelCollectableSpawnType; }
+
 	void                  RestartLevel();
 	void                  LoadLevel(const unsigned int newLevelID);
 
-
+	void                  SaveOutScoreToLeaderboard();
 private:
 	GameManager();
 	void                SetDotCounts();
@@ -72,6 +74,8 @@ private:
 	float               mTimeRemainingInPoweredUpState;
 
 	PLAYER_CHARACTER_TYPE   mPlayerCharacterType;
+
+	PICKUP_TYPES        mThisLevelCollectableSpawnType;
 
 	bool                mPlayerIsPoweredUp;
 	bool			    mPlayerIsAlive;

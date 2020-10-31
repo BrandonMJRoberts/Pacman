@@ -13,7 +13,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	_frameCount = 0;
 
 	//Initialise important Game aspects
-	Graphics::Initialise(argc, argv, this, SCREEN_WIDTH, SCREEN_HEIGHT, false, 25, 25, "Pacman", 60);
+	Graphics::Initialise(argc, argv, this, SCREEN_WIDTH, SCREEN_HEIGHT, false, 25, 25, "Pacman", FRAME_RATE);
 	Input::Initialise();
 
 	// Start the Game Loop - This calls Update and Draw in game loop
@@ -109,7 +109,7 @@ void Pacman::Draw(int elapsedTime)
 		// Increment the frame count
 		_frameCount++;
 
-		if (_frameCount >= 60)
+		if (_frameCount >= FRAME_RATE)
 			_frameCount = 0;
 
 	SpriteBatch::EndDraw(); // Ends Drawing
@@ -272,7 +272,7 @@ void Pacman::MainGameRender()
 void Pacman::SpawnNextCollectable()
 {
 	// Spawn in a new random collectable
-	mCollectable = new PickUps((PICKUP_TYPES) (rand() % 8));
+	mCollectable = new PickUps(GameManager::Instance()->GetThisLevelCollectableType());
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

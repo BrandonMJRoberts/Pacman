@@ -74,7 +74,7 @@ private:
 	int              _frameCount;
 
 	float            mTimeTillNextCollectableSpawn;
-	
+
 	bool             mInStartMenu;
 	bool             mInHighscoreMenu;
 	bool             mInMainGame;

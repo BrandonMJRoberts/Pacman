@@ -1,5 +1,14 @@
 #include "GameManager.h"
 #include "Constants.h"
+#include "Commons.h"
+#include "HighScoresMenu.h"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+#include "UIManager.h"
 
 GameManager* GameManager::mInstance = nullptr;
 
@@ -24,6 +33,9 @@ GameManager::GameManager()
 	mGameIsPaused				   = false;
 
 	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
+
+	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
+	UIManager::GetInstance()->AddCollectedPickup(mThisLevelCollectableSpawnType);
 }
 
 // ---------------------------------------------------------------- //
@@ -120,6 +132,11 @@ void GameManager::Update(const float deltaTime)
 void GameManager::LoadLevel(const unsigned int newLevelID)
 {
 	mCurrentLevelID = newLevelID;
+
+	// Re-allocate a ramdom collectable type for this level
+	mThisLevelCollectableSpawnType = (PICKUP_TYPES)(rand() % 8);
+
+	UIManager::GetInstance()->AddCollectedPickup(mThisLevelCollectableSpawnType);
 }
 
 // ---------------------------------------------------------------- //
@@ -152,6 +169,72 @@ void GameManager::IncrementPlayerCharacter()
 	break;
 
 	}
+}
+
+// ---------------------------------------------------------------- //
+
+void GameManager::SaveOutScoreToLeaderboard()
+{
+	// First load in all of the scores currently saved out
+	ifstream readFile("Save Data/HighScores.txt");
+
+	if (!readFile.is_open())
+	{
+		std::cout << "Failed to open the highscores data file for saving out score!" << std::endl;
+		return;
+	}
+
+	char*                     cLine = new char[100];
+	std::vector<ScoreData>    scoreData;
+	unsigned int              colourIndex, score;
+	std::string               sLine, name;
+	std::stringstream         ssLine;
+
+	while (readFile.getline(cLine, 100))
+	{
+		sLine  = cLine;
+		ssLine = std::stringstream(sLine);
+
+		ssLine >> name >> score >> colourIndex;
+		scoreData.push_back(ScoreData(score, name, colourIndex));
+	}
+	readFile.close();
+
+	bool addedToList = false;
+
+	// Now add the score into where it should go
+	for (unsigned int i = 0; i < scoreData.size(); i++)
+	{
+		if (scoreData[i].GetScore() < mCurrentScore)
+		{
+			scoreData.insert(scoreData.begin() + i, ScoreData(mCurrentScore, "Test", 0));
+			addedToList = true;
+			break;
+		}
+	}
+
+	if(!addedToList && scoreData.size() < 10)
+		scoreData.push_back(ScoreData(mCurrentScore, "Test", 0));
+
+	// Cap scores count to 10
+	while (scoreData.size() > 10)
+		scoreData.pop_back();
+
+	// Save out the scores to the file
+	ofstream writeFile("Save Data/HighScores.txt");
+
+	if (!writeFile.is_open())
+	{
+		std::cout << "Failed to write to the highscores file" << std::endl;
+		return;
+	}
+
+	for (unsigned int i = 0; i < scoreData.size(); i++)
+		writeFile << scoreData[i].GetName() << " " << scoreData[i].GetScore() << " " << scoreData[i].GetColourIndex() << "\n";
+
+	writeFile.close();
+
+	delete[] cLine;
 }
 
 // ---------------------------------------------------------------- //

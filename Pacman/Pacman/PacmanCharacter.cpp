@@ -40,6 +40,8 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int sprites
 	}
 
 	mCollisionMap = collisionMap;
+
+	mCurrentFrame = 0;
 }
 
 // ------------------------------------------------------------- //
@@ -59,27 +61,20 @@ PacmanCharacter::~PacmanCharacter()
 
 void PacmanCharacter::Render(unsigned int currentFrameCount)
 {
-	unsigned int progressThroughAnimation = currentFrameCount % 12;
+	if ((currentFrameCount % 6) == 1)
+		mCurrentFrame++;
 
-	if (progressThroughAnimation <= 3)
-	{
-		mPacmanSourceRect->X = 0;
-	}
-	else if (progressThroughAnimation <= 7)
-	{
-		mPacmanSourceRect->X = (float)mSingleSpriteWidth;
-	}
-	else
-	{
-		mPacmanSourceRect->X = (float)mSingleSpriteWidth * 2;
-	}
+	if (mCurrentFrame > 2)
+		mCurrentFrame = 0;
 
 	if (mPacmanSourceRect && mPacmanTexture)
 	{
 		// Calculate the render position
 		mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
 
-			// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
+		mPacmanSourceRect->X = (float)mSingleSpriteWidth * mCurrentFrame;
+
+		// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
 		S2D::SpriteBatch::Draw(mPacmanTexture,
 							   &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
 							   mPacmanSourceRect); // Draws Pacman
