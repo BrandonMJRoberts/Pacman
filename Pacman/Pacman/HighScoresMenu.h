@@ -43,6 +43,12 @@ private:
 	TextRenderer*        mTextRenderer;
 	vector<ScoreData>    mScores;
 
+	S2D::Vector2         mHighScoresTextRenderPosition;
+	S2D::Vector2         mScoresRenderOffset;
+	S2D::Vector2         mNamesRenderOffset;
+
+	float                mGapBetweenScores;
+
 };
 
 

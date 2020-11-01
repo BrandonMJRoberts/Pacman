@@ -41,7 +41,7 @@ public:
 	bool                GetIsAlreadySettingGamePaused()       { return mSettingGamePausedState; }
 	void                SetIsPausedButtonPressed(bool newVal) { mSettingGamePausedState = newVal; }
 
-	PLAYER_CHARACTER_TYPE GetPlayerCurrentCharacter()         { return mPlayerCharacterType; }
+	PLAYER_CHARACTER_TYPE GetPlayerCharacterType()                          { return mPlayerCharacterType; }
 	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
 	void                  IncrementPlayerCharacter();
 

@@ -7,136 +7,100 @@
 
 // -------------------------------------------------------- //
 
-StartMenu::StartMenu()
+StartMenu::StartMenu() : mMaxSelectorSpriteFrames(2), mAmountOfRenderedFramesPerAnimationFrame(10), mAmountOfSpitesOnSelectorHeight(5), mAmountOfSpitesOnSelectorWidth(2)
 {
-	mBackgroundSprite = new S2D::Texture2D();
-	mBackgroundSprite->Load("Textures/Backgrounds/StartBackground.png", false);
-	if (!mBackgroundSprite)
-	{
-		std::cout << "Failed to load the background sprite for the main menu." << std::endl;
-		return;
-	}
+	// Setup the text renderer
+	mTextRenderer        = new TextRenderer("Textures/UI/Font.png", 15, 21);
 
-	mBackgroundRenderRect = new S2D::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	mSelectorSprite = new S2D::Texture2D();
-	mSelectorSprite->Load("Textures/SelectorSprite.png", false);
-	if (!mSelectorSprite)
+	// Load in the selector sprite sheet
+	mSelectorSpriteSheet = new S2D::Texture2D();
+	mSelectorSpriteSheet->Load("Textures/SelectorSprite.png", false);
+	if (!mSelectorSpriteSheet)
 	{
 		std::cout << "Failed to load the selector sprite for the main menu." << std::endl;
 		return;
 	}
 
-	mAmountOfSpitesOnSelectorWidth  = 2;
-	mAmountOfSpitesOnSelectorHeight = 5;
+	mSingleSpriteWidth              = float(mSelectorSpriteSheet->GetWidth() / mAmountOfSpitesOnSelectorWidth);
+	mSingleSpriteHeight             = float(mSelectorSpriteSheet->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 
-	mSelectorRenderRect             = new S2D::Rect(0, 
-		                                            0, 
-		                                            mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth, 
-		                                            mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+	mSelectorSourceRenderRect       = new S2D::Rect(0, 0, (unsigned int)mSingleSpriteWidth, (unsigned int)mSingleSpriteHeight - 1);
+	mSelectorSpriteCurrentFrame     = 0;
+
+	mStartGamePosition              = S2D::Vector2(350, 250);
+	mHighScoresPosition             = S2D::Vector2(350, 300);
+	mChangeCharacterPosition        = S2D::Vector2(350, 350);
+	mExitGamePosition               = S2D::Vector2(350, 400);
+
+	mSelectorPosition               = S2D::Vector2(50, mStartGamePosition.Y - (mSingleSpriteHeight / 2));
 
 	mCurrentlySelectedOption        = SELECTION_OPTIONS::START_GAME;
 	mButtonCurrentlyPressed         = false;
-
-	// Initialse the positions for the text to be rendered in the start menu
-	mStartOptionPosition            = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 40);
-	mHighScoresOptionPosition       = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 80);
-	mChangeCharacterOptionPosition  = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 120);
-	mQuitOptionPosition			    = new S2D::Vector2     (HALF_SCREEN_WIDTH, HALF_SCREEN_HEIGHT        + 160);
-	mStartMenuLabelPosition		    = new S2D::Vector2     (HALF_SCREEN_WIDTH - 60, QUATER_SCREEN_HEIGHT);
-
-	mSelectorPosition               = new S2D::Vector2(mStartOptionPosition->X - (2 * (mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth)),
-		                                               mStartOptionPosition->Y -      (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight));
 }
 
 // -------------------------------------------------------- //
 
 StartMenu::~StartMenu()
 {
-	delete mBackgroundSprite;
-		mBackgroundSprite = nullptr;
+	delete mTextRenderer;
+	mTextRenderer = nullptr;
 
-	delete mSelectorSprite;
-		mSelectorSprite = nullptr;
+	delete mSelectorSpriteSheet;
+	mSelectorSpriteSheet = nullptr;
 
-	delete mBackgroundRenderRect;
-		mBackgroundRenderRect = nullptr;
+	delete mSelectorSourceRenderRect;
+	mSelectorSourceRenderRect = nullptr;
 
-	delete mSelectorRenderRect;
-		mSelectorRenderRect = nullptr;
-
-	delete mStartOptionPosition;
-		mStartOptionPosition = nullptr;
-
-	delete mHighScoresOptionPosition;
-		mHighScoresOptionPosition = nullptr;
-
-	delete mQuitOptionPosition;
-		mQuitOptionPosition = nullptr;
-
-	delete mChangeCharacterOptionPosition;
-		delete mChangeCharacterOptionPosition;
-
-	delete mStartMenuLabelPosition;
-		mStartMenuLabelPosition = nullptr;
 }
 
 // -------------------------------------------------------- //
 
 void StartMenu::Render(const unsigned int frameCount)
 {
-	if(mBackgroundSprite && mBackgroundRenderRect)
-		S2D::SpriteBatch::Draw(mBackgroundSprite, mBackgroundRenderRect);
-
-	if (mSelectorSprite && mSelectorPosition && mSelectorRenderRect)
+	if (mSelectorSpriteSheet)
 	{
 		// Handle which frame of animation the sprite is on
-		if (frameCount % 20 < 10)
-			mSelectorRenderRect->X = 0.0f;
-		else 
-			mSelectorRenderRect->X = float(mSelectorSprite->GetWidth() / mAmountOfSpitesOnSelectorWidth);
+		if (frameCount % mAmountOfRenderedFramesPerAnimationFrame == 0)
+		{
+			mSelectorSpriteCurrentFrame++;
+		}
+
+		if (mSelectorSpriteCurrentFrame >= mMaxSelectorSpriteFrames)
+			mSelectorSpriteCurrentFrame = 0;
+
+		mSelectorSourceRenderRect->X = mSelectorSpriteCurrentFrame * mSingleSpriteWidth;
 
 		// Now handle which sprite representation should be shown
-		switch (GameManager::Instance()->GetPlayerCurrentCharacter())
+		switch (GameManager::Instance()->GetPlayerCharacterType())
 		{
-		case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
-			mSelectorRenderRect->Y = 2 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+		case PLAYER_CHARACTER_TYPE::RED_GHOST:
+			mSelectorSourceRenderRect->Y = 0.0f;
 		break;
 
-		case PLAYER_CHARACTER_TYPE::RED_GHOST:
-			mSelectorRenderRect->Y = 0.0f;
+		case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+			mSelectorSourceRenderRect->Y = 2 * mSingleSpriteHeight;
 		break;
 
 		case PLAYER_CHARACTER_TYPE::PINK_GHOST:
-			mSelectorRenderRect->Y = float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorSourceRenderRect->Y = mSingleSpriteHeight;
 		break;
 
 		case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
-			mSelectorRenderRect->Y = 3 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorSourceRenderRect->Y = 3 * mSingleSpriteHeight;
 		break;
 
 		case PLAYER_CHARACTER_TYPE::PACMAN:
-			mSelectorRenderRect->Y = 4 * float(mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorSourceRenderRect->Y = 4 * mSingleSpriteHeight;
 		break;
 		}
 
-		S2D::SpriteBatch::Draw(mSelectorSprite, mSelectorPosition, mSelectorRenderRect);
+		S2D::SpriteBatch::Draw(mSelectorSpriteSheet, &mSelectorPosition, mSelectorSourceRenderRect);
 	}
 
-	if(mStartOptionPosition)
-		S2D::SpriteBatch::DrawString("START GAME", mStartOptionPosition, S2D::Color::White);
-
-	if(mHighScoresOptionPosition)
-		S2D::SpriteBatch::DrawString("HIGH SCORES", mHighScoresOptionPosition, S2D::Color::White);
-
-	if(mChangeCharacterOptionPosition)
-		S2D::SpriteBatch::DrawString("CHANGE CHARACTER", mChangeCharacterOptionPosition, S2D::Color::White);
-
-	if(mQuitOptionPosition)
-		S2D::SpriteBatch::DrawString("QUIT", mQuitOptionPosition, S2D::Color::White);
-
-	if(mStartMenuLabelPosition)
-		S2D::SpriteBatch::DrawString("START MENU:", mStartMenuLabelPosition, S2D::Color::White);
+	mTextRenderer->Render("START GAME",       20, mStartGamePosition,       2);
+	mTextRenderer->Render("HIGHSCORES",       20, mHighScoresPosition,      2);
+	mTextRenderer->Render("CHANGE CHARACTER", 30, mChangeCharacterPosition, 2);
+	mTextRenderer->Render("EXIT GAME",        20, mExitGamePosition,        2);
 }
 
 // -------------------------------------------------------- //
@@ -181,25 +145,25 @@ void StartMenu::HandleDownPress(S2D::Input::KeyboardState& keyboardState)
 		case SELECTION_OPTIONS::START_GAME:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
 
-			mSelectorPosition->Y = mHighScoresOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mHighScoresPosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::HIGHSCORES:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::CHANGE_PLAYER;
 
-			mSelectorPosition->Y = mChangeCharacterOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mChangeCharacterPosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::CHANGE_PLAYER:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
 
-			mSelectorPosition->Y = mQuitOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mExitGamePosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::QUIT:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
 
-			mSelectorPosition->Y = mStartOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mStartGamePosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		default:
@@ -221,25 +185,25 @@ void StartMenu::HandleUpPress(S2D::Input::KeyboardState& keyboardState)
 		case SELECTION_OPTIONS::START_GAME:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::QUIT;
 
-			mSelectorPosition->Y = mQuitOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mExitGamePosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::HIGHSCORES:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::START_GAME;
 
-			mSelectorPosition->Y = mStartOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mStartGamePosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::CHANGE_PLAYER:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::HIGHSCORES;
 
-			mSelectorPosition->Y = mHighScoresOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mHighScoresPosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		case SELECTION_OPTIONS::QUIT:
 			mCurrentlySelectedOption = SELECTION_OPTIONS::CHANGE_PLAYER;
 
-			mSelectorPosition->Y = mChangeCharacterOptionPosition->Y - (mSelectorSprite->GetHeight() / mAmountOfSpitesOnSelectorHeight);
+			mSelectorPosition.Y = mChangeCharacterPosition.Y - (mSingleSpriteHeight / 2);
 		break;
 
 		default:

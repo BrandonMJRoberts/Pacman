@@ -13,6 +13,12 @@ HighScoresMenu::HighScoresMenu()
 	// Setup the text renderer
 	mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
 
+	mHighScoresTextRenderPosition = S2D::Vector2(330, 50);
+	mScoresRenderOffset           = S2D::Vector2(330, 100);
+	mNamesRenderOffset            = S2D::Vector2(180, 100);
+
+	mGapBetweenScores             = 50.0f;
+
 	// Load in the scores
 	LoadInScores();
 }
@@ -32,7 +38,7 @@ HighScoresMenu::~HighScoresMenu()
 void HighScoresMenu::Render()
 {
 	// First render the words 'HIGH SCORES:'
-	mTextRenderer->Render("HIGH SCORES", 15, S2D::Vector2(300,50), 0);
+	mTextRenderer->Render("HIGH SCORES", 15, mHighScoresTextRenderPosition, 0);
 
 	// Loop through all the scores and render them
 	for (unsigned int i = 0; i < 10; i++)
@@ -40,16 +46,16 @@ void HighScoresMenu::Render()
 		if (i < mScores.size())
 		{
 			// Render the name first, then the score
-			mTextRenderer->Render(mScores[i].GetName(), 10, S2D::Vector2(150, 100 + (i * 50)), mScores[i].GetColourIndex());
+			mTextRenderer->Render(mScores[i].GetName(), 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].GetColourIndex());
 
-			mTextRenderer->Render(to_string(mScores[i].GetScore()), 100, S2D::Vector2(300, 100 + (i * 50)), mScores[i].GetColourIndex());
+			mTextRenderer->Render(to_string(mScores[i].GetScore()), 100, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].GetColourIndex());
 		}
 		else
 		{
 			// Render a preset for filler space
-			mTextRenderer->Render("FILLER", 10, S2D::Vector2(150, 100 + (i * 50)), (i % 7));
+			mTextRenderer->Render("FILLER", 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 
-			mTextRenderer->Render("10", 100, S2D::Vector2(300, 100 + (i * 50)), (i % 7));
+			mTextRenderer->Render("10", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 		}
 	}
 }
