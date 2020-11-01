@@ -13,6 +13,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	_frameCount = 0;
 
 	//Initialise important Game aspects
+	S2D::Audio::Initialise();
 	Graphics::Initialise(argc, argv, this, SCREEN_WIDTH, SCREEN_HEIGHT, false, 25, 25, "Pacman", FRAME_RATE);
 	Input::Initialise();
 
@@ -34,6 +35,8 @@ Pacman::~Pacman()
 
 	delete mCollectable;
 	delete mTextRenderer;
+
+	Graphics::Destroy();
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -183,7 +186,7 @@ void Pacman::InGameUpdate(const float deltaTime)
 	mPlayer->Update(deltaTime);
 
 	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8, mPlayer->GetFacingDirection()))
+	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 13, mPlayer->GetFacingDirection()))
 	{
 		// Add the relevent score
 		GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
@@ -210,6 +213,7 @@ void Pacman::InGameUpdate(const float deltaTime)
 
 	// Update the game manager
 	GameManager::Instance()->Update(deltaTime);
+	UIManager::GetInstance()->Update(deltaTime);
 
 	// Input
 	InGameInputCheck();
@@ -247,6 +251,8 @@ void Pacman::MainGameRender()
 	if (mBackground)
 		mBackground->Render();
 
+	UIManager::GetInstance()->Render();
+
 	// Render the dots onto the screen
 	if (mDotHandler)
 		mDotHandler->Render(_frameCount);
@@ -257,10 +263,6 @@ void Pacman::MainGameRender()
 	// Render the player
 	if (mPlayer)
 		mPlayer->Render(_frameCount);
-
-	UIManager::GetInstance()->Render();
-
-	RenderScores();
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -270,20 +272,6 @@ void Pacman::SpawnNextCollectable()
 	// Spawn in a new random collectable
 	if(!mCollectable)
 		mCollectable = new PickUps(GameManager::Instance()->GetThisLevelCollectableType());
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::RenderScores()
-{
-	// First render the text at the top
-	mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2((QUATER_SCREEN_WIDTH * 3) - 48, 50), 7);
-
-	// Now render the player's current score
-	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, S2D::Vector2(96, 80), 0);
-
-	// Now render the currently saved highscore
-	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, S2D::Vector2(HALF_SCREEN_WIDTH, 80), 0);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

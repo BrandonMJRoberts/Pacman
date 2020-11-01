@@ -27,3 +27,5 @@
 #define FRAME_TIME (1.0f/FRAME_RATE)
 
 #define AMOUNT_OF_LEVELS 3
+
+#define TIME_POINTS_SHOW_FOR 4.0f

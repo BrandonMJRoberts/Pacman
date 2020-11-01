@@ -36,6 +36,7 @@ private:
 
 	bool            mCollidedWith;
 	bool            mCollidedFromLeft;
+	bool            mCollected;
 };
 
 #endif // !_PICKUPS_H_

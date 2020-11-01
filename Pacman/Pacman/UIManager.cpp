@@ -10,16 +10,14 @@ UIManager* UIManager::mInstance = nullptr;
 
 // ---------------------------------------------------------------- //
 
-UIManager::UIManager()
+UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOfSpritesOnPointsSpriteSheetWidth(4)
 {
 	// First load in the sprite sheets we need
 	mExtraLivesSpriteSheet       = new S2D::Texture2D();
 	mPointsSpriteSheet           = new S2D::Texture2D();
-	mCurrentScoreFontSpriteSheet = new S2D::Texture2D();
 
 	mExtraLivesSpriteSheet->Load("Textures/UI/LifeIcon.png", false);
 	mPointsSpriteSheet->Load("Textures/UI/PointsSpriteSheet.png", false);
-	mCurrentScoreFontSpriteSheet->Load("Textures/UI/ColouredFonts.png", false);
 
 	// Check that the sprite sheets have been loaded in correctly
 	if (!mExtraLivesSpriteSheet)
@@ -28,17 +26,23 @@ UIManager::UIManager()
 	if (!mPointsSpriteSheet)
 		std::cout << "Failed to load in the sprite sheet for the UI points." << std::endl;
 
-	if (!mCurrentScoreFontSpriteSheet)
-		std::cout << "Failed to load in the font sprite sheet for the UI manager." << std::endl;
-
 	// Set the display positions
-	mCollectedPickUpsPosition    = S2D::Vector2(400, 600);
-	mExtraLivesStartTopRightPos  = S2D::Vector2(150, 604);
-	mHighScoreDisplayPosition    = S2D::Vector2();
-	mCurrentScoreDisplayPosition = S2D::Vector2();
+	mCollectedPickUpsPosition      = S2D::Vector2(400, 600);
+	mExtraLivesStartTopRightPos    = S2D::Vector2(150, 604);
+	mHighScoreDisplayPosition      = S2D::Vector2(HALF_SCREEN_WIDTH, 80);
+	mCurrentScoreDisplayPosition   = S2D::Vector2(96, 80);
 
 	// Setup the extra life render rect
-	mExtraLifeRenderRect         = new S2D::Rect(0, 0, mExtraLivesSpriteSheet->GetWidth(), mExtraLivesSpriteSheet->GetHeight());
+	mExtraLifeRenderRect           = new S2D::Rect(0, 0, mExtraLivesSpriteSheet->GetWidth(), mExtraLivesSpriteSheet->GetHeight());
+
+	mPointsSingleSpriteWidth       = mPointsSpriteSheet->GetWidth() / mAmountOfSpritesOnPointsSpriteSheetWidth;
+	mPointsSingleSpriteHeight      = mPointsSpriteSheet->GetHeight() / mAmountOfSpritesOnPointsSpriteSheetHeight;
+	mPointsSourceRect              = new S2D::Rect(0, 0, mPointsSingleSpriteWidth, mPointsSingleSpriteHeight);
+
+	mTextRenderer                  = new TextRenderer("Textures/UI/Font.png", 15, 21);
+
+	mDisplayingPointsToScreen      = false;
+	mTimeRemainingForPointsDisplay = TIME_POINTS_SHOW_FOR;
 }
 
 // ---------------------------------------------------------------- //
@@ -46,19 +50,22 @@ UIManager::UIManager()
 UIManager::~UIManager()
 {
 	delete mExtraLivesSpriteSheet;
-	mExtraLivesSpriteSheet = nullptr;
+		mExtraLivesSpriteSheet = nullptr;
 
 	delete mPointsSpriteSheet;
-	mPointsSpriteSheet = nullptr;
-
-	delete mCurrentScoreFontSpriteSheet;
-	mCurrentScoreFontSpriteSheet = nullptr;
+		mPointsSpriteSheet = nullptr;
 
 	delete mExtraLifeRenderRect;
-	mExtraLifeRenderRect = nullptr;
+		mExtraLifeRenderRect = nullptr;
 
-	delete mInstance;
-	mInstance = nullptr;
+	delete mTextRenderer;
+		mTextRenderer = nullptr;
+
+	delete mPointsSourceRect;
+		mPointsSourceRect = nullptr;
+
+	delete mPointsDestRect;
+		mPointsDestRect = nullptr;
 
 	for(unsigned int i = 0; i < mCollectedPickups.size(); i++)
 	{
@@ -66,35 +73,36 @@ UIManager::~UIManager()
 	}
 
 	mCollectedPickups.clear();
+
+	delete mInstance;
+		mInstance = nullptr;
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::Update(const float deltaTime)
+{
+	if (mDisplayingPointsToScreen)
+	{
+		mTimeRemainingForPointsDisplay -= deltaTime;
+
+		if (mTimeRemainingForPointsDisplay <= 0.0f)
+			mDisplayingPointsToScreen = false;
+	}
 }
 
 // ---------------------------------------------------------------- //
 
 void UIManager::Render()
 {
-	// First render the current score to the screen
+	RenderScores();
 
+	RenderExtraLives();
 
-	// Now render the current highscore to the screen
+	RenderCollectables();
 
-
-
-	// Now render the extra lives icons
-	for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
-	{
-		//S2D::Vector2* position = new S2D::Vector2(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f));
-
-		S2D::SpriteBatch::Draw(mExtraLivesSpriteSheet, 
-							   &(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f)),
-			                   mExtraLifeRenderRect);
-	}
-
-	unsigned int startPoint = mCollectedPickups.size() < 7 ? 0: mCollectedPickups.size() - 7;
-
-	for (unsigned int i = startPoint; i < mCollectedPickups.size(); i++)
-	{
-		mCollectedPickups[i]->Render(mCollectedPickUpsPosition - S2D::Vector2(float(30 * (i - startPoint)), 0.0f));
-	}
+	if(mDisplayingPointsToScreen)
+		RenderPoints();
 }
 
 // ---------------------------------------------------------------- //
@@ -112,6 +120,90 @@ UIManager* UIManager::GetInstance()
 void UIManager::AddCollectedPickup(PICKUP_TYPES typeToAdd)
 {
 	mCollectedPickups.push_back(new PickUps(typeToAdd));
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::RenderScores()
+{
+	if (mTextRenderer)
+	{
+		// First render the text at the top
+		mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2((QUATER_SCREEN_WIDTH * 3) - 48, 50), 7);
+
+		// Now render the player's current score
+		mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, mCurrentScoreDisplayPosition, 0);
+
+		// Now render the currently saved highscore
+		mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, mHighScoreDisplayPosition, 0);
+	}
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::RenderCollectables()
+{
+	unsigned int startPoint = mCollectedPickups.size() < 7 ? 0 : mCollectedPickups.size() - 7;
+
+	for (unsigned int i = startPoint; i < mCollectedPickups.size(); i++)
+	{
+		mCollectedPickups[i]->Render(mCollectedPickUpsPosition - S2D::Vector2(float(30 * (i - startPoint)), 0.0f));
+	}
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::RenderExtraLives()
+{
+	if (mExtraLivesSpriteSheet)
+	{
+		// Now render the extra lives icons
+		for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
+		{
+			S2D::SpriteBatch::Draw( mExtraLivesSpriteSheet,
+				                  &(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f)),
+				                    mExtraLifeRenderRect);
+		}
+	}
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::DisplayPoints(S2D::Vector2 centrePosition, bool fromGhost, unsigned int magnitude)
+{
+	mDisplayingPointsToScreen      = true;
+	mTimeRemainingForPointsDisplay = TIME_POINTS_SHOW_FOR;
+
+	delete mPointsDestRect;
+	mPointsDestRect = nullptr;
+
+	delete mPointsSourceRect;
+	mPointsSourceRect = nullptr;
+
+	// Setup where the points are going to be rendered in the maze
+	mPointsDestRect                = new S2D::Rect(centrePosition.X - (mPointsSingleSpriteWidth / 2),
+												   centrePosition.Y - (mPointsSingleSpriteHeight / 2),
+		                                           mPointsSingleSpriteWidth, 
+		                                           mPointsSingleSpriteHeight);
+
+	if(fromGhost)
+		mPointsSourceRect              = new S2D::Rect(magnitude * mPointsSingleSpriteWidth, 
+			                                           0.0f, 
+			                                           mPointsSingleSpriteWidth, 
+			                                           mPointsSingleSpriteHeight);
+	else
+		mPointsSourceRect              = new S2D::Rect((magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth) * mPointsSingleSpriteWidth,
+			                                            ((int)(magnitude / mAmountOfSpritesOnPointsSpriteSheetHeight) + 1) * mPointsSingleSpriteHeight, 
+			                                            mPointsSingleSpriteWidth, 
+			                                            mPointsSingleSpriteHeight);
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::RenderPoints()
+{
+	if(mPointsDestRect && mPointsSourceRect && mPointsSpriteSheet)
+		S2D::SpriteBatch::Draw(mPointsSpriteSheet, mPointsDestRect, mPointsSourceRect);
 }
 
 // ---------------------------------------------------------------- //

@@ -55,8 +55,7 @@ private:
 	void             InGameInputCheck();
 	
 	void             MainGameRender();
-	void             RenderScores();
-	
+
 	void             LoadInDataForLevel();
 
 	void             SpawnNextCollectable();
