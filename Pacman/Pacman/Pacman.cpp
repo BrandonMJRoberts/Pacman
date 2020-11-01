@@ -40,23 +40,16 @@ Pacman::~Pacman()
 
 void Pacman::LoadContent()
 {
-	mBackground      = new Background(14, 4);
-
-	mPlayer          = new PacmanCharacter(mBackground->GetCollisionMap());
-	mDotHandler      = new DotsHandler();
-
-	mPauseMenu       = new PauseMenu();
-	mStartMenu       = new StartMenu();
-	mHighScoreMenu   = new HighScoresMenu();
+	if(!mStartMenu)
+		mStartMenu		  = new StartMenu();
 
 	// Default into the start menu
 	mInStartMenu     = true;
 	mInHighscoreMenu = false;
 	mInMainGame      = false;
 
-	mTimeTillNextCollectableSpawn = 10.0f;
-
-	mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
+	if(!mTextRenderer)
+		mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -67,14 +60,11 @@ void Pacman::Update(int elapsedTime)
 
 	if (mInStartMenu)
 		StartMenuUpdate(deltaTime);
-
-	if (mInHighscoreMenu)
+	else if (mInHighscoreMenu)
 		HighScoreMenuUpdate();
-
-	if(GameManager::Instance()->GetGameIsPaused())
+	else if(GameManager::Instance()->GetGameIsPaused())
 		PauseMenuUpdate(deltaTime);
-
-	if(mInMainGame)
+	else if(mInMainGame)
 		InGameUpdate(deltaTime);
 }
 
@@ -87,23 +77,18 @@ void Pacman::Draw(int elapsedTime)
 
 		// Make sure we are rendering the correct content
 		if (mInMainGame)
-		{
 			MainGameRender();
-		}
-		else
+		else if (mInStartMenu)
 		{
-			if (mInStartMenu)
-			{
-				mStartMenu->Render(_frameCount);
-			}
-			else if (mInHighscoreMenu)
-			{
-				mHighScoreMenu->Render();
-			}
-			else if (GameManager::Instance()->GetGameIsPaused())
-			{
-				mPauseMenu->Render();
-			}
+			mStartMenu->Render(_frameCount);
+		}
+		else if (mInHighscoreMenu)
+		{
+			mHighScoreMenu->Render();
+		}
+		else if (GameManager::Instance()->GetGameIsPaused())
+		{
+			mPauseMenu->Render();
 		}
 
 		// Increment the frame count
@@ -127,6 +112,8 @@ void Pacman::StartMenuUpdate(const float deltaTime)
 		mInMainGame      = true;
 		mInStartMenu     = false;
 		mInHighscoreMenu = false;
+
+		LoadInDataForLevel();
 	}
 	else if (returnOption == SELECTION_OPTIONS::HIGHSCORES)
 	{
@@ -134,11 +121,15 @@ void Pacman::StartMenuUpdate(const float deltaTime)
 		mInMainGame      = false;
 		mInStartMenu     = false;
 		mInHighscoreMenu = true;
+
+		if (!mHighScoreMenu)
+			mHighScoreMenu = new HighScoresMenu();
 	}
 	else if (returnOption == SELECTION_OPTIONS::CHANGE_PLAYER)
 	{
 		GameManager::Instance()->IncrementPlayerCharacter();
-		mInMainGame = false;
+		mInMainGame      = false;
+		mInHighscoreMenu = false;
 	}
 	else if (returnOption == SELECTION_OPTIONS::QUIT)
 	{
@@ -173,6 +164,35 @@ void Pacman::HighScoreMenuUpdate()
 
 void Pacman::InGameUpdate(const float deltaTime)
 {
+	// Update the dots in the level
+	mDotHandler->Update(mPlayer->GetCentrePosition(), 9);
+
+    // First check if the level is over
+	if (GameManager::Instance()->GetRemainingDots() == 0)
+	{
+		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
+		mPlayer->ResetCharacter();
+
+		delete mCollectable;
+		mCollectable = nullptr;
+
+		return;
+	}
+
+	// Player update
+	mPlayer->Update(deltaTime);
+
+	// Collectable collision
+	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8, mPlayer->GetFacingDirection()))
+	{
+		// Add the relevent score
+		GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
+
+		// Delete this collectable
+		delete mCollectable;
+		mCollectable = nullptr;
+	}
+
 	if (mCollectable == nullptr)
 	{
 		// Collectable update
@@ -188,32 +208,8 @@ void Pacman::InGameUpdate(const float deltaTime)
 		}
 	}
 
-	// Player update
-	mPlayer->Update(deltaTime);
-
-	// Background Update
-	mBackground->Update();
-
-	// Update the dots in the level
-	if (mDotHandler->Update(mPlayer->GetCentrePosition(), 9))
-	{
-		mPlayer->ResetCharacter();
-		return;
-	}
-
 	// Update the game manager
 	GameManager::Instance()->Update(deltaTime);
-
-	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 8, mPlayer->GetFacingDirection()))
-	{
-		// Add the relevent score
-		GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
-
-		// Delete this collectable
-		delete mCollectable;
-		mCollectable = nullptr;
-	}
 
 	// Input
 	InGameInputCheck();
@@ -272,7 +268,8 @@ void Pacman::MainGameRender()
 void Pacman::SpawnNextCollectable()
 {
 	// Spawn in a new random collectable
-	mCollectable = new PickUps(GameManager::Instance()->GetThisLevelCollectableType());
+	if(!mCollectable)
+		mCollectable = new PickUps(GameManager::Instance()->GetThisLevelCollectableType());
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -287,6 +284,25 @@ void Pacman::RenderScores()
 
 	// Now render the currently saved highscore
 	mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, S2D::Vector2(HALF_SCREEN_WIDTH, 80), 0);
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+void Pacman::LoadInDataForLevel()
+{
+	if(!mBackground)
+		mBackground  = new Background(14, 4);
+
+	if(!mPauseMenu)
+		mPlayer      = new PacmanCharacter(mBackground->GetCollisionMap());
+
+	if(!mDotHandler)
+		mDotHandler  = new DotsHandler();
+
+	if(!mPauseMenu)
+		mPauseMenu   = new PauseMenu();
+
+	mTimeTillNextCollectableSpawn = 10.0f;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

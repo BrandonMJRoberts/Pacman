@@ -57,6 +57,8 @@ private:
 	void             MainGameRender();
 	void             RenderScores();
 	
+	void             LoadInDataForLevel();
+
 	void             SpawnNextCollectable();
 
 	PacmanCharacter* mPlayer;

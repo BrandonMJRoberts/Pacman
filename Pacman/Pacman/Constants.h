@@ -23,7 +23,7 @@
 
 #define POINTS_PER_EXTRA_LIFE 10000
 
-#define FRAME_RATE 60.0f
+#define FRAME_RATE 60
 #define FRAME_TIME (1.0f/FRAME_RATE)
 
 #define AMOUNT_OF_LEVELS 3
