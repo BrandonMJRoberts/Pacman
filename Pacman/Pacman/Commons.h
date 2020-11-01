@@ -37,12 +37,12 @@ enum class PLAYER_CHARACTER_TYPE : char
 
 enum class PICKUP_TYPES : char
 {
-	CHERRY     = 0x00,
-	STRAWBERRY = 0x01,
-	PEACH      = 0x02,
-	APPLE      = 0x04,
-	LIME       = 0x08,
-	CUP        = 0x10,
-	BELL       = 0x20,
-	KEY        = 0x40
+	CHERRY     = 0,
+	STRAWBERRY = 1,
+	PEACH      = 2,
+	APPLE      = 3,
+	LIME       = 4,
+	CUP        = 5,
+	BELL       = 6,
+	KEY        = 7
 };

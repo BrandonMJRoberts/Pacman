@@ -71,7 +71,6 @@ private:
 	DotsHandler*     mDotHandler;
 	TextRenderer*    mTextRenderer;
 
-	// Data to represent Munchie
 	int              _frameCount;
 
 	float            mTimeTillNextCollectableSpawn;

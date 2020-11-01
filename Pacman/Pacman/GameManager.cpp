@@ -36,6 +36,8 @@ GameManager::GameManager()
 
 	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
 	UIManager::GetInstance()->AddCollectedPickup(mThisLevelCollectableSpawnType);
+
+	mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
 }
 
 // ---------------------------------------------------------------- //
@@ -105,18 +107,10 @@ void GameManager::Update(const float deltaTime)
 		mCurrentHighScore = mCurrentScore;
 
 	// You get an extra life after collecting 10,000 points
-	if (mCurrentScore != 0)
+	if (mPointsRemainingTillNextLife <= 0)
 	{
-		if (mCurrentScore % POINTS_PER_EXTRA_LIFE == 0)
-		{
-			if (!mAllocatedExtraLife)
-			{
-				AddExtraLife();
-				mAllocatedExtraLife = true;
-			}
-		}
-		else
-			mAllocatedExtraLife = false;
+		AddExtraLife();
+		mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
 	}
 }
 

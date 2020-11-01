@@ -192,8 +192,8 @@ void UIManager::DisplayPoints(S2D::Vector2 centrePosition, bool fromGhost, unsig
 			                                           mPointsSingleSpriteWidth, 
 			                                           mPointsSingleSpriteHeight);
 	else
-		mPointsSourceRect              = new S2D::Rect((magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth) * mPointsSingleSpriteWidth,
-			                                            ((int)(magnitude / mAmountOfSpritesOnPointsSpriteSheetHeight) + 1) * mPointsSingleSpriteHeight, 
+		mPointsSourceRect              = new S2D::Rect(     (magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth)       * mPointsSingleSpriteWidth,
+			                                            (int(magnitude / mAmountOfSpritesOnPointsSpriteSheetWidth) + 1) * mPointsSingleSpriteHeight,
 			                                            mPointsSingleSpriteWidth, 
 			                                            mPointsSingleSpriteHeight);
 }

@@ -176,6 +176,9 @@ void Pacman::InGameUpdate(const float deltaTime)
 		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
 		mPlayer->ResetCharacter();
 
+		// Make sure we change the background colour to being the next level's
+		mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
+
 		delete mCollectable;
 		mCollectable = nullptr;
 
@@ -188,9 +191,6 @@ void Pacman::InGameUpdate(const float deltaTime)
 	// Collectable collision
 	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 13, mPlayer->GetFacingDirection()))
 	{
-		// Add the relevent score
-		GameManager::Instance()->AddToScore((int)mCollectable->GetType() * 100);
-
 		// Delete this collectable
 		delete mCollectable;
 		mCollectable = nullptr;

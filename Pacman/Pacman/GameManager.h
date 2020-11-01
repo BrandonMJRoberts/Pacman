@@ -21,7 +21,7 @@ public:
 	void                SetStartingLevel(unsigned int newID) { mCurrentLevelID = newID; SetDotCounts(); }
 	unsigned int        GetCurrentLevel()                    { return mCurrentLevelID; }
 
-	void                AddToScore(unsigned int addition)    { mCurrentScore += addition;  }
+	void                AddToScore(unsigned int addition)    { mCurrentScore += addition;  mPointsRemainingTillNextLife -= addition; }
 	unsigned int        GetCurrentScore()			         { return mCurrentScore; }
 
 	unsigned int        SetCurrentHighScore(unsigned int score) { mCurrentHighScore = score; }
@@ -69,6 +69,8 @@ private:
 	unsigned int        mCurrentScore;
 	unsigned int        mCurrentHighScore;
 
+	int        mPointsRemainingTillNextLife;
+
 	unsigned int        mExtraLifeCount;
 
 	float               mTimeRemainingInPoweredUpState;
@@ -82,8 +84,6 @@ private:
 
 	bool                mGameIsPaused;
 	bool                mSettingGamePausedState;
-
-	bool                mAllocatedExtraLife;
 };
 
 #endif // !_GAME_MANAGER_H_
