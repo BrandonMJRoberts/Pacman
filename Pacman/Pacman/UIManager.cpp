@@ -155,7 +155,7 @@ void UIManager::RenderCollectables()
 
 void UIManager::RenderExtraLives()
 {
-	if (mExtraLivesSpriteSheet)
+	if (mExtraLivesSpriteSheet && mExtraLifeRenderRect)
 	{
 		// Now render the extra lives icons
 		for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
@@ -187,13 +187,13 @@ void UIManager::DisplayPoints(S2D::Vector2 centrePosition, bool fromGhost, unsig
 		                                           mPointsSingleSpriteHeight);
 
 	if(fromGhost)
-		mPointsSourceRect              = new S2D::Rect(magnitude * mPointsSingleSpriteWidth, 
+		mPointsSourceRect              = new S2D::Rect(float(magnitude * mPointsSingleSpriteWidth), 
 			                                           0.0f, 
 			                                           mPointsSingleSpriteWidth, 
 			                                           mPointsSingleSpriteHeight);
 	else
-		mPointsSourceRect              = new S2D::Rect(     (magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth)       * mPointsSingleSpriteWidth,
-			                                            (int(magnitude / mAmountOfSpritesOnPointsSpriteSheetWidth) + 1) * mPointsSingleSpriteHeight,
+		mPointsSourceRect              = new S2D::Rect(     float((magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth)       * mPointsSingleSpriteWidth),
+			                                            float(int(magnitude / mAmountOfSpritesOnPointsSpriteSheetWidth) + 1) * mPointsSingleSpriteHeight,
 			                                            mPointsSingleSpriteWidth, 
 			                                            mPointsSingleSpriteHeight);
 }

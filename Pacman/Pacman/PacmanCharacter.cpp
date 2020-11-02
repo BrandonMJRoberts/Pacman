@@ -211,7 +211,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		mChangeDirectionInputDelay = PLAYER_CHANGE_DIRECTION_DELAY;
 
 		// Variable to hold the grid position of the projected positon
-		S2D::Vector2 gridPos;
+	//	S2D::Vector2 gridPos;
 		float        yPosOfSpriteSheet = 0.0f;
 
 		switch (mRequestedFacingDirection)
@@ -219,7 +219,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::DOWN:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));// mSingleSpriteHeight / 2.0f));
+			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));// mSingleSpriteHeight / 2.0f));
 
 			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 3);
 		break;
@@ -227,7 +227,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::UP:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
+			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
 
 			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 2);
 
@@ -236,7 +236,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::LEFT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.5f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
+			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.5f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
 
 			yPosOfSpriteSheet = (float)mSingleSpriteHeight;
 		break;
@@ -244,7 +244,7 @@ void PacmanCharacter::CheckForDirectionChange()
 		case FACING_DIRECTION::RIGHT:
 
 			// Calculate the correctly projected direction
-			gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.5f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
+			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.5f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
 
 			yPosOfSpriteSheet = 0.0f;
 
@@ -252,14 +252,16 @@ void PacmanCharacter::CheckForDirectionChange()
 		}
 
 		// Check if it is a valid direction change
-		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
-		{
-			// Change the sprite to represent the direction
-			ReSetupPacmanSourceRect(0, yPosOfSpriteSheet, mSingleSpriteWidth, mSingleSpriteHeight);
+		//if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
+		//{
 
-			// Set the new direction of facing
-			mCurrentFacingDirection = mRequestedFacingDirection;
-		}
+		// Change the sprite to represent the direction
+		ReSetupPacmanSourceRect(0, yPosOfSpriteSheet, mSingleSpriteWidth, mSingleSpriteHeight);
+
+		// Set the new direction of facing
+		mCurrentFacingDirection = mRequestedFacingDirection;
+
+		//}
 	}
 }
 
@@ -296,21 +298,28 @@ void PacmanCharacter::HandleInput()
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
 	// Checks if the directional keys have been pressed and set the requested change in direction
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanMoveInDirection(FACING_DIRECTION::RIGHT))
 	{
 		mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+		return;
 	}
-	else if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
-	{
-		mRequestedFacingDirection = FACING_DIRECTION::LEFT;
-	}
-	else if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP)
+
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanMoveInDirection(FACING_DIRECTION::UP))
 	{
 		mRequestedFacingDirection = FACING_DIRECTION::UP;
+		return;
 	}
-	else if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
+
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanMoveInDirection(FACING_DIRECTION::DOWN))
 	{
 		mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+		return;
+	}
+
+	if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanMoveInDirection(FACING_DIRECTION::LEFT))
+	{
+		mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+		return;
 	}
 }
 
@@ -339,3 +348,54 @@ void PacmanCharacter::ResetCharacter()
 
 	ReSetupPacmanSourceRect(0, 0, mSingleSpriteWidth, mSingleSpriteHeight);
 }
+
+// ----------------------------------------------------------------- //
+
+bool PacmanCharacter::CanMoveInDirection(FACING_DIRECTION direction)
+{
+	S2D::Vector2 gridPos = S2D::Vector2();
+
+	switch (direction)
+	{
+	case FACING_DIRECTION::DOWN:
+
+		// Calculate the correctly projected direction
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));
+
+	break;
+
+	case FACING_DIRECTION::UP:
+
+		// Calculate the correctly projected direction
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
+
+	break;
+
+	case FACING_DIRECTION::LEFT:
+
+		// Calculate the correctly projected direction
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.5f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
+
+	break;
+
+	case FACING_DIRECTION::RIGHT:
+
+		// Calculate the correctly projected direction
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.5f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
+
+	break;
+	}
+
+	// Check if it is a valid direction change
+	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
+	{
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+// ----------------------------------------------------------------- //

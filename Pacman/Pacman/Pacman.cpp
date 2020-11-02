@@ -3,6 +3,9 @@
 #include "Constants.h"
 
 #include "UIManager.h"
+#include "AudioManager.h"
+
+#include <time.h>
 
 #include <sstream>
 
@@ -10,6 +13,9 @@
 
 Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 {
+	// Set the seed to be random
+	srand(time(NULL));
+
 	_frameCount = 0;
 
 	//Initialise important Game aspects

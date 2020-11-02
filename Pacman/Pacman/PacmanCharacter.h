@@ -29,6 +29,8 @@ private:
 	void             MoveInCurrentDirection(const float deltaTime);
 	void             CheckForDirectionChange();
 
+	bool             CanMoveInDirection(FACING_DIRECTION direction);
+
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);
 
 	S2D::Vector2     ConvertPositionToGridPosition(S2D::Vector2 position);

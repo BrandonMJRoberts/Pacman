@@ -46,7 +46,7 @@ public:
 	void                  IncrementPlayerCharacter();
 
 	unsigned int          GetExtraLivesCount()                         { return mExtraLifeCount; }
-	void                  AddExtraLife()                               { if(mExtraLifeCount < 5) mExtraLifeCount++; }
+	void                  AddExtraLife()                               { mExtraLifeCount++; }
 	void                  RemoveLife()                                 { if (mExtraLifeCount > 0) mExtraLifeCount--; }
 
 	PICKUP_TYPES          GetThisLevelCollectableType()                { return mThisLevelCollectableSpawnType; }
@@ -69,7 +69,7 @@ private:
 	unsigned int        mCurrentScore;
 	unsigned int        mCurrentHighScore;
 
-	int        mPointsRemainingTillNextLife;
+	int                 mPointsRemainingTillNextLife;
 
 	unsigned int        mExtraLifeCount;
 

@@ -2,6 +2,7 @@
 
 #include "GameManager.h"
 #include "UIManager.h"
+#include "AudioManager.h"
 
 #include <iostream>
 
@@ -193,6 +194,8 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const u
 			}
 
 			UIManager::GetInstance()->DisplayPoints(renderPos, false, magnitude);
+			AudioManager::GetInstance()->PlayEatingFruitSFX();
+
 
 			// We have been passed over so return this to the higher function call
 			return true;

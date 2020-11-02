@@ -1,6 +1,8 @@
 #include "DotsHandler.h"
 
 #include "GameManager.h"
+#include "AudioManager.h"
+
 #include "Constants.h"
 
 #include <iostream>
@@ -162,6 +164,8 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned
 				mDots.pop_back();
 
 				GameManager::Instance()->DecreaseRemainingDots(1);
+
+				AudioManager::GetInstance()->PlayDotCollectionSFX();
 
 				return;
 			}

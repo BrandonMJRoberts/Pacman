@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "UIManager.h"
+#include "AudioManager.h"
 
 GameManager* GameManager::mInstance = nullptr;
 
@@ -107,10 +108,11 @@ void GameManager::Update(const float deltaTime)
 		mCurrentHighScore = mCurrentScore;
 
 	// You get an extra life after collecting 10,000 points
-	if (mPointsRemainingTillNextLife <= 0)
+	if (mPointsRemainingTillNextLife <= 0 && mExtraLifeCount < 5)
 	{
 		AddExtraLife();
-		mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
+		AudioManager::GetInstance()->PlayExtraLifeSFX();
+		mPointsRemainingTillNextLife += POINTS_PER_EXTRA_LIFE;
 	}
 }
 
