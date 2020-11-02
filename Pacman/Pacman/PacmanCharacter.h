@@ -48,7 +48,12 @@ private:
 	unsigned int	 mSingleSpriteWidth;
 	unsigned int	 mSingleSpriteHeight;
 
+	const unsigned int mSpritesOnWidth;
+	const unsigned int mSpritesOnHeight;
+
 	unsigned int     mCurrentFrame;
+	unsigned int     mStartFrame;
+	unsigned int     mEndFrame;
 
 	float            mChangeDirectionInputDelay;
 

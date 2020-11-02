@@ -288,7 +288,7 @@ void Pacman::LoadInDataForLevel()
 		mBackground  = new Background(14, 4);
 
 	if(!mPauseMenu)
-		mPlayer      = new PacmanCharacter(mBackground->GetCollisionMap());
+		mPlayer      = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3);
 
 	if(!mDotHandler)
 		mDotHandler  = new DotsHandler();

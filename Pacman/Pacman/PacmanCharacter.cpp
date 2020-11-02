@@ -7,11 +7,11 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight)
+PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
 {
 	// Load in the texture
 	mPacmanTexture                     = new S2D::Texture2D();
-	mPacmanTexture->Load("Textures/Pacman/PacmanAnimations.png", false);
+	mPacmanTexture->Load("Textures/Pacman/PacmanSprites.png", false);
 	if (!mPacmanTexture)
 	{
 		std::cout << "Failed to load the pacman sprite." << std::endl;
@@ -42,6 +42,8 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int sprites
 	mCollisionMap = collisionMap;
 
 	mCurrentFrame = 0;
+	mStartFrame   = 0;
+	mEndFrame     = 0;
 }
 
 // ------------------------------------------------------------- //
@@ -64,15 +66,24 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 	if ((currentFrameCount % 6) == 1)
 		mCurrentFrame++;
 
-	if (mCurrentFrame > 2)
-		mCurrentFrame = 0;
+	if (mCurrentFrame > mEndFrame)
+		mCurrentFrame = mStartFrame;
 
 	if (mPacmanSourceRect && mPacmanTexture)
 	{
 		// Calculate the render position
 		mRenderPosition = S2D::Vector2(mCentrePosition - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
 
-		mPacmanSourceRect->X = (float)mSingleSpriteWidth * mCurrentFrame;
+		if (mCurrentFrame == mEndFrame)
+		{
+			mPacmanSourceRect->X = (float)mSingleSpriteWidth * 2;
+			mPacmanSourceRect->Y = (float)mSingleSpriteWidth * 2;
+		}
+		else
+		{
+			mPacmanSourceRect->X = (float)mSingleSpriteWidth    *    (mCurrentFrame % mSpritesOnWidth);
+			mPacmanSourceRect->Y = (float)mSingleSpriteHeight   * int(mCurrentFrame / mSpritesOnWidth);
+		}
 
 		// Render pacman in the correct position referencing his top left position, as the grid has 0,0 at the top left of the screen
 		S2D::SpriteBatch::Draw(mPacmanTexture,
@@ -210,58 +221,36 @@ void PacmanCharacter::CheckForDirectionChange()
 		// If we have changed direction then reset the countdown for the next change of direction
 		mChangeDirectionInputDelay = PLAYER_CHANGE_DIRECTION_DELAY;
 
-		// Variable to hold the grid position of the projected positon
-	//	S2D::Vector2 gridPos;
-		float        yPosOfSpriteSheet = 0.0f;
-
 		switch (mRequestedFacingDirection)
 		{
 		case FACING_DIRECTION::DOWN:
-
-			// Calculate the correctly projected direction
-			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.5f));// mSingleSpriteHeight / 2.0f));
-
-			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 3);
+			mStartFrame   = 6;
+			mEndFrame     = 8;
+			mCurrentFrame = 6;
 		break;
 
 		case FACING_DIRECTION::UP:
-
-			// Calculate the correctly projected direction
-			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.5f));// (mSingleSpriteHeight / 2.0f)));
-
-			yPosOfSpriteSheet = (float)(mSingleSpriteHeight * 2);
-
+			mStartFrame   = 4;
+			mEndFrame     = 6;
+			mCurrentFrame = 4;
 		break;
 
 		case FACING_DIRECTION::LEFT:
-
-			// Calculate the correctly projected direction
-			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * (mSingleSpriteWidth * 0.5f), 0.0f));// (mSingleSpriteWidth / 2.0f), 0.0f));
-
-			yPosOfSpriteSheet = (float)mSingleSpriteHeight;
+			mStartFrame   = 2;
+			mEndFrame     = 4;
+			mCurrentFrame = 2;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
-
-			// Calculate the correctly projected direction
-			//gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.5f, 0.0f));// mSingleSpriteWidth / 2.0f, 0.0f));
-
-			yPosOfSpriteSheet = 0.0f;
+			mStartFrame   = 0;
+			mEndFrame     = 2;
+			mCurrentFrame = 0;
 
 		break;
 		}
 
-		// Check if it is a valid direction change
-		//if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] == '0')
-		//{
-
-		// Change the sprite to represent the direction
-		ReSetupPacmanSourceRect(0, yPosOfSpriteSheet, mSingleSpriteWidth, mSingleSpriteHeight);
-
 		// Set the new direction of facing
 		mCurrentFacingDirection = mRequestedFacingDirection;
-
-		//}
 	}
 }
 
