@@ -247,6 +247,12 @@ void PacmanCharacter::CheckForDirectionChange()
 			mCurrentFrame = 0;
 
 		break;
+
+		default:
+			mStartFrame   = 8;
+			mEndFrame     = 8;
+			mCurrentFrame = 8;
+		break;
 		}
 
 		// Set the new direction of facing
@@ -363,10 +369,12 @@ void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, unsigned int wid
 void PacmanCharacter::ResetCharacter()
 {
 	mCentrePosition           = mStartPosition; 
-	mCurrentFacingDirection   = FACING_DIRECTION::RIGHT; 
-	mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+	mCurrentFacingDirection   = FACING_DIRECTION::NONE; 
+	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
-	ReSetupPacmanSourceRect(0, 0, mSingleSpriteWidth, mSingleSpriteHeight);
+	mStartFrame   = 8;
+	mEndFrame     = 8;
+	mCurrentFrame = 8;
 }
 
 // ----------------------------------------------------------------- //
