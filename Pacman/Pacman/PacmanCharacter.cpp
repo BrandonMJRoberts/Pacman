@@ -116,7 +116,9 @@ bool PacmanCharacter::EdgeCheck()
 
 void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 {
-	S2D::Vector2 centreGridPos = ConvertPositionToGridPosition(mCentrePosition), gridPos;
+	// Calculate the current grid postion of pacman's centre
+	S2D::Vector2 centreGridPos = ConvertPositionToGridPosition(mCentrePosition);
+	S2D::Vector2 gridPos = S2D::Vector2(), movementAmount = S2D::Vector2();
 
 	// First lock the opposite axis to which we are moving in
 	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
@@ -137,31 +139,14 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position - now with the projection in his direction
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 3.0f));
 
-		// If we are free to move in this direction then move in the direction
-		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
-		{
-			mCentrePosition.Y     += PACMAN_MOVEMENT_SPEED * deltaTime;
-		}
-		else
-		{
-			mCentrePosition.Y       = SPRITE_RESOLUTION * ((int)centreGridPos.Y + 0.5f);
-			mCurrentFacingDirection = FACING_DIRECTION::NONE;
-		}
+		movementAmount.Y = PACMAN_MOVEMENT_SPEED * deltaTime;
 	break;
 
 	case FACING_DIRECTION::UP:
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
 
-		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
-		{
-			mCentrePosition.Y     -= PACMAN_MOVEMENT_SPEED * deltaTime;
-		}
-		else
-		{
-			mCentrePosition.Y       = SPRITE_RESOLUTION * ((int)centreGridPos.Y + 0.5f);
-			mCurrentFacingDirection = FACING_DIRECTION::NONE;
-		}
+		movementAmount.Y = -1.0f * (PACMAN_MOVEMENT_SPEED * deltaTime);
 	break;
 
 	case FACING_DIRECTION::LEFT:
@@ -169,15 +154,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * mSingleSpriteWidth * 0.4f, 0.0f)); //(mSingleSpriteWidth / 2.0f), 0.0f));
 
-		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
-		{
-			mCentrePosition.X     -= PACMAN_MOVEMENT_SPEED * deltaTime;
-		}
-		else
-		{
-			mCentrePosition.X       = SPRITE_RESOLUTION * ((int)centreGridPos.X + 0.5f);
-			mCurrentFacingDirection = FACING_DIRECTION::NONE;
-		}
+		movementAmount.X = -1.0f * (PACMAN_MOVEMENT_SPEED * deltaTime);
 	break;
 
 	case FACING_DIRECTION::RIGHT:
@@ -185,15 +162,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f ,0.0f));//mSingleSpriteWidth / 2.0f, 0.0f));
 
-		if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
-		{
-			mCentrePosition.X     += PACMAN_MOVEMENT_SPEED * deltaTime;
-		}
-		else
-		{
-			mCentrePosition.X       = SPRITE_RESOLUTION * ((int)centreGridPos.X + 0.5f);
-			mCurrentFacingDirection = FACING_DIRECTION::NONE;
-		}
+		movementAmount.X = PACMAN_MOVEMENT_SPEED * deltaTime;
 	break;
 
 	case FACING_DIRECTION::NONE:
@@ -203,6 +172,21 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		std::cout << "In an error movement state!" << std::endl;
 		return;
 	break;
+	}
+
+	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
+	{
+		mCentrePosition.X += movementAmount.X;
+		mCentrePosition.Y += movementAmount.Y;
+	}
+	else
+	{
+		if(movementAmount.X > 0)
+			mCentrePosition.X       = SPRITE_RESOLUTION * ((int)centreGridPos.X + 0.5f);
+		else
+			mCentrePosition.Y       = SPRITE_RESOLUTION * ((int)centreGridPos.Y + 0.5f);
+
+		mCurrentFacingDirection = FACING_DIRECTION::NONE;
 	}
 }
 
