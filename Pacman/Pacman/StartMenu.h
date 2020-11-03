@@ -14,7 +14,7 @@ class StartMenu final : public BaseMenu
 {
 public:
 	StartMenu();
-	~StartMenu();
+	~StartMenu() override;
 
 	void    Render(const unsigned int frameCount);
 	SCREENS Update(const float deltaTime);

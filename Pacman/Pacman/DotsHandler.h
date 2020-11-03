@@ -43,6 +43,8 @@ public:
 private:
 	void LoadInDotData();
 
+	unsigned int      mTotalDots;
+
 	std::vector<Dot*> mDots;
 
 	S2D::Texture2D*   mSmallDotSpriteSheet;

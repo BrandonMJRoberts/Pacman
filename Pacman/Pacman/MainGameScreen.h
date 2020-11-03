@@ -8,14 +8,13 @@
 class PickUps;
 class PacmanCharacter;
 class Background;
-class TextRenderer;
 class DotsHandler;
 
 class MainGameScreen : public BaseMenu
 {
 public:
 	MainGameScreen();
-	~MainGameScreen();
+	~MainGameScreen() override;
 
 	void             Render(const unsigned int frameCount) override;
 	SCREENS          Update(const float deltaTime)         override;
@@ -31,7 +30,6 @@ private:
 
 	Background*      mBackground;
 	DotsHandler*     mDotHandler;
-	TextRenderer*    mTextRenderer;
 
 	float            mTimeTillNextCollectableSpawn;
 };

@@ -15,7 +15,7 @@
 Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 {
 	// Set the seed to be a random one
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	mFrameCount = 0;
 
@@ -33,6 +33,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 Pacman::~Pacman()
 {
 	delete mCurrentScreen;
+	delete mGameInstance;
 
 	Graphics::Destroy();
 }
@@ -49,6 +50,8 @@ void Pacman::LoadContent()
 
 	mCurrentScreenType = SCREENS::MAIN_MENU;
 	mPriorScreenType   = SCREENS::MAIN_MENU;
+
+	mGameInstance      = nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -58,11 +61,27 @@ void Pacman::Update(int elapsedTime)
 	float deltaTime = ((float)elapsedTime / 1000.0f);
 
 	// Update the current screen/menu and check if we are quitting the program
-	if (HandleScreenUpdate(mCurrentScreen->Update(deltaTime)))
+	SCREENS screenToSwapTo = mCurrentScreen->Update(deltaTime);
+	bool swappingToPriorScreen = false;
+
+	if (screenToSwapTo == SCREENS::PRIOR)
+	{
+		screenToSwapTo = mPriorScreenType;
+		swappingToPriorScreen = true;
+	}
+
+	if (HandleScreenUpdate(screenToSwapTo))
 	{
 		// Close the program
 		S2D::Audio::Destroy();
 		S2D::Graphics::Destroy();
+	}
+
+	if (swappingToPriorScreen)
+	{
+		SCREENS temp       = mCurrentScreenType;
+		mCurrentScreenType = mPriorScreenType;
+		mPriorScreenType   = temp;
 	}
 }
 
@@ -70,28 +89,60 @@ void Pacman::Update(int elapsedTime)
 
 bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 {
-	SCREENS temp;
-
+	// Switch through the screens we want to transition to 
 	switch (newScreen)
 	{
 	case SCREENS::HIGH_SCORES:
-		delete mCurrentScreen;
+		// If we are not coming from the game then we can delete the current screen safely
+		if (mCurrentScreenType != SCREENS::IN_GAME)
+		{
+			delete mCurrentScreen;
+			mCurrentScreen = nullptr;
+		}
 
 		mPriorScreenType   = mCurrentScreenType;
 		mCurrentScreenType = SCREENS::HIGH_SCORES;
 		mCurrentScreen     = (BaseMenu*)(new HighScoresMenu);
 	break;
 
+	// Going into a new game
 	case SCREENS::IN_GAME:
-		delete mCurrentScreen;
+		// If a game currently exists then delete it
+		if (mGameInstance)
+		{
+			delete mGameInstance;
+			mGameInstance = nullptr;
+		}
+		else
+		{
+			delete mCurrentScreen;
+		}
+
+		mCurrentScreen     = nullptr;
+
+		// Create a new game instance
+		mGameInstance      = new MainGameScreen;
 
 		mPriorScreenType   = mCurrentScreenType;
 		mCurrentScreenType = SCREENS::IN_GAME;
-		mCurrentScreen     = (BaseMenu*)(new MainGameScreen);
+
+		// Set the current screen to be our game instance
+		mCurrentScreen     = (BaseMenu*)mGameInstance;
 	break;
 
 	case SCREENS::MAIN_MENU:
-		delete mCurrentScreen;
+		// If we are going to the main menu then we need to clear all memory of a game instance
+		if (mGameInstance)
+		{
+			delete mGameInstance;
+			mGameInstance  = nullptr;
+		}
+		else
+		{
+			delete mCurrentScreen;
+		}
+
+		mCurrentScreen = nullptr;
 
 		mPriorScreenType   = mCurrentScreenType;
 		mCurrentScreenType = SCREENS::MAIN_MENU;
@@ -99,7 +150,11 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 	break;
 
 	case SCREENS::PAUSE_MENU:
-		delete mCurrentScreen;
+		if (mCurrentScreenType != SCREENS::IN_GAME)
+		{
+			delete mCurrentScreen;
+			mCurrentScreen = nullptr;
+		}
 
 		mPriorScreenType   = mCurrentScreenType;
 		mCurrentScreenType = SCREENS::PAUSE_MENU;
@@ -107,37 +162,6 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 	break;
 
 	case SCREENS::PRIOR:
-		temp               = mCurrentScreenType;
-
-		mCurrentScreenType = mPriorScreenType;
-		mPriorScreenType   = temp;
-
-		switch (mCurrentScreenType)
-		{
-		case SCREENS::HIGH_SCORES:
-			delete mCurrentScreen;
-
-			mCurrentScreen = (BaseMenu*)(new HighScoresMenu);
-		break;
-
-		case SCREENS::IN_GAME:
-			delete mCurrentScreen;
-
-			mCurrentScreen = (BaseMenu*)(new MainGameScreen);
-		break;
-
-		case SCREENS::MAIN_MENU:
-			delete mCurrentScreen;
-
-			mCurrentScreen = (BaseMenu*)(new StartMenu);
-		break;
-
-		case SCREENS::PAUSE_MENU:
-			delete mCurrentScreen;
-
-			mCurrentScreen = (BaseMenu*)(new PauseMenu);
-		break;
-		}
 	break;
 
 	case SCREENS::SAME:

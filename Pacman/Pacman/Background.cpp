@@ -43,14 +43,15 @@ Background::~Background()
 
 	for (unsigned int row = 0; row < mHeight; row++)
 	{
-		delete[] mBackgroundSpriteMap;
-		delete[] mCollisionMap;
+		delete[] mBackgroundSpriteMap[row];
+
+		delete[] mCollisionMap[row];
 	}
 
-	delete mBackgroundSpriteMap;
+	delete[] mBackgroundSpriteMap;
 		mBackgroundSpriteMap = nullptr;
 
-	delete mCollisionMap;
+	delete[] mCollisionMap;
 		mCollisionMap = nullptr;
 
 }

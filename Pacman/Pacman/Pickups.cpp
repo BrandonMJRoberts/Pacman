@@ -28,10 +28,11 @@ PickUps::PickUps()
 PickUps::~PickUps()
 {
 	delete mSpriteSheet;
-		mSpriteSheet = nullptr;
+	mSpriteSheet = nullptr;
 
 	delete mSourceRect;
-		mSourceRect = nullptr;
+	mSourceRect = nullptr;
+
 }
 
 // -------------------------------------------------------- //

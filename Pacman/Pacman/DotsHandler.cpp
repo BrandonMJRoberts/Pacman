@@ -158,9 +158,9 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned
 					GameManager::Instance()->SetPlayerPoweredUp(true);
 				}
 
-				Dot* placeholder = mDots[mDots.size() - 1];
+				Dot* placeholder        = mDots[mDots.size() - 1];
 				mDots[mDots.size() - 1] = mDots[i];
-				mDots[i] = placeholder;
+				mDots[i]                = placeholder;
 				mDots.pop_back();
 
 				GameManager::Instance()->DecreaseRemainingDots(1);

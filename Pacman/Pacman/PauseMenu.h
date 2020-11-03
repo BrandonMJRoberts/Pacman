@@ -9,7 +9,7 @@ class PauseMenu final : public BaseMenu
 {
 public:
 	PauseMenu();
-	~PauseMenu();
+	~PauseMenu() override;
 
 	void            Render();
 

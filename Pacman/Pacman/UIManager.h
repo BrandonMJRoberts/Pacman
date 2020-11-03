@@ -21,6 +21,8 @@ public:
 	void AddCollectedPickup(PICKUP_TYPES typeToAdd);
 	void DisplayPoints(S2D::Vector2 position, bool fromGhost, unsigned int magnitude);
 
+	void RemoveALlCollectedPickups();
+
 private:
 	UIManager();
 

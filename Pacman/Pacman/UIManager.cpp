@@ -209,3 +209,16 @@ void UIManager::RenderPoints()
 }
 
 // ---------------------------------------------------------------- //
+
+void UIManager::RemoveALlCollectedPickups()
+{
+	for (unsigned int i = 0; i < mCollectedPickups.size(); i++)
+	{
+		delete mCollectedPickups[i];
+		mCollectedPickups[i] = nullptr;
+	}
+
+	mCollectedPickups.clear();
+}
+
+// ---------------------------------------------------------------- //

@@ -28,7 +28,7 @@ class HighScoresMenu final : public BaseMenu
 {
 public:
 	HighScoresMenu();
-	~HighScoresMenu();
+	~HighScoresMenu() override;
 
 	void            Render(unsigned int frameCount) override;
 

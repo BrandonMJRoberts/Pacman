@@ -7,7 +7,7 @@ class BaseMenu
 {
 public:
 	BaseMenu();
-	~BaseMenu();
+	virtual ~BaseMenu();
 
 	virtual void    Render(const unsigned int frameCount);
 	virtual SCREENS Update(const float deltaTime);

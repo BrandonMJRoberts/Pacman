@@ -36,9 +36,8 @@ GameManager::GameManager()
 	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
 
 	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
-	UIManager::GetInstance()->AddCollectedPickup(mThisLevelCollectableSpawnType);
 
-	mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
+	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
 }
 
 // ---------------------------------------------------------------- //

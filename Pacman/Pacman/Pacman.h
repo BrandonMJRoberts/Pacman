@@ -15,6 +15,7 @@
 using namespace S2D;
 
 #include "BaseMenu.h"
+#include "MainGameScreen.h"
 
 class Pacman : public Game
 {
@@ -38,6 +39,7 @@ private:
 	bool             HandleScreenUpdate(SCREENS newScreen);
 
 	BaseMenu*        mCurrentScreen;
+	MainGameScreen*  mGameInstance;
 
 	SCREENS          mCurrentScreenType;
 	SCREENS          mPriorScreenType;

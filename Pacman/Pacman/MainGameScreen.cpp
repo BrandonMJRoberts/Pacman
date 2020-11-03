@@ -7,24 +7,25 @@
 #include "Pickups.h"
 #include "Background.h"
 #include "DotsHandler.h"
-#include "TextRenderer.h"
 
 // ------------------------------------------------------------------------------ //
 
 MainGameScreen::MainGameScreen() : BaseMenu()
 {
 	LoadInDataForLevel();
+
+	UIManager::GetInstance()->AddCollectedPickup(GameManager::Instance()->GetThisLevelCollectableType());
 }
 
 // ------------------------------------------------------------------------------ //
 
 MainGameScreen::~MainGameScreen()
 {
-	delete mCollectable;
-	mCollectable = nullptr;
-
-	delete mTextRenderer;
-	mTextRenderer = nullptr;
+	if (mCollectable)
+	{
+		delete mCollectable;
+		mCollectable = nullptr;
+	}
 
 	delete mBackground;
 	mBackground = nullptr;
@@ -34,6 +35,8 @@ MainGameScreen::~MainGameScreen()
 
 	delete mDotHandler;
 	mDotHandler = nullptr;
+
+	UIManager::GetInstance()->RemoveALlCollectedPickups();
 }
 
 // ------------------------------------------------------------------------------ //
@@ -112,9 +115,6 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 	// Input
 	return InGameInputCheck();
-
-
-	return SCREENS::SAME;
 }
 
 // ------------------------------------------------------------------------------ //
@@ -131,6 +131,8 @@ void MainGameScreen::LoadInDataForLevel()
 		mDotHandler = new DotsHandler();
 
 	mTimeTillNextCollectableSpawn = 10.0f;
+
+	mCollectable = nullptr;
 }
 
 // ------------------------------------------------------------------------------ //
