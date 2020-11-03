@@ -286,29 +286,60 @@ void PacmanCharacter::HandleInput()
 	// Gets the current state of the keyboard
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
-	// Checks if the directional keys have been pressed and set the requested change in direction
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanMoveInDirection(FACING_DIRECTION::RIGHT))
+	// Horizontal movement first 
+	if (mCurrentFacingDirection == FACING_DIRECTION::RIGHT || mCurrentFacingDirection == FACING_DIRECTION::LEFT || mCurrentFacingDirection == FACING_DIRECTION::NONE)
 	{
-		mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
-		return;
-	}
+		// Can swap to the other axis just fine
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanMoveInDirection(FACING_DIRECTION::UP))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanMoveInDirection(FACING_DIRECTION::DOWN))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+			return;
+		}
 
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanMoveInDirection(FACING_DIRECTION::UP))
-	{
-		mRequestedFacingDirection = FACING_DIRECTION::UP;
-		return;
-	}
+		// Now check for the same axis
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && !keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanMoveInDirection(FACING_DIRECTION::RIGHT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && !keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanMoveInDirection(FACING_DIRECTION::LEFT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			return;
+		}
 
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanMoveInDirection(FACING_DIRECTION::DOWN))
-	{
-		mRequestedFacingDirection = FACING_DIRECTION::DOWN;
-		return;
 	}
-
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanMoveInDirection(FACING_DIRECTION::LEFT))
+	
+	if(mCurrentFacingDirection == FACING_DIRECTION::UP || mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::NONE)// Horizontal movement
 	{
-		mRequestedFacingDirection = FACING_DIRECTION::LEFT;
-		return;
+		// Can swap to the other axis just fine
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanMoveInDirection(FACING_DIRECTION::LEFT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanMoveInDirection(FACING_DIRECTION::RIGHT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+			return;
+		}
+
+		// Now check for the same axis
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && !keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanMoveInDirection(FACING_DIRECTION::UP))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && !keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanMoveInDirection(FACING_DIRECTION::DOWN))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+			return;
+		}
 	}
 }
 
