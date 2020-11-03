@@ -14,21 +14,8 @@
 // Reduces the amount of typing by including all classes in S2D namespace
 using namespace S2D;
 
-#include "PacmanCharacter.h"
-#include "Background.h"
-#include "DotsHandler.h"
+#include "BaseMenu.h"
 
-#include "PauseMenu.h"
-#include "StartMenu.h"
-#include "HighScoresMenu.h"
-
-#include "Pickups.h"
-
-#include "TextRenderer.h"
-
-// Declares the Pacman class which inherits from the Game class.
-// This allows us to overload the Game class methods to help us
-// load content, draw and update our game.
 class Pacman : public Game
 {
 public:
@@ -48,34 +35,12 @@ public:
 	void virtual Draw(int elapsedTime);
 
 private:
-	void             StartMenuUpdate(const float deltaTime);
-	void             PauseMenuUpdate(const float deltaTime);
-	void             HighScoreMenuUpdate();
-	void             InGameUpdate(const float deltaTime);
-	void             InGameInputCheck();
-	
-	void             MainGameRender();
+	bool             HandleScreenUpdate(SCREENS newScreen);
 
-	void             LoadInDataForLevel();
+	BaseMenu*        mCurrentScreen;
 
-	void             SpawnNextCollectable();
+	SCREENS          mCurrentScreenType;
+	SCREENS          mPriorScreenType;
 
-	PacmanCharacter* mPlayer;
-	PickUps*         mCollectable;
-
-	PauseMenu*       mPauseMenu;
-	StartMenu*       mStartMenu;
-	HighScoresMenu*  mHighScoreMenu;
-
-	Background*      mBackground;
-	DotsHandler*     mDotHandler;
-	TextRenderer*    mTextRenderer;
-
-	int              _frameCount;
-
-	float            mTimeTillNextCollectableSpawn;
-
-	bool             mInStartMenu;
-	bool             mInHighscoreMenu;
-	bool             mInMainGame;
+	int              mFrameCount;
 };

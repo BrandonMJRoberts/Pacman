@@ -2,13 +2,15 @@
 
 #include "Constants.h"
 
+#include "TextRenderer.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 // ---------------------------------------------------------------- //
 
-HighScoresMenu::HighScoresMenu()
+HighScoresMenu::HighScoresMenu() : BaseMenu()
 {
 	// Setup the text renderer
 	mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
@@ -35,7 +37,7 @@ HighScoresMenu::~HighScoresMenu()
 
 // ---------------------------------------------------------------- //
 
-void HighScoresMenu::Render()
+void HighScoresMenu::Render(unsigned int frameCount)
 {
 	// First render the words 'HIGH SCORES:'
 	mTextRenderer->Render("HIGH SCORES", 15, mHighScoresTextRenderPosition, 0);
@@ -46,9 +48,9 @@ void HighScoresMenu::Render()
 		if (i < mScores.size())
 		{
 			// Render the name first, then the score
-			mTextRenderer->Render(mScores[i].GetName(), 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].GetColourIndex());
+			mTextRenderer->Render(mScores[i].name, 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
 
-			mTextRenderer->Render(to_string(mScores[i].GetScore()), 100, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].GetColourIndex());
+			mTextRenderer->Render(to_string(mScores[i].score), 100, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
 		}
 		else
 		{
@@ -58,19 +60,6 @@ void HighScoresMenu::Render()
 			mTextRenderer->Render("10", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 		}
 	}
-}
-
-// ---------------------------------------------------------------- //
-
-bool HighScoresMenu::Update()
-{
-	// Allow the player to return back to the previous screen
-	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::ESCAPE))
-	{
-		return false;
-	}
-
-	return true;
 }
 
 // ---------------------------------------------------------------- //
@@ -109,9 +98,9 @@ void HighScoresMenu::LoadInScores()
 
 ScoreData::ScoreData(unsigned int score, std::string name, unsigned int colourIndex)
 {
-	mScore       = score;
-	mName        = name;
-	mColourIndex = colourIndex;
+	score       = score;
+	name        = name;
+	colourIndex = colourIndex;
 }
 
 // ---------------------------------------------------------------- //

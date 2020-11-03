@@ -108,10 +108,14 @@ void GameManager::Update(const float deltaTime)
 		mCurrentHighScore = mCurrentScore;
 
 	// You get an extra life after collecting 10,000 points
-	if (mPointsRemainingTillNextLife <= 0 && mExtraLifeCount < 5)
+	if (mPointsRemainingTillNextLife <= 0)
 	{
-		AddExtraLife();
-		AudioManager::GetInstance()->PlayExtraLifeSFX();
+		if (mExtraLifeCount < 5)
+		{
+			AddExtraLife();
+			AudioManager::GetInstance()->PlayExtraLifeSFX();
+		}
+
 		mPointsRemainingTillNextLife += POINTS_PER_EXTRA_LIFE;
 	}
 }
@@ -194,7 +198,7 @@ void GameManager::SaveOutScoreToLeaderboard()
 	// Now add the score into where it should go
 	for (unsigned int i = 0; i < scoreData.size(); i++)
 	{
-		if (scoreData[i].GetScore() < mCurrentScore)
+		if (scoreData[i].score < mCurrentScore)
 		{
 			scoreData.insert(scoreData.begin() + i, ScoreData(mCurrentScore, "Test", 0));
 			addedToList = true;
@@ -219,7 +223,7 @@ void GameManager::SaveOutScoreToLeaderboard()
 	}
 
 	for (unsigned int i = 0; i < scoreData.size(); i++)
-		writeFile << scoreData[i].GetName() << " " << scoreData[i].GetScore() << " " << scoreData[i].GetColourIndex() << "\n";
+		writeFile << scoreData[i].name << " " << scoreData[i].score << " " << scoreData[i].colourIndex << "\n";
 
 	writeFile.close();
 

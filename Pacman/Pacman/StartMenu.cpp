@@ -3,15 +3,14 @@
 #include "Constants.h"
 #include "GameManager.h"
 
+#include "TextRenderer.h"
+
 #include <iostream>
 
 // -------------------------------------------------------- //
 
-StartMenu::StartMenu() : mMaxSelectorSpriteFrames(2), mAmountOfRenderedFramesPerAnimationFrame(10), mAmountOfSpitesOnSelectorHeight(5), mAmountOfSpitesOnSelectorWidth(2)
+StartMenu::StartMenu() : BaseMenu(), mMaxSelectorSpriteFrames(2), mAmountOfRenderedFramesPerAnimationFrame(10), mAmountOfSpitesOnSelectorHeight(5), mAmountOfSpitesOnSelectorWidth(2)
 {
-	// Setup the text renderer
-	mTextRenderer        = new TextRenderer("Textures/UI/Font.png", 15, 21);
-
 	// Load in the selector sprite sheet
 	mSelectorSpriteSheet = new S2D::Texture2D();
 	mSelectorSpriteSheet->Load("Textures/SelectorSprite.png", false);
@@ -36,6 +35,10 @@ StartMenu::StartMenu() : mMaxSelectorSpriteFrames(2), mAmountOfRenderedFramesPer
 
 	mCurrentlySelectedOption        = SELECTION_OPTIONS::START_GAME;
 	mButtonCurrentlyPressed         = false;
+
+	// Setup the text renderer
+	mTextRenderer                   = new TextRenderer("Textures/UI/Font.png", 15, 21);
+
 }
 
 // -------------------------------------------------------- //
@@ -105,7 +108,7 @@ void StartMenu::Render(const unsigned int frameCount)
 
 // -------------------------------------------------------- //
 
-SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
+SCREENS StartMenu::Update(const float deltaTime)
 {
 	// Check for any relevent button inputs
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
@@ -113,25 +116,45 @@ SELECTION_OPTIONS StartMenu::Update(const float deltaTime)
 	HandleDownPress(*keyboardState);
 	HandleUpPress(*keyboardState);
 
-	SELECTION_OPTIONS buttonPress = HandleReturnPress(*keyboardState);
-	if (buttonPress != SELECTION_OPTIONS::NONE)
-		return buttonPress;
-
-	if (keyboardState->IsKeyDown(S2D::Input::Keys::RETURN) && !mButtonCurrentlyPressed)
-	{
-		// Return the currently selected option
-		mButtonCurrentlyPressed = true;
-
-		return mCurrentlySelectedOption;
-	}
-
 	// Now check if all buttons we care about are released
-	if (keyboardState->IsKeyUp(S2D::Input::Keys::DOWN) && keyboardState->IsKeyUp(S2D::Input::Keys::UP) && keyboardState->IsKeyUp(S2D::Input::Keys::RETURN))
+	if (keyboardState->IsKeyUp(S2D::Input::Keys::DOWN) && 
+		keyboardState->IsKeyUp(S2D::Input::Keys::UP)   && 
+		keyboardState->IsKeyUp(S2D::Input::Keys::RETURN))
 	{
 		mButtonCurrentlyPressed = false;
 	}
 
-	return SELECTION_OPTIONS::NONE;
+	// Get if the return button has been pressed
+	SELECTION_OPTIONS buttonPress = HandleReturnPress(*keyboardState);
+	if (buttonPress != SELECTION_OPTIONS::NONE)
+	{
+		switch (buttonPress)
+		{
+		case SELECTION_OPTIONS::START_GAME:
+			return SCREENS::IN_GAME;
+		break;
+
+		case SELECTION_OPTIONS::HIGHSCORES:
+			return SCREENS::HIGH_SCORES;
+		break;
+
+		case SELECTION_OPTIONS::QUIT:
+			return SCREENS::QUIT;
+		break;
+
+		case SELECTION_OPTIONS::CHANGE_PLAYER:
+			GameManager::Instance()->IncrementPlayerCharacter();
+		break;
+
+		default:
+			return SCREENS::SAME;
+		break;
+		}
+	}
+	else
+		return SCREENS::SAME;
+
+	return SCREENS::SAME;
 }
 
 // -------------------------------------------------------- //

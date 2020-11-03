@@ -3,10 +3,11 @@
 
 #include "S2D/S2D.h"
 
-#include "TextRenderer.h"
-#include "Commons.h"
+#include "BaseMenu.h"
 
-#include <vector>
+#include <string>
+
+class TextRenderer;
 
 // -------------------------------------------------------------------------------------------------- //
 
@@ -16,26 +17,20 @@ public:
 	ScoreData(unsigned int score, std::string name, unsigned int colourIndex);
 	~ScoreData() { ; }
 
-	unsigned int GetScore() { return mScore; }
-	std::string GetName() { return mName; }
-	unsigned int GetColourIndex() { return mColourIndex; }
-
-private:
-	std::string  mName;
-	unsigned int mScore;
-	unsigned int mColourIndex;
+	std::string  name;
+	unsigned int score;
+	unsigned int colourIndex;
 };
 
 // -------------------------------------------------------------------------------------------------- //
 
-class HighScoresMenu final
+class HighScoresMenu final : public BaseMenu
 {
 public:
 	HighScoresMenu();
 	~HighScoresMenu();
 
-	void            Render();
-	bool            Update();
+	void            Render(unsigned int frameCount) override;
 
 private:
 	void LoadInScores();

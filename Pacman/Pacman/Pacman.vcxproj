@@ -86,10 +86,12 @@
   <ItemGroup>
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="BaseMenu.cpp" />
     <ClCompile Include="DotsHandler.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="HighScoresMenu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainGameScreen.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanCharacter.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
@@ -101,11 +103,13 @@
   <ItemGroup>
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="BaseMenu.h" />
     <ClInclude Include="Commons.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DotsHandler.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="HighScoresMenu.h" />
+    <ClInclude Include="MainGameScreen.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="PacmanCharacter.h" />
     <ClInclude Include="PauseMenu.h" />

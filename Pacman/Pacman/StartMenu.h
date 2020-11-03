@@ -3,18 +3,21 @@
 
 #include "S2D/S2D.h"
 #include "Commons.h"
-#include "TextRenderer.h"
+
+#include "BaseMenu.h"
+
+class TextRenderer;
 
 // ------------------------------------------------------------------------- //
 
-class StartMenu final
+class StartMenu final : public BaseMenu
 {
 public:
 	StartMenu();
 	~StartMenu();
 
-	void              Render(const unsigned int frameCount);
-	SELECTION_OPTIONS Update(const float deltaTime);
+	void    Render(const unsigned int frameCount);
+	SCREENS Update(const float deltaTime);
 
 private:
 	void               HandleDownPress  (S2D::Input::KeyboardState& keyboardState);

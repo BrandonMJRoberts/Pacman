@@ -1,6 +1,8 @@
 #include "UIManager.h"
 
 #include "GameManager.h"
+#include "TextRenderer.h"
+#include "Pickups.h"
 
 #include <iostream>
 

@@ -1,9 +1,10 @@
 #include "Pacman.h"
-#include "GameManager.h"
 #include "Constants.h"
 
-#include "UIManager.h"
-#include "AudioManager.h"
+#include "StartMenu.h"
+#include "PauseMenu.h"
+#include "HighScoresMenu.h"
+#include "MainGameScreen.h"
 
 #include <time.h>
 
@@ -13,10 +14,10 @@
 
 Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 {
-	// Set the seed to be random
+	// Set the seed to be a random one
 	srand(time(NULL));
 
-	_frameCount = 0;
+	mFrameCount = 0;
 
 	//Initialise important Game aspects
 	S2D::Audio::Initialise();
@@ -31,16 +32,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 
 Pacman::~Pacman()
 {
-	delete mBackground;
-	delete mPlayer;
-	delete mDotHandler;
-
-	delete mPauseMenu;
-	delete mStartMenu;
-	delete mHighScoreMenu;
-
-	delete mCollectable;
-	delete mTextRenderer;
+	delete mCurrentScreen;
 
 	Graphics::Destroy();
 }
@@ -49,16 +41,14 @@ Pacman::~Pacman()
 
 void Pacman::LoadContent()
 {
-	if(!mStartMenu)
-		mStartMenu		  = new StartMenu();
+	// Set the current screen to being the start menu
+	if (mCurrentScreen)
+		delete mCurrentScreen;
 
-	// Default into the start menu
-	mInStartMenu     = true;
-	mInHighscoreMenu = false;
-	mInMainGame      = false;
+	mCurrentScreen     = (BaseMenu*)(new StartMenu);
 
-	if(!mTextRenderer)
-		mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
+	mCurrentScreenType = SCREENS::MAIN_MENU;
+	mPriorScreenType   = SCREENS::MAIN_MENU;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -67,14 +57,101 @@ void Pacman::Update(int elapsedTime)
 {
 	float deltaTime = ((float)elapsedTime / 1000.0f);
 
-	if (mInStartMenu)
-		StartMenuUpdate(deltaTime);
-	else if (mInHighscoreMenu)
-		HighScoreMenuUpdate();
-	else if(GameManager::Instance()->GetGameIsPaused())
-		PauseMenuUpdate(deltaTime);
-	else if(mInMainGame)
-		InGameUpdate(deltaTime);
+	// Update the current screen/menu and check if we are quitting the program
+	if (HandleScreenUpdate(mCurrentScreen->Update(deltaTime)))
+	{
+		// Close the program
+		S2D::Audio::Destroy();
+		S2D::Graphics::Destroy();
+	}
+}
+
+// -------------------------------------------------------------------------------------------------------------- //
+
+bool Pacman::HandleScreenUpdate(SCREENS newScreen)
+{
+	SCREENS temp;
+
+	switch (newScreen)
+	{
+	case SCREENS::HIGH_SCORES:
+		delete mCurrentScreen;
+
+		mPriorScreenType   = mCurrentScreenType;
+		mCurrentScreenType = SCREENS::HIGH_SCORES;
+		mCurrentScreen     = (BaseMenu*)(new HighScoresMenu);
+	break;
+
+	case SCREENS::IN_GAME:
+		delete mCurrentScreen;
+
+		mPriorScreenType   = mCurrentScreenType;
+		mCurrentScreenType = SCREENS::IN_GAME;
+		mCurrentScreen     = (BaseMenu*)(new MainGameScreen);
+	break;
+
+	case SCREENS::MAIN_MENU:
+		delete mCurrentScreen;
+
+		mPriorScreenType   = mCurrentScreenType;
+		mCurrentScreenType = SCREENS::MAIN_MENU;
+		mCurrentScreen     = (BaseMenu*)(new StartMenu);
+	break;
+
+	case SCREENS::PAUSE_MENU:
+		delete mCurrentScreen;
+
+		mPriorScreenType   = mCurrentScreenType;
+		mCurrentScreenType = SCREENS::PAUSE_MENU;
+		mCurrentScreen     = (BaseMenu*)(new PauseMenu);
+	break;
+
+	case SCREENS::PRIOR:
+		temp               = mCurrentScreenType;
+
+		mCurrentScreenType = mPriorScreenType;
+		mPriorScreenType   = temp;
+
+		switch (mCurrentScreenType)
+		{
+		case SCREENS::HIGH_SCORES:
+			delete mCurrentScreen;
+
+			mCurrentScreen = (BaseMenu*)(new HighScoresMenu);
+		break;
+
+		case SCREENS::IN_GAME:
+			delete mCurrentScreen;
+
+			mCurrentScreen = (BaseMenu*)(new MainGameScreen);
+		break;
+
+		case SCREENS::MAIN_MENU:
+			delete mCurrentScreen;
+
+			mCurrentScreen = (BaseMenu*)(new StartMenu);
+		break;
+
+		case SCREENS::PAUSE_MENU:
+			delete mCurrentScreen;
+
+			mCurrentScreen = (BaseMenu*)(new PauseMenu);
+		break;
+		}
+	break;
+
+	case SCREENS::SAME:
+	break;
+
+	case SCREENS::QUIT:
+		return true;
+	break;
+
+	default:
+	break;
+	}
+
+	return false;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
@@ -84,219 +161,16 @@ void Pacman::Draw(int elapsedTime)
 	// Starts Drawing
 	SpriteBatch::BeginDraw();
 
-		// Make sure we are rendering the correct content
-		if (mInMainGame)
-			MainGameRender();
-		else if (mInStartMenu)
-		{
-			mStartMenu->Render(_frameCount);
-		}
-		else if (mInHighscoreMenu)
-		{
-			mHighScoreMenu->Render();
-		}
-		else if (GameManager::Instance()->GetGameIsPaused())
-		{
-			mPauseMenu->Render();
-		}
+		// Render the current screen/menu
+		mCurrentScreen->Render(mFrameCount);
 
 		// Increment the frame count
-		_frameCount++;
+		mFrameCount++;
 
-		if (_frameCount >= FRAME_RATE)
-			_frameCount = 0;
+		if (mFrameCount >= FRAME_RATE)
+			mFrameCount = 0;
 
 	SpriteBatch::EndDraw(); // Ends Drawing
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::StartMenuUpdate(const float deltaTime)
-{
-	mInMainGame = false;
-
-	SELECTION_OPTIONS returnOption = mStartMenu->Update(deltaTime);
-	if (returnOption == SELECTION_OPTIONS::START_GAME)
-	{
-		mInMainGame      = true;
-		mInStartMenu     = false;
-		mInHighscoreMenu = false;
-
-		LoadInDataForLevel();
-	}
-	else if (returnOption == SELECTION_OPTIONS::HIGHSCORES)
-	{
-		// Selected to go into the highscores menu
-		mInMainGame      = false;
-		mInStartMenu     = false;
-		mInHighscoreMenu = true;
-
-		if (!mHighScoreMenu)
-			mHighScoreMenu = new HighScoresMenu();
-	}
-	else if (returnOption == SELECTION_OPTIONS::CHANGE_PLAYER)
-	{
-		GameManager::Instance()->IncrementPlayerCharacter();
-		mInMainGame      = false;
-		mInHighscoreMenu = false;
-	}
-	else if (returnOption == SELECTION_OPTIONS::QUIT)
-	{
-		std::cout << "Quitting the program." << std::endl;
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::PauseMenuUpdate(const float deltaTime)
-{
-	if (mPauseMenu)
-	{
-		mInMainGame = mPauseMenu->Update(deltaTime);
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::HighScoreMenuUpdate()
-{
-	mInMainGame = false;
-
-	if (!mHighScoreMenu->Update())
-	{
-		mInHighscoreMenu = false;
-		mInStartMenu = true;
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::InGameUpdate(const float deltaTime)
-{
-	// Update the dots in the level
-	mDotHandler->Update(mPlayer->GetCentrePosition(), 9);
-
-    // First check if the level is over
-	if (GameManager::Instance()->GetRemainingDots() == 0)
-	{
-		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
-		mPlayer->ResetCharacter();
-
-		// Make sure we change the background colour to being the next level's
-		mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
-
-		delete mCollectable;
-		mCollectable = nullptr;
-
-		return;
-	}
-
-	// Player update
-	mPlayer->Update(deltaTime);
-
-	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 13, mPlayer->GetFacingDirection()))
-	{
-		// Delete this collectable
-		delete mCollectable;
-		mCollectable = nullptr;
-	}
-
-	if (mCollectable == nullptr)
-	{
-		// Collectable update
-		mTimeTillNextCollectableSpawn -= deltaTime;
-
-		if (mTimeTillNextCollectableSpawn <= 0.0f)
-		{
-			// Spawn the collectable
-			SpawnNextCollectable();
-
-			// Reset the time to a random amount
-			mTimeTillNextCollectableSpawn = 5; //= float((rand() % 40) + 15);
-		}
-	}
-
-	// Update the game manager
-	GameManager::Instance()->Update(deltaTime);
-	UIManager::GetInstance()->Update(deltaTime);
-
-	// Input
-	InGameInputCheck();
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::InGameInputCheck()
-{
-	// Check if the player has paused the game
-	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
-	{
-		GameManager::Instance()->SetGameIsPaused(true);
-		GameManager::Instance()->SetIsPausedButtonPressed(true);
-		return;
-	}
-	else if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::P))
-	{
-		GameManager::Instance()->SetIsPausedButtonPressed(false);
-	}
-
-	// If we want to return back to the start menu then the player must press escape
-	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::ESCAPE))
-	{
-		mInStartMenu = true;
-		return;
-	}
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::MainGameRender()
-{
-	// Draw the background first
-	if (mBackground)
-		mBackground->Render();
-
-	UIManager::GetInstance()->Render();
-
-	// Render the dots onto the screen
-	if (mDotHandler)
-		mDotHandler->Render(_frameCount);
-
-	if (mCollectable)
-		mCollectable->Render();
-
-	// Render the player
-	if (mPlayer)
-		mPlayer->Render(_frameCount);
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::SpawnNextCollectable()
-{
-	// Spawn in a new random collectable
-	if(!mCollectable)
-		mCollectable = new PickUps(GameManager::Instance()->GetThisLevelCollectableType());
-}
-
-// -------------------------------------------------------------------------------------------------------------- //
-
-void Pacman::LoadInDataForLevel()
-{
-	if(!mBackground)
-		mBackground  = new Background(14, 4);
-
-	if(!mPauseMenu)
-		mPlayer      = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3);
-
-	if(!mDotHandler)
-		mDotHandler  = new DotsHandler();
-
-	if(!mPauseMenu)
-		mPauseMenu   = new PauseMenu();
-
-	mTimeTillNextCollectableSpawn = 10.0f;
 }
 
 // -------------------------------------------------------------------------------------------------------------- //

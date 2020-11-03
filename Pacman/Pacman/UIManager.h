@@ -1,8 +1,12 @@
 #ifndef _UI_MANAGER_H_
 #define _UI_MANAGER_H_
 
-#include "Pickups.h"
-#include "TextRenderer.h"
+#include "S2D/S2D.h"
+
+#include "Commons.h"
+
+class PickUps;
+class TextRenderer;
 
 class UIManager final
 {

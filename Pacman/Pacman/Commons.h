@@ -46,3 +46,18 @@ enum class PICKUP_TYPES : char
 	BELL       = 6,
 	KEY        = 7
 };
+
+// ------------------------------------------------------------------ //
+
+enum class SCREENS : char
+{
+	MAIN_MENU   = 0x00,
+	PAUSE_MENU  = 0x01,
+	IN_GAME     = 0x02,
+	HIGH_SCORES = 0x04,
+	SAME        = 0x08,
+	PRIOR       = 0x16,
+	QUIT        = 0x32
+};
+
+// ------------------------------------------------------------------ //

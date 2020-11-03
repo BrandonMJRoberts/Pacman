@@ -7,7 +7,7 @@
 
 // ---------------------------------------------------------------------- //
 
-PauseMenu::PauseMenu()
+PauseMenu::PauseMenu() : BaseMenu()
 {
 	mBackgroundSprite = new S2D::Texture2D();
 	mBackgroundSprite->Load("Textures/Backgrounds/PausedBackground.png", false);
@@ -41,7 +41,7 @@ void PauseMenu::Render()
 
 // ---------------------------------------------------------------------- //
 
-bool PauseMenu::Update(const float deltaTime)
+SCREENS PauseMenu::Update(const float deltaTime)
 {
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
@@ -50,14 +50,15 @@ bool PauseMenu::Update(const float deltaTime)
 	{
 		GameManager::Instance()->SetGameIsPaused(false);
 		GameManager::Instance()->SetIsPausedButtonPressed(true);
-		return true;
+
+		return SCREENS::PRIOR;
 	}
 	else if (keyboardState->IsKeyUp(S2D::Input::Keys::P))
 	{
 		GameManager::Instance()->SetIsPausedButtonPressed(false);
 	}
 
-	return false;
+	return SCREENS::SAME;
 }
 
 // ---------------------------------------------------------------------- //
