@@ -13,43 +13,46 @@ public:
 
 	void                Update(const float deltaTime);
 
-	unsigned int        GetRemainingDots()			         { return mRemainingDots; }
+	unsigned int        GetRemainingDots()			                          { return mRemainingDots; }
 
 	void                SetCurrentDotCount(const unsigned int count)          { mRemainingDots = count; }
 	void                DecreaseRemainingDots(const unsigned int amount)      { mRemainingDots -= amount; }
 
-	void                SetStartingLevel(unsigned int newID) { mCurrentLevelID = newID; SetDotCounts(); }
-	unsigned int        GetCurrentLevel()                    { return mCurrentLevelID; }
+	void                SetCurrentLevel(unsigned int newID)                   { mCurrentLevelID = newID; }
+	unsigned int        GetCurrentLevel()                                     { return mCurrentLevelID; }
 
-	void                AddToScore(unsigned int addition)    { mCurrentScore += addition;  mPointsRemainingTillNextLife -= addition; }
-	unsigned int        GetCurrentScore()			         { return mCurrentScore; }
+	void                AddToScore(unsigned int addition)                     { mCurrentScore += addition;  mPointsRemainingTillNextLife -= addition; }
+	unsigned int        GetCurrentScore()			                          { return mCurrentScore; }
+	void                SetCurrentScore(unsigned int newVal)                  { mCurrentScore = newVal; }
 
-	unsigned int        SetCurrentHighScore(unsigned int score) { mCurrentHighScore = score; }
-	unsigned int        GetCurrentHighScore()                { return mCurrentHighScore; }
+	unsigned int        SetCurrentHighScore(unsigned int score)               { mCurrentHighScore = score; }
+	unsigned int        GetCurrentHighScore()                                 { return mCurrentHighScore; }
 
 	void                SetPlayerPoweredUp(bool playerState);
-	bool                GetIsPlayerPoweredUp()               { return mPlayerIsPoweredUp; }
+	bool                GetIsPlayerPoweredUp()                                { return mPlayerIsPoweredUp; }
 
-	S2D::Vector2        GetGridOffset()                      { return mGridOffsetFromTopLeft; }
+	S2D::Vector2        GetGridOffset()                                       { return mGridOffsetFromTopLeft; }
 
-	bool                GetPlayerIsAlive()					 { return mPlayerIsAlive; }
-	void                SetPlayerIsAlive(bool newVal)        { mPlayerIsAlive = newVal; }
+	bool                GetPlayerIsAlive()					                  { return mPlayerIsAlive; }
+	void                SetPlayerIsAlive(bool newVal)                         { mPlayerIsAlive = newVal; }
 
-	bool                GetGameIsPaused()                    { return mGameIsPaused; }
-	void                SetGameIsPaused(bool newVal)         { mGameIsPaused = newVal; }
+	bool                GetGameIsPaused()                                     { return mGameIsPaused; }
+	void                SetGameIsPaused(bool newVal)                          { mGameIsPaused = newVal; }
 
-	bool                GetIsAlreadySettingGamePaused()       { return mSettingGamePausedState; }
-	void                SetIsPausedButtonPressed(bool newVal) { mSettingGamePausedState = newVal; }
+	bool                GetIsAlreadySettingGamePaused()                       { return mSettingGamePausedState; }
+	void                SetIsPausedButtonPressed(bool newVal)                 { mSettingGamePausedState = newVal; }
 
-	PLAYER_CHARACTER_TYPE GetPlayerCharacterType()                          { return mPlayerCharacterType; }
-	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType) { mPlayerCharacterType = newType; }
+	PLAYER_CHARACTER_TYPE GetPlayerCharacterType()                            { return mPlayerCharacterType; }
+	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType)   { mPlayerCharacterType = newType; }
 	void                  IncrementPlayerCharacter();
 
-	unsigned int          GetExtraLivesCount()                         { return mExtraLifeCount; }
-	void                  AddExtraLife()                               { mExtraLifeCount++; }
-	void                  RemoveLife()                                 { if (mExtraLifeCount > 0) mExtraLifeCount--; }
-
-	PICKUP_TYPES          GetThisLevelCollectableType()                { return mThisLevelCollectableSpawnType; }
+	unsigned int          GetExtraLivesCount()                                { return mExtraLifeCount; }
+	void                  AddExtraLife()                                      { mExtraLifeCount++; }
+	void                  RemoveLife()                                        { if (mExtraLifeCount > 0) mExtraLifeCount--; }
+	void                  SetCurrentExtraLifeCount(unsigned int newVal)       { mExtraLifeCount = newVal; }
+	 
+	PICKUP_TYPES          GetThisLevelCollectableType()                       { return mThisLevelCollectableSpawnType; }
+	void                  SetLevelPickupType(PICKUP_TYPES newType)            { mThisLevelCollectableSpawnType = newType; }
 
 	void                  RestartLevel();
 	void                  LoadLevel(const unsigned int newLevelID);

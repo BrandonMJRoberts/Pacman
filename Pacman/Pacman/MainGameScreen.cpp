@@ -71,7 +71,10 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	// First check if the level is over
 	if (GameManager::Instance()->GetRemainingDots() == 0)
 	{
+		// Increase the level in the game manager
 		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
+
+		// Reset the player
 		mPlayer->ResetCharacter();
 
 		// Make sure we change the background colour to being the next level's
@@ -164,10 +167,33 @@ SCREENS MainGameScreen::InGameInputCheck()
 	// If we want to return back to the start menu then the player must press escape
 	if (S2D::Input::Keyboard::GetState()->IsKeyDown(S2D::Input::Keys::ESCAPE))
 	{
+		GameManager::Instance()->SetCurrentLevel(0);                            // Reset the level ID
+		GameManager::Instance()->SetCurrentScore(0);                            // Reset the player's current score
+		GameManager::Instance()->SetLevelPickupType(PICKUP_TYPES::CHERRY);      // Set the starting collectable type
+		GameManager::Instance()->SetCurrentExtraLifeCount(STARTING_LIFE_COUNT); // Reset the starting life count
+
+
 		return SCREENS::MAIN_MENU;
 	}
 
 	return SCREENS::SAME;
 }
 
+// ------------------------------------------------------------------------------ //
+
+/*
+void MainGameScreen::LoadNextLevel()
+{
+	delete mBackground;
+	mBackground = nullptr;
+
+	delete mPlayer;
+	mPlayer = nullptr;
+
+	delete mDotHandler;
+	mDotHandler = nullptr;
+
+	LoadInDataForLevel();
+}
+*/
 // ------------------------------------------------------------------------------ //

@@ -33,6 +33,9 @@ AudioManager::~AudioManager()
 {
 	delete mDotCollectionSFX;
 	mDotCollectionSFX = nullptr;
+
+	delete mInstance;
+	mInstance = nullptr;
 }
 
 // -------------------------------------------------------------------------- //

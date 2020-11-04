@@ -6,6 +6,8 @@
 #include "HighScoresMenu.h"
 #include "MainGameScreen.h"
 
+#include "GameManager.h"
+
 #include <time.h>
 
 #include <sstream>
@@ -61,33 +63,24 @@ void Pacman::Update(int elapsedTime)
 	float deltaTime = ((float)elapsedTime / 1000.0f);
 
 	// Update the current screen/menu and check if we are quitting the program
-	SCREENS screenToSwapTo = mCurrentScreen->Update(deltaTime);
-	bool swappingToPriorScreen = false;
+	SCREENS screenToSwapTo        = mCurrentScreen->Update(deltaTime);
 
 	if (screenToSwapTo == SCREENS::PRIOR)
 	{
 		screenToSwapTo = mPriorScreenType;
-		swappingToPriorScreen = true;
 	}
 
-	if (HandleScreenUpdate(screenToSwapTo))
+	if (HandleScreenChange(screenToSwapTo))
 	{
 		// Close the program
 		S2D::Audio::Destroy();
 		S2D::Graphics::Destroy();
 	}
-
-	if (swappingToPriorScreen)
-	{
-		SCREENS temp       = mCurrentScreenType;
-		mCurrentScreenType = mPriorScreenType;
-		mPriorScreenType   = temp;
-	}
 }
 
 // -------------------------------------------------------------------------------------------------------------- //
 
-bool Pacman::HandleScreenUpdate(SCREENS newScreen)
+bool Pacman::HandleScreenChange(SCREENS newScreen)
 {
 	// Switch through the screens we want to transition to 
 	switch (newScreen)
@@ -108,7 +101,7 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 	// Going into a new game
 	case SCREENS::IN_GAME:
 		// If a game currently exists then delete it
-		if (mGameInstance)
+		if (mGameInstance && mCurrentScreenType != SCREENS::PAUSE_MENU)
 		{
 			delete mGameInstance;
 			mGameInstance = nullptr;
@@ -120,8 +113,9 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 
 		mCurrentScreen     = nullptr;
 
-		// Create a new game instance
-		mGameInstance      = new MainGameScreen;
+		// Create a new game instance if there is not one already
+		if(!mGameInstance)
+			mGameInstance      = new MainGameScreen;
 
 		mPriorScreenType   = mCurrentScreenType;
 		mCurrentScreenType = SCREENS::IN_GAME;
@@ -131,6 +125,7 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 	break;
 
 	case SCREENS::MAIN_MENU:
+
 		// If we are going to the main menu then we need to clear all memory of a game instance
 		if (mGameInstance)
 		{
@@ -149,6 +144,7 @@ bool Pacman::HandleScreenUpdate(SCREENS newScreen)
 		mCurrentScreen     = (BaseMenu*)(new StartMenu);
 	break;
 
+	// Going to the pause menu
 	case SCREENS::PAUSE_MENU:
 		if (mCurrentScreenType != SCREENS::IN_GAME)
 		{

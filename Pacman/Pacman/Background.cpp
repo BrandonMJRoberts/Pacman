@@ -85,6 +85,17 @@ void Background::Render()
 
 void Background::LoadInCollisionMap()
 {
+	if (mCollisionMap)
+	{
+		for (unsigned int row = 0; row < mHeight; row++)
+		{
+			delete[] mCollisionMap[row];
+		}
+
+		delete[] mCollisionMap;
+		mCollisionMap = nullptr;
+	}
+
 	std::ifstream file;
 	file.open("CollisionMaps/" + to_string(GameManager::Instance()->GetCurrentLevel()) + ".txt");
 	if (!file.is_open())

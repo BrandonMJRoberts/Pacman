@@ -21,7 +21,7 @@ GameManager::GameManager()
 
 	mRemainingDots				   = 0;
 
-	mExtraLifeCount                = 2;
+	mExtraLifeCount                = STARTING_LIFE_COUNT;
 	mPlayerIsPoweredUp             = false;
 	mCurrentScore                  = 0;
 	mCurrentHighScore              = 0;

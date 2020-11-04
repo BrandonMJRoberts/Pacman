@@ -27,3 +27,5 @@
 #define AMOUNT_OF_LEVELS 3
 
 #define TIME_POINTS_SHOW_FOR 4.0f
+
+#define STARTING_LIFE_COUNT 2

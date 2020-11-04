@@ -20,6 +20,7 @@ public:
 	SCREENS          Update(const float deltaTime)         override;
 
 private:
+	void             LoadNextLevel();
 	void             LoadInDataForLevel();
 	void             SpawnNextCollectable();
 

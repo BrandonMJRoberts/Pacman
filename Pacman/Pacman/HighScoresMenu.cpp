@@ -13,7 +13,7 @@
 HighScoresMenu::HighScoresMenu() : BaseMenu()
 {
 	// Setup the text renderer
-	mTextRenderer = new TextRenderer("Textures/UI/Font.png", 15, 21);
+	mTextRenderer                 = new TextRenderer("Textures/UI/Font.png", 15, 21);
 
 	mHighScoresTextRenderPosition = S2D::Vector2(330, 50);
 	mScoresRenderOffset           = S2D::Vector2(330, 100);
@@ -78,7 +78,7 @@ void HighScoresMenu::LoadInScores()
 		while (file.getline(cLine, 100))
 		{
 			// Read in the data
-			sLine = cLine;
+			sLine  = cLine;
 			ssLine = std::stringstream(sLine);
 
 			ssLine >> name >> score >> colourIndex;
@@ -86,7 +86,7 @@ void HighScoresMenu::LoadInScores()
 			mScores.push_back(ScoreData(score, name, colourIndex));
 		}
 
-		delete cLine;
+		delete[] cLine;
 	}
 	else
 	{
@@ -96,11 +96,11 @@ void HighScoresMenu::LoadInScores()
 
 // ---------------------------------------------------------------- //
 
-ScoreData::ScoreData(unsigned int score, std::string name, unsigned int colourIndex)
+ScoreData::ScoreData(unsigned int startScore, std::string startName, unsigned int startColourIndex)
 {
-	score       = score;
-	name        = name;
-	colourIndex = colourIndex;
+	score       = startScore;
+	name        = startName;
+	colourIndex = startColourIndex;
 }
 
 // ---------------------------------------------------------------- //

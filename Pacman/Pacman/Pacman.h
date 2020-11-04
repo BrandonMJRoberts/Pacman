@@ -36,7 +36,7 @@ public:
 	void virtual Draw(int elapsedTime);
 
 private:
-	bool             HandleScreenUpdate(SCREENS newScreen);
+	bool             HandleScreenChange(SCREENS newScreen);
 
 	BaseMenu*        mCurrentScreen;
 	MainGameScreen*  mGameInstance;
