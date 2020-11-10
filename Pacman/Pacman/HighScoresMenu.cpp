@@ -40,7 +40,7 @@ HighScoresMenu::~HighScoresMenu()
 void HighScoresMenu::Render(unsigned int frameCount)
 {
 	// First render the words 'HIGH SCORES:'
-	mTextRenderer->Render("HIGH SCORES", 15, mHighScoresTextRenderPosition, 0);
+	mTextRenderer->RenderFromRight("HIGH SCORES", 15, mHighScoresTextRenderPosition, 0);
 
 	// Loop through all the scores and render them
 	for (unsigned int i = 0; i < 10; i++)
@@ -48,16 +48,16 @@ void HighScoresMenu::Render(unsigned int frameCount)
 		if (i < mScores.size())
 		{
 			// Render the name first, then the score
-			mTextRenderer->Render(mScores[i].name, 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
+			mTextRenderer->RenderFromRight(mScores[i].name, 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
 
-			mTextRenderer->Render(to_string(mScores[i].score), 100, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
+			mTextRenderer->RenderFromRight(to_string(mScores[i].score), 100, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), mScores[i].colourIndex);
 		}
 		else
 		{
 			// Render a preset for filler space
-			mTextRenderer->Render("FILLER", 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
+			mTextRenderer->RenderFromRight("FILLER", 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 
-			mTextRenderer->Render("0", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
+			mTextRenderer->RenderFromRight("0", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 		}
 	}
 }

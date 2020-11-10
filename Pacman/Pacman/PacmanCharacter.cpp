@@ -120,6 +120,8 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	S2D::Vector2 centreGridPos = ConvertPositionToGridPosition(mCentrePosition);
 	S2D::Vector2 gridPos = S2D::Vector2(), movementAmount = S2D::Vector2();
 
+	double pacmanMovementDistance = PACMAN_MOVEMENT_SPEED * deltaTime;
+
 	// First lock the opposite axis to which we are moving in
 	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
 	{
@@ -139,14 +141,14 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position - now with the projection in his direction
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 3.0f));
 
-		movementAmount.Y = PACMAN_MOVEMENT_SPEED * deltaTime;
+		movementAmount.Y = pacmanMovementDistance;
 	break;
 
 	case FACING_DIRECTION::UP:
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
 
-		movementAmount.Y = -1.0f * (PACMAN_MOVEMENT_SPEED * deltaTime);
+		movementAmount.Y = -1.0f * pacmanMovementDistance;
 	break;
 
 	case FACING_DIRECTION::LEFT:
@@ -154,7 +156,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(-1.0f * mSingleSpriteWidth * 0.4f, 0.0f)); //(mSingleSpriteWidth / 2.0f), 0.0f));
 
-		movementAmount.X = -1.0f * (PACMAN_MOVEMENT_SPEED * deltaTime);
+		movementAmount.X = -1.0f * pacmanMovementDistance;
 	break;
 
 	case FACING_DIRECTION::RIGHT:
@@ -162,7 +164,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f ,0.0f));//mSingleSpriteWidth / 2.0f, 0.0f));
 
-		movementAmount.X = PACMAN_MOVEMENT_SPEED * deltaTime;
+		movementAmount.X = pacmanMovementDistance;
 	break;
 
 	case FACING_DIRECTION::NONE:

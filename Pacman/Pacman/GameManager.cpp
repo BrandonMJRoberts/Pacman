@@ -17,35 +17,14 @@ GameManager* GameManager::mInstance = nullptr;
 
 GameManager::GameManager()
 {
-	mPlayerName                    = "UNNAMED";
-	mCurrentLevelID				   = 0;
-	mPlayerNameColourIndex         = 0;
-
-	mRemainingDots				   = 0;
-
-	mExtraLifeCount                = STARTING_LIFE_COUNT;
-	mPlayerIsPoweredUp             = false;
-	mCurrentScore                  = 0;
-	mCurrentHighScore              = 0;
-
-	mTimeRemainingInPoweredUpState = 0.0f;
-
-	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
-
-	mPlayerIsAlive                 = true;
-	mGameIsPaused				   = false;
-
-	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
-
-	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
-
-	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
+	SetVariablesToStartingValues();
 }
 
 // ---------------------------------------------------------------- //
 
 GameManager::~GameManager()
 {
+	// Clear up the memory allocated
 	delete mInstance;
 	mInstance = nullptr;
 }
@@ -64,6 +43,35 @@ GameManager* GameManager::Instance()
 
 // ---------------------------------------------------------------- //
 
+void GameManager::SetVariablesToStartingValues()
+{
+	mPlayerName                    = "UNNAMED";
+	mCurrentLevelID                = 0;
+	mPlayerNameColourIndex         = 0;
+
+	mRemainingDots                 = 0;
+
+	mExtraLifeCount                = STARTING_LIFE_COUNT;
+	mPlayerIsPoweredUp             = false;
+	mCurrentScore                  = 0;
+	mCurrentHighScore              = 0;
+
+	mTimeRemainingInPoweredUpState = 0.0f;
+
+	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
+
+	mPlayerIsAlive                 = true;
+	mGameIsPaused                  = false;
+
+	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
+
+	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
+
+	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
+}
+
+// ---------------------------------------------------------------- //
+
 void GameManager::SetDotCounts()
 {
 	mRemainingDots = 0;
@@ -73,7 +81,7 @@ void GameManager::SetDotCounts()
 
 void GameManager::RestartLevel()
 {
-	mExtraLifeCount = 2;
+	SetVariablesToStartingValues();
 }
 
 // ---------------------------------------------------------------- //
@@ -94,6 +102,7 @@ void GameManager::SetPlayerPoweredUp(bool playerState)
 
 void GameManager::Update(const float deltaTime)
 {
+	// First handle the powerup timer
 	if (mTimeRemainingInPoweredUpState > 0)
 	{
 		mTimeRemainingInPoweredUpState -= deltaTime;

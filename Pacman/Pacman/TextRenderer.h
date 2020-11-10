@@ -13,7 +13,8 @@ public:
 	TextRenderer(std::string filePath, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight);
 	~TextRenderer();
 
-	void Render(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex);
+	void RenderFromRight(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex);
+	void RenderFromLeft(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex);
 
 private:
 	void SetUpConversionTable();

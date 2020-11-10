@@ -133,15 +133,15 @@ void UIManager::RenderScores()
 	if (mTextRenderer)
 	{
 		// First render the text at the top
-		mTextRenderer->Render("HIGH SCORE", 12, mHighScoreTextPosition, 7);
+		mTextRenderer->RenderFromRight("HIGH SCORE", 12, mHighScoreTextPosition, 7);
 
-		mTextRenderer->Render(GameManager::Instance()->GetPlayerName(), 8, mPlayerNamePosition, GameManager::Instance()->GetPlayerNameColourIndex());
+		mTextRenderer->RenderFromRight(GameManager::Instance()->GetPlayerName(), 8, mPlayerNamePosition, GameManager::Instance()->GetPlayerNameColourIndex());
 
 		// Now render the player's current score
-		mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, mCurrentScoreDisplayPosition, 0);
+		mTextRenderer->RenderFromRight(to_string(GameManager::Instance()->GetCurrentScore()), 20, mCurrentScoreDisplayPosition, 0);
 
 		// Now render the currently saved highscore
-		mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, mHighScoreDisplayPosition, 0);
+		mTextRenderer->RenderFromRight(to_string(GameManager::Instance()->GetCurrentHighScore()), 20, mHighScoreDisplayPosition, 0);
 	}
 }
 

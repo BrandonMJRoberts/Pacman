@@ -41,7 +41,7 @@ TextRenderer::TextRenderer(std::string filePath, const unsigned int spritesOnWid
 
 // ------------------------------------------------------------------------------------------------------------------------------------------ //
 
-void TextRenderer::Render(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex)
+void TextRenderer::RenderFromRight(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topRightPos, unsigned int colourIndex)
 {
 	mDestRect->X = topRightPos.X;
 	mDestRect->Y = topRightPos.Y;
@@ -68,6 +68,38 @@ void TextRenderer::Render(std::string textToRender, unsigned int amountOfCharact
 
 		// Increment the render position
 		mDestRect->X -= mSingleSpriteWidth;
+	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------------------ //
+
+void TextRenderer::RenderFromLeft(std::string textToRender, unsigned int amountOfCharactersPerLine, S2D::Vector2 topLeftPos, unsigned int colourIndex)
+{
+	mDestRect->X = topLeftPos.X;
+	mDestRect->Y = topLeftPos.Y;
+
+	// Make sure that the colour of the text is a valid index
+	colourIndex %= 7;
+
+	// Loop through all of the text we need to render
+	for (int charID = 0; charID < textToRender.size(); charID++)
+	{
+		if (charID % amountOfCharactersPerLine == 0 && charID != textToRender.size() - 1)
+		{
+			// Reset to the starting render position
+			mDestRect->Y += mSingleSpriteHeight;
+			mDestRect->X = topLeftPos.X;
+		}
+
+		// Now calculate the source render rect based on the current character
+		mSourceRect->X = float((mConversionMap[textToRender[charID]] % mSpritesOnWidth) * mSingleSpriteWidth);
+		mSourceRect->Y = float(((int(mConversionMap[textToRender[charID]] / mSpritesOnWidth)) * mSingleSpriteHeight) + (colourIndex * (3 * mSingleSpriteHeight)));
+
+		// Now do the draw call
+		S2D::SpriteBatch::Draw(mSpriteSheet, mDestRect, mSourceRect);
+
+		// Increment the render position
+		mDestRect->X += mSingleSpriteWidth;
 	}
 }
 

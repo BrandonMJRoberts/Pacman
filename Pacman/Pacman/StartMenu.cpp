@@ -105,11 +105,11 @@ void StartMenu::Render(const unsigned int frameCount)
 		S2D::SpriteBatch::Draw(mSelectorSpriteSheet, &mSelectorPosition, mSelectorSourceRenderRect);
 	}
 
-	mTextRenderer->Render("START GAME",       20, mStartGamePosition,       2);
-	mTextRenderer->Render("HIGHSCORES",       20, mHighScoresPosition,      2);
-	mTextRenderer->Render("CHANGE CHARACTER", 30, mChangeCharacterPosition, 2);
-	mTextRenderer->Render("NAME - " + GameManager::Instance()->GetPlayerName(),      40, mSetNamePosition,         GameManager::Instance()->GetPlayerNameColourIndex());
-	mTextRenderer->Render("EXIT GAME",        20, mExitGamePosition,        2);
+	mTextRenderer->RenderFromRight("START GAME",       20, mStartGamePosition,       2);
+	mTextRenderer->RenderFromRight("HIGHSCORES",       20, mHighScoresPosition,      2);
+	mTextRenderer->RenderFromRight("CHANGE CHARACTER", 30, mChangeCharacterPosition, 2);
+	mTextRenderer->RenderFromRight("NAME - " + GameManager::Instance()->GetPlayerName(),      40, mSetNamePosition,         GameManager::Instance()->GetPlayerNameColourIndex());
+	mTextRenderer->RenderFromRight("EXIT GAME",        20, mExitGamePosition,        2);
 }
 
 // -------------------------------------------------------- //

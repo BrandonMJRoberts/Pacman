@@ -86,6 +86,7 @@ public:
 private:
 	GameManager();
 	void                SetDotCounts();
+	void                SetVariablesToStartingValues();
 
 	// static instance
 	static GameManager* mInstance;
