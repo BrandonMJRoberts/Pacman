@@ -22,6 +22,15 @@ public:
 	void                  SetCurrentDotCount(const unsigned int count)        { mRemainingDots = count; }
 	void                  DecreaseRemainingDots(const unsigned int amount)    { mRemainingDots -= amount; }
 
+	// Dots collected and ghosts eaten
+	unsigned int         GetCurrentAmountOfDotsEaten()                        { return mDotsCollectedThisGame; }
+	void                 IncrementDotsEatenCount()                            { mDotsCollectedThisGame++; }
+	void                 ResetDotsEatenCount()                                { mDotsCollectedThisGame = 0; }
+
+	unsigned int         GetAmountOfGhostsEatenthisGame()                     { return mGhostsEatenThisGame; }
+	void                 IncrementGhostsEatenCount()                          { mGhostsEatenThisGame++; }
+	void                 ResetGhostsEatenCount()                              { mGhostsEatenThisGame = 0; }
+
 	// Levels
 	void                  SetCurrentLevel(unsigned int newID)                 { mCurrentLevelID = newID; }
 	unsigned int          GetCurrentLevel()                                   { return mCurrentLevelID; }
@@ -87,6 +96,7 @@ private:
 	GameManager();
 	void                SetDotCounts();
 	void                SetVariablesToStartingValues();
+	unsigned int        LoadInCurrentHighScore();
 
 	// static instance
 	static GameManager* mInstance;
@@ -99,6 +109,9 @@ private:
 	unsigned int        mCurrentHighScore;
 	unsigned int        mExtraLifeCount;
 	unsigned int	    mRemainingDots;
+
+	unsigned int        mDotsCollectedThisGame;
+	unsigned int        mGhostsEatenThisGame;
 
 	int                 mPointsRemainingTillNextLife;
 	float               mTimeRemainingInPoweredUpState;

@@ -164,6 +164,7 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned
 				mDots.pop_back();
 
 				GameManager::Instance()->DecreaseRemainingDots(1);
+				GameManager::Instance()->IncrementDotsEatenCount();
 
 				AudioManager::GetInstance()->PlayDotCollectionSFX();
 

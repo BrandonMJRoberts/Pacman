@@ -120,7 +120,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	S2D::Vector2 centreGridPos = ConvertPositionToGridPosition(mCentrePosition);
 	S2D::Vector2 gridPos = S2D::Vector2(), movementAmount = S2D::Vector2();
 
-	double pacmanMovementDistance = PACMAN_MOVEMENT_SPEED * deltaTime;
+	float pacmanMovementDistance = PACMAN_MOVEMENT_SPEED * deltaTime;
 
 	// First lock the opposite axis to which we are moving in
 	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)

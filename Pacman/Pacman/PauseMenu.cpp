@@ -58,8 +58,7 @@ void PauseMenu::Render(unsigned int frameCount)
 	if(mBackgroundSprite && mRenderRectangle)
 		S2D::SpriteBatch::Draw(mBackgroundSprite, mRenderRectangle);
 
-
-	// Render "pause menu" to the screen
+	// Render current stats to the screen
 	if (mTextRenderer)
 	{
 		GameManager* GM = GameManager::Instance();
@@ -69,8 +68,8 @@ void PauseMenu::Render(unsigned int frameCount)
 		mTextRenderer->RenderFromLeft("HIGH SCORE      - " + std::to_string(GM->GetCurrentHighScore()),30, mHighScoreTextPosition,                  0);
 		mTextRenderer->RenderFromLeft("REMAINING LIVES - " + std::to_string(GM->GetExtraLivesCount()), 30, mRemainingLivesCountTextPosition,        0);
 		mTextRenderer->RenderFromLeft("NAME            - " + GM->GetPlayerName(),                      30, mPlayerNameTextPosition,                 0);
-		mTextRenderer->RenderFromLeft("GHOSTS EATEN    - 0",                                           30, mGhostsEatenThisGameTextPosition,        0);
-		mTextRenderer->RenderFromLeft("DOTS COLLECTED  - 0",                                           30, mDotsCollectedThisGameCountTextPosition, 0);
+		mTextRenderer->RenderFromLeft("GHOSTS EATEN    - " + std::to_string(GM->GetAmountOfGhostsEatenthisGame()),                                           30, mGhostsEatenThisGameTextPosition,        0);
+		mTextRenderer->RenderFromLeft("DOTS COLLECTED  - " + std::to_string(GM->GetCurrentAmountOfDotsEaten()),                                           30, mDotsCollectedThisGameCountTextPosition, 0);
 	}
 }
 

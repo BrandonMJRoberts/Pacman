@@ -173,6 +173,8 @@ SCREENS MainGameScreen::InGameInputCheck()
 		gm->ResetScoreForExtraLife();                      // Reset the points required for another life
 		gm->SaveOutScoreToLeaderboard();                   // Save the player's score out
 		gm->SetCurrentScore(0);                            // Reset the player's current score
+		gm->ResetDotsEatenCount();                         // Reset the dots eaten count
+		gm->ResetGhostsEatenCount();					   // Reset the ghosts eaten count
 
 		return SCREENS::MAIN_MENU;
 	}

@@ -47,14 +47,17 @@ void GameManager::SetVariablesToStartingValues()
 {
 	mPlayerName                    = "UNNAMED";
 	mCurrentLevelID                = 0;
-	mPlayerNameColourIndex         = 0;
+	mPlayerNameColourIndex         = 1;
+
+	mDotsCollectedThisGame         = 0;
+	mGhostsEatenThisGame           = 0;
 
 	mRemainingDots                 = 0;
 
 	mExtraLifeCount                = STARTING_LIFE_COUNT;
 	mPlayerIsPoweredUp             = false;
 	mCurrentScore                  = 0;
-	mCurrentHighScore              = 0;
+	mCurrentHighScore              = LoadInCurrentHighScore();
 
 	mTimeRemainingInPoweredUpState = 0.0f;
 
@@ -248,6 +251,38 @@ void GameManager::SaveOutScoreToLeaderboard()
 	writeFile.close();
 
 	delete[] cLine;
+}
+
+// ---------------------------------------------------------------- //
+
+unsigned int GameManager::LoadInCurrentHighScore()
+{
+	// First open the high scores file
+	ifstream readFile("Save Data/HighScores.txt");
+
+	if (!readFile.is_open())
+	{
+		std::cout << "Failed to load in the current highscore from the save data." << std::endl;
+		return 0;
+	}
+
+	// We just need to load in the first line of the file and get the score from it
+	char* cLine               = new char[100];
+	unsigned int              returnVal;
+	std::string               sLine, temp;
+	std::stringstream         ssLine;
+
+	readFile.getline(cLine, 100);
+
+	sLine = cLine;
+	ssLine = std::stringstream(sLine);
+
+	ssLine >> temp >> returnVal;
+
+	// Clean up the memory allocated
+	delete[] cLine;
+
+	return returnVal;
 }
 
 // ---------------------------------------------------------------- //
