@@ -3,7 +3,7 @@
 
 #include "S2D/S2D.h"
 
-class AudioManager
+class AudioManager final
 {
 public:
 	~AudioManager();

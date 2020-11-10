@@ -17,7 +17,7 @@ using namespace S2D;
 #include "BaseMenu.h"
 #include "MainGameScreen.h"
 
-class Pacman : public Game
+class Pacman final : public Game
 {
 public:
 	/// <summary> Constructs the Pacman class. </summary>

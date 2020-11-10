@@ -33,6 +33,8 @@ UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOf
 	mExtraLivesStartTopRightPos    = S2D::Vector2(150, 604);
 	mHighScoreDisplayPosition      = S2D::Vector2(HALF_SCREEN_WIDTH, 80);
 	mCurrentScoreDisplayPosition   = S2D::Vector2(96, 80);
+	mPlayerNamePosition            = S2D::Vector2(96, 50);
+	mHighScoreTextPosition         = S2D::Vector2(288, 50);
 
 	// Setup the extra life render rect
 	mExtraLifeRenderRect           = new S2D::Rect(0, 0, mExtraLivesSpriteSheet->GetWidth(), mExtraLivesSpriteSheet->GetHeight());
@@ -131,7 +133,9 @@ void UIManager::RenderScores()
 	if (mTextRenderer)
 	{
 		// First render the text at the top
-		mTextRenderer->Render("HIGH SCORE", 12, S2D::Vector2((QUATER_SCREEN_WIDTH * 3) - 48, 50), 7);
+		mTextRenderer->Render("HIGH SCORE", 12, mHighScoreTextPosition, 7);
+
+		mTextRenderer->Render(GameManager::Instance()->GetPlayerName(), 8, mPlayerNamePosition, GameManager::Instance()->GetPlayerNameColourIndex());
 
 		// Now render the player's current score
 		mTextRenderer->Render(to_string(GameManager::Instance()->GetCurrentScore()), 20, mCurrentScoreDisplayPosition, 0);

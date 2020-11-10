@@ -57,7 +57,7 @@ void HighScoresMenu::Render(unsigned int frameCount)
 			// Render a preset for filler space
 			mTextRenderer->Render("FILLER", 10, mNamesRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 
-			mTextRenderer->Render("10", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
+			mTextRenderer->Render("0", 10, mScoresRenderOffset + S2D::Vector2(0.0f, mGapBetweenScores * i), (i % 7));
 		}
 	}
 }

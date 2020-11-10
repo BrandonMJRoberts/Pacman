@@ -17,7 +17,9 @@ GameManager* GameManager::mInstance = nullptr;
 
 GameManager::GameManager()
 {
+	mPlayerName                    = "UNNAMED";
 	mCurrentLevelID				   = 0;
+	mPlayerNameColourIndex         = 0;
 
 	mRemainingDots				   = 0;
 
@@ -182,6 +184,7 @@ void GameManager::SaveOutScoreToLeaderboard()
 	std::string               sLine, name;
 	std::stringstream         ssLine;
 
+	// Read in all scores currently
 	while (readFile.getline(cLine, 100))
 	{
 		sLine  = cLine;
@@ -199,14 +202,23 @@ void GameManager::SaveOutScoreToLeaderboard()
 	{
 		if (scoreData[i].score < mCurrentScore)
 		{
-			scoreData.insert(scoreData.begin() + i, ScoreData(mCurrentScore, "Test", 0));
+			if(mPlayerName != "")
+				scoreData.insert(scoreData.begin() + i, ScoreData(mCurrentScore, mPlayerName, mPlayerNameColourIndex));
+			else
+				scoreData.insert(scoreData.begin() + i, ScoreData(mCurrentScore, "UNNAMED", mPlayerNameColourIndex));
+
 			addedToList = true;
 			break;
 		}
 	}
 
-	if(!addedToList && scoreData.size() < 10)
-		scoreData.push_back(ScoreData(mCurrentScore, "Test", 0));
+	if (!addedToList && scoreData.size() < 10)
+	{
+		if(mPlayerName != "")
+			scoreData.push_back(ScoreData(mCurrentScore, mPlayerName, mPlayerNameColourIndex));
+		else
+			scoreData.push_back(ScoreData(mCurrentScore, "UNNAMED", mPlayerNameColourIndex));
+	}
 
 	// Cap scores count to 10
 	while (scoreData.size() > 10)

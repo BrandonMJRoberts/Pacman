@@ -24,6 +24,8 @@ private:
 	void               HandleUpPress    (S2D::Input::KeyboardState& keyboardState);
 	SELECTION_OPTIONS  HandleReturnPress(S2D::Input::KeyboardState& keyboardState);
 
+	void               TypingInName();
+
 	const unsigned int       mAmountOfSpitesOnSelectorHeight;
 	const unsigned int       mAmountOfSpitesOnSelectorWidth;
 
@@ -31,6 +33,7 @@ private:
 	S2D::Vector2       mHighScoresPosition;
 	S2D::Vector2       mChangeCharacterPosition;
 	S2D::Vector2       mExitGamePosition;
+	S2D::Vector2       mSetNamePosition;
 
 	S2D::Texture2D*    mSelectorSpriteSheet;
 	S2D::Rect*         mSelectorSourceRenderRect;
@@ -47,6 +50,7 @@ private:
 
 	SELECTION_OPTIONS  mCurrentlySelectedOption;
 	bool               mButtonCurrentlyPressed;
+	bool               mLettersPressedCurrently;
 };
 
 // ------------------------------------------------------------------------- //

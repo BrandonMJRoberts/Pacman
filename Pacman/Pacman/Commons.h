@@ -15,22 +15,23 @@ enum class FACING_DIRECTION : char
 
 enum class SELECTION_OPTIONS : char
 {
-	START_GAME = 0x00,
-	HIGHSCORES = 0x01,
+	START_GAME    = 0x00,
+	HIGHSCORES    = 0x01,
 	CHANGE_PLAYER = 0x02,
-	QUIT = 0x04,
-	NONE = 0x08
+	CHANGE_NAME   = 0x04,
+	QUIT          = 0x08,
+	NONE          = 0x16
 };
 
 // ------------------------------------------------------------------ //
 
 enum class PLAYER_CHARACTER_TYPE : char
 {
-	PACMAN = 0x00,
-	RED_GHOST = 0x01,
-	BLUE_GHOST = 0x02,
+	PACMAN       = 0x00,
+	RED_GHOST    = 0x01,
+	BLUE_GHOST   = 0x02,
 	ORANGE_GHOST = 0x04,
-	PINK_GHOST = 0x08
+	PINK_GHOST   = 0x08
 };
 
 // ------------------------------------------------------------------ //

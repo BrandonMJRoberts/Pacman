@@ -64,10 +64,10 @@ void DotsHandler::Render(unsigned int currentFrameCount)
 	// Loop through all dots and render them in the correct position using the correct sprite sheet
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
-		if (mDots[i]->GetDotType() == DOT_TYPE::SMALL)
-			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectSmallDot);
+		if (mDots[i]->mDotType == DOT_TYPE::SMALL)
+			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->mPosition), mSourceRectSmallDot);
 		else
-			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->GetPosition()), mSourceRectLargeDot);
+			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->mPosition), mSourceRectLargeDot);
 	}
 }
 
@@ -143,12 +143,12 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
 		// The X lines up correctly
-		if (mDots[i]->GetPosition().X + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.X - pacmanDimensions && mDots[i]->GetPosition().X + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.X + pacmanDimensions)
+		if (mDots[i]->mPosition.X + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.X - pacmanDimensions && mDots[i]->mPosition.X + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.X + pacmanDimensions)
 		{
-			if (mDots[i]->GetPosition().Y + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->GetPosition().Y + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.Y + pacmanDimensions)
+			if (mDots[i]->mPosition.Y + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->mPosition.Y + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.Y + pacmanDimensions)
 			{
 				// Add score to the player's score based on the type of dot it is
-				if (mDots[i]->GetDotType() == DOT_TYPE::SMALL)
+				if (mDots[i]->mDotType == DOT_TYPE::SMALL)
 				{
 					GameManager::Instance()->AddToScore(10);
 				}

@@ -5,10 +5,13 @@
 
 #include "Commons.h"
 
+#include <vector>
+
 class PickUps;
 class PacmanCharacter;
 class Background;
 class DotsHandler;
+class Ghost;
 
 class MainGameScreen : public BaseMenu
 {
@@ -23,16 +26,18 @@ private:
 	void             LoadNextLevel();
 	void             LoadInDataForLevel();
 	void             SpawnNextCollectable();
+	void             HandleCollectable(const float deltaTime);
 
 	SCREENS          InGameInputCheck();
 
-	PacmanCharacter* mPlayer;
-	PickUps*         mCollectable;
+	PacmanCharacter*    mPlayer;
+	PickUps*            mCollectable;
 
-	Background*      mBackground;
-	DotsHandler*     mDotHandler;
+	Background*         mBackground;
+	DotsHandler*        mDotHandler;
+	std::vector<Ghost*> mGhosts;
 
-	float            mTimeTillNextCollectableSpawn;
+	float               mTimeTillNextCollectableSpawn;
 };
 
 

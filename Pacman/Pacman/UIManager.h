@@ -59,6 +59,8 @@ private:
 	// Scores
 	S2D::Vector2		   mHighScoreDisplayPosition;
 	S2D::Vector2		   mCurrentScoreDisplayPosition;
+	S2D::Vector2           mPlayerNamePosition;
+	S2D::Vector2           mHighScoreTextPosition;
 
 	float                  mTimeRemainingForPointsDisplay;
 

@@ -15,7 +15,6 @@ struct ScoreData
 {
 public:
 	ScoreData(unsigned int score, std::string name, unsigned int colourIndex);
-	~ScoreData() { ; }
 
 	std::string  name;
 	unsigned int score;
