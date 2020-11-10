@@ -162,7 +162,7 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 	case FACING_DIRECTION::RIGHT:
 
 		// Convert the projected position of pacman into a grid position
-		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f ,0.0f));//mSingleSpriteWidth / 2.0f, 0.0f));
+		gridPos = ConvertPositionToGridPosition(mCentrePosition + S2D::Vector2(mSingleSpriteWidth * 0.4f, 0.0f));
 
 		movementAmount.X = pacmanMovementDistance;
 	break;

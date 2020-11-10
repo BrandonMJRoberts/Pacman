@@ -237,7 +237,7 @@ void GameManager::SaveOutScoreToLeaderboard()
 		scoreData.pop_back();
 
 	// Save out the scores to the file
-	ofstream writeFile("Save Data/HighScores.txt");
+	ofstream writeFile("Save Data/HighScores.txt", std::ofstream::trunc);
 
 	if (!writeFile.is_open())
 	{
