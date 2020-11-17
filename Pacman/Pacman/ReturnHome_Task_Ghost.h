@@ -9,11 +9,12 @@ public:
 	ReturnHomeState_Ghost();
 	~ReturnHomeState_Ghost() override;
 
+	void OnUpdate() override;
+	void CheckTransitions() override;
+
 private:
 	void OnEnter() override;
 	void OnExit() override;
-	void OnUpdate() override;
-	void CheckTransitions() override;
 };
 
 #endif

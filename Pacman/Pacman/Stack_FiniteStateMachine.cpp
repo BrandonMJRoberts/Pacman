@@ -93,5 +93,8 @@ void Stack_FiniteStateMachine_Pacman::PopStack()
 
 BaseState_Pacman* Stack_FiniteStateMachine_Pacman::PeekStack()
 {
-	return mCurrentStack[mCurrentStack.size() - 1];
+	if (mCurrentStack.size() > 0)
+		return mCurrentStack[mCurrentStack.size() - 1];
+	else
+		return nullptr;
 }

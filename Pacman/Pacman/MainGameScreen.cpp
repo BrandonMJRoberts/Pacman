@@ -9,8 +9,6 @@
 #include "DotsHandler.h"
 #include "AIController.h"
 
-//#include "Ghost.h"
-
 // ------------------------------------------------------------------------------ //
 
 MainGameScreen::MainGameScreen() : BaseMenu()
@@ -33,17 +31,8 @@ MainGameScreen::~MainGameScreen()
 	delete mBackground;
 	mBackground = nullptr;
 
-	//delete mPlayer;
-	//mPlayer = nullptr;
-
 	delete mDotHandler;
 	mDotHandler = nullptr;
-
-	//for (unsigned int i = 0; i < mGhosts.size(); i++)
-	//{
-	//	delete mGhosts[i];
-	//}
-	//mGhosts.clear();
 
 	delete mAIController;
 	mAIController = nullptr;
@@ -67,15 +56,6 @@ void MainGameScreen::Render(const unsigned int frameCount)
 
 	if (mCollectable)
 		mCollectable->Render();
-
-	// Render the player
-	//if (mPlayer)
-	//	mPlayer->Render(frameCount);
-
-	//for (unsigned int i = 0; i < mGhosts.size(); i++)
-	//{
-	//	mGhosts[i]->Render();
-	//}
 
 	if(mAIController)
 		mAIController->Render(frameCount);
@@ -125,9 +105,6 @@ void MainGameScreen::LoadInDataForLevel()
 	if (!mBackground)
 		mBackground = new Background(14, 4);
 
-	//if (!mPlayer)
-	//	mPlayer = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3);
-
 	if (!mDotHandler)
 		mDotHandler = new DotsHandler();
 
@@ -138,13 +115,6 @@ void MainGameScreen::LoadInDataForLevel()
 		else
 			mAIController = new AIController();
 	}
-
-	//unsigned int ghostIndex = 0;
-	//while (mGhosts.size() < NUMBER_OF_GHOSTS_IN_LEVEL)
-	//{
-	//	mGhosts.push_back(new Ghost(S2D::Vector2(11.0f + float(ghostIndex), 20.0f), mBackground->GetCollisionMap(), (GHOST_TYPE)ghostIndex, "Textures/Ghosts/Ghosts.png", 8, 4));
-	//	ghostIndex++;
-	//}
 
 	mTimeTillNextCollectableSpawn = 10.0f;
 
