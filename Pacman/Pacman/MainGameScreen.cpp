@@ -7,7 +7,9 @@
 #include "Pickups.h"
 #include "Background.h"
 #include "DotsHandler.h"
-#include "Ghost.h"
+#include "AIController.h"
+
+//#include "Ghost.h"
 
 // ------------------------------------------------------------------------------ //
 
@@ -31,17 +33,20 @@ MainGameScreen::~MainGameScreen()
 	delete mBackground;
 	mBackground = nullptr;
 
-	delete mPlayer;
-	mPlayer = nullptr;
+	//delete mPlayer;
+	//mPlayer = nullptr;
 
 	delete mDotHandler;
 	mDotHandler = nullptr;
 
-	for (unsigned int i = 0; i < mGhosts.size(); i++)
-	{
-		delete mGhosts[i];
-	}
-	mGhosts.clear();
+	//for (unsigned int i = 0; i < mGhosts.size(); i++)
+	//{
+	//	delete mGhosts[i];
+	//}
+	//mGhosts.clear();
+
+	delete mAIController;
+	mAIController = nullptr;
 
 	UIManager::GetInstance()->RemoveALlCollectedPickups();
 }
@@ -64,13 +69,16 @@ void MainGameScreen::Render(const unsigned int frameCount)
 		mCollectable->Render();
 
 	// Render the player
-	if (mPlayer)
-		mPlayer->Render(frameCount);
+	//if (mPlayer)
+	//	mPlayer->Render(frameCount);
 
-	for (unsigned int i = 0; i < mGhosts.size(); i++)
-	{
-		mGhosts[i]->Render();
-	}
+	//for (unsigned int i = 0; i < mGhosts.size(); i++)
+	//{
+	//	mGhosts[i]->Render();
+	//}
+
+	if(mAIController)
+		mAIController->Render(frameCount);
 }
 
 // ------------------------------------------------------------------------------ //
@@ -78,7 +86,7 @@ void MainGameScreen::Render(const unsigned int frameCount)
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
 	// Update the dots in the level
-	mDotHandler->Update(mPlayer->GetCentrePosition(), 9);
+	mDotHandler->Update(mAIController->GetPacmanRef().GetCentrePosition(), 9);
 
 	// First check if the level is over
 	if (GameManager::Instance()->GetRemainingDots() == 0)
@@ -87,19 +95,18 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
 
 		// Reset the player
-		mPlayer->ResetCharacter();
+		mAIController->GetPacmanRef().ResetCharacter();
 
 		// Make sure we change the background colour to being the next level's
 		mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
 
 		delete mCollectable;
 		mCollectable = nullptr;
-
-		// Now need to refresh the game
 	}
 
 	// Player update
-	mPlayer->Update(deltaTime);
+	//mAIController->GetPacmanRef().Update(deltaTime);
+	mAIController->Update(deltaTime);
 
 	HandleCollectable(deltaTime);
 
@@ -118,18 +125,26 @@ void MainGameScreen::LoadInDataForLevel()
 	if (!mBackground)
 		mBackground = new Background(14, 4);
 
-	if (!mPlayer)
-		mPlayer = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3);
+	//if (!mPlayer)
+	//	mPlayer = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3);
 
 	if (!mDotHandler)
 		mDotHandler = new DotsHandler();
 
-	unsigned int ghostIndex = 0;
-	while (mGhosts.size() < NUMBER_OF_GHOSTS_IN_LEVEL)
+	if (!mAIController)
 	{
-		mGhosts.push_back(new Ghost(S2D::Vector2(11.0f + float(ghostIndex), 20.0f), mBackground->GetCollisionMap(), (GHOST_TYPE)ghostIndex, "Textures/Ghosts/Ghosts.png", 8, 4));
-		ghostIndex++;
+		if(mBackground)
+			mAIController = new AIController(mBackground->GetCollisionMap());
+		else
+			mAIController = new AIController();
 	}
+
+	//unsigned int ghostIndex = 0;
+	//while (mGhosts.size() < NUMBER_OF_GHOSTS_IN_LEVEL)
+	//{
+	//	mGhosts.push_back(new Ghost(S2D::Vector2(11.0f + float(ghostIndex), 20.0f), mBackground->GetCollisionMap(), (GHOST_TYPE)ghostIndex, "Textures/Ghosts/Ghosts.png", 8, 4));
+	//	ghostIndex++;
+	//}
 
 	mTimeTillNextCollectableSpawn = 10.0f;
 
@@ -204,7 +219,7 @@ void MainGameScreen::LoadNextLevel()
 void MainGameScreen::HandleCollectable(const float deltaTime)
 {
 	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mPlayer->GetCentrePosition(), 13, mPlayer->GetFacingDirection()))
+	if (mCollectable && mCollectable->CheckForCollision(mAIController->GetPacmanRef().GetCentrePosition(), 13, mAIController->GetPacmanRef().GetFacingDirection()))
 	{
 		// Delete this collectable
 		delete mCollectable;

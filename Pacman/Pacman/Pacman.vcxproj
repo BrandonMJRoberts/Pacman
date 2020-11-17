@@ -84,8 +84,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AIController.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="BaseState_Task_Ghost.cpp" />
+    <ClCompile Include="BaseState_Task_Pacman.cpp" />
+    <ClCompile Include="ChaseGhostsState_Task_Pacman.cpp" />
+    <ClCompile Include="ChaseState_Task_Ghost.cpp" />
+    <ClCompile Include="ExitHome_Task_Ghost.cpp" />
+    <ClCompile Include="FleeState_Task_Ghost.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="BaseMenu.cpp" />
     <ClCompile Include="DotsHandler.cpp" />
@@ -97,13 +104,23 @@
     <ClCompile Include="PacmanCharacter.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Pickups.cpp" />
+    <ClCompile Include="ReturnHome_Task_Ghost.cpp" />
+    <ClCompile Include="Stack_FiniteStateMachine.cpp" />
     <ClCompile Include="StartMenu.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIController.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="BaseState_Task_Ghost.h" />
+    <ClInclude Include="BaseState_Task_Pacman.h" />
+    <ClInclude Include="ChaseGhostsState_Task_Pacman.h" />
+    <ClInclude Include="ChaseState_Task_Ghost.h" />
+    <ClInclude Include="DodgeGhostsState_Task_Pacman.h" />
+    <ClInclude Include="ExitHome_Task_Ghost.h" />
+    <ClInclude Include="FleeState_Task_Ghost.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="BaseMenu.h" />
     <ClInclude Include="Commons.h" />
@@ -116,6 +133,8 @@
     <ClInclude Include="PacmanCharacter.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Pickups.h" />
+    <ClInclude Include="ReturnHome_Task_Ghost.h" />
+    <ClInclude Include="Stack_FiniteStateMachine.h" />
     <ClInclude Include="StartMenu.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="UIManager.h" />

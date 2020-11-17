@@ -7,7 +7,7 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
+PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight, bool isAIControlled) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
 {
 	// Load in the texture
 	mPacmanTexture                     = new S2D::Texture2D();
@@ -248,7 +248,7 @@ void PacmanCharacter::CheckForDirectionChange()
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::Update(const float deltaTime)
+void PacmanCharacter::UpdateAsPlayerControlled(const float deltaTime)
 {
 	if(mChangeDirectionInputDelay > 0.0f)
 		mChangeDirectionInputDelay -= deltaTime;
@@ -267,6 +267,14 @@ void PacmanCharacter::Update(const float deltaTime)
 	CheckForDirectionChange();
 
 }
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::UpdateAsAI(BaseState_Pacman& currentState)
+{
+	currentState.CheckTransitions();
+}
+
 
 // ------------------------------------------------------------- //
 

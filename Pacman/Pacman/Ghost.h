@@ -26,9 +26,14 @@ public:
 	void Render();
 	void Update(const float deltaTime, S2D::Vector2 pacmanPos);
 
+	void SetIsPlayerControlled()     { mIsPlayerControlled = true; }
+
 private:
 	S2D::Vector2                     CalculateTargetPosition(S2D::Vector2 pacmanGridPos, FACING_DIRECTION pacmanFacingDirection);
 	void                             LoadInSpriteSheet(char* filePath);
+
+	void                             MoveInCurrentDirection(const float deltaTime);
+	S2D::Vector2                     ConvertPositionToGridPosition(S2D::Vector2 position);
 	 
 	S2D::Vector2                     mPosition;
 	S2D::Vector2                     mTargetPositon;
@@ -43,11 +48,15 @@ private:
 	static unsigned int              mSingleSpriteHeight;
 	static char**                    mCollisionMap;
 
+	FACING_DIRECTION                 mCurrentFacingDirection;
+	FACING_DIRECTION                 mRequestedFacingDirection;
+
 	unsigned int		             mCurrentFrame;
 	unsigned int		             mStartFrame;
 	unsigned int		             mEndFrame;
 
 	GHOST_TYPE			             mThisGhostType;
+	bool							 mIsPlayerControlled;
 
 };
 

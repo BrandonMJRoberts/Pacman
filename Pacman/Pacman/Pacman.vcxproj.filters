@@ -49,6 +49,24 @@
     <Filter Include="Header Files\Game Components\Visuals">
       <UniqueIdentifier>{c0f1c422-d14e-475a-9f6e-fd0046abc978}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game Components\AI">
+      <UniqueIdentifier>{e177d7c7-45b0-4850-89aa-fd5c68a7eed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AI">
+      <UniqueIdentifier>{d5f577aa-d789-4f56-bd03-86d7e6292168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game Components\AI\PacmanTasks">
+      <UniqueIdentifier>{a0a58daf-6c5b-4ecb-817f-f7f9c84c4e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AI\Ghost Tasks">
+      <UniqueIdentifier>{73f1b4f9-aefd-47dd-9ec2-b0415d375402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game Components\AI\Ghost Tasks">
+      <UniqueIdentifier>{6650bb72-5c43-4fb7-b57e-0e2808e83067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AI\Pacman Tasks">
+      <UniqueIdentifier>{11b2bace-3f9e-4585-964a-f69f5c76289e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pacman.cpp">
@@ -98,6 +116,33 @@
     </ClCompile>
     <ClCompile Include="Ghost.cpp">
       <Filter>Source Files\Game Components\Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="Stack_FiniteStateMachine.cpp">
+      <Filter>Source Files\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="AIController.cpp">
+      <Filter>Source Files\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseState_Task_Pacman.cpp">
+      <Filter>Source Files\AI\Pacman Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseState_Task_Ghost.cpp">
+      <Filter>Source Files\AI\Ghost Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ChaseState_Task_Ghost.cpp">
+      <Filter>Source Files\AI\Ghost Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ExitHome_Task_Ghost.cpp">
+      <Filter>Source Files\AI\Ghost Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="FleeState_Task_Ghost.cpp">
+      <Filter>Source Files\AI\Ghost Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ReturnHome_Task_Ghost.cpp">
+      <Filter>Source Files\AI\Ghost Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="ChaseGhostsState_Task_Pacman.cpp">
+      <Filter>Source Files\AI\Pacman Tasks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +196,36 @@
     </ClInclude>
     <ClInclude Include="Ghost.h">
       <Filter>Header Files\Game Components\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack_FiniteStateMachine.h">
+      <Filter>Header Files\Game Components\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="AIController.h">
+      <Filter>Header Files\Game Components\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseState_Task_Ghost.h">
+      <Filter>Header Files\Game Components\AI\Ghost Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ChaseState_Task_Ghost.h">
+      <Filter>Header Files\Game Components\AI\Ghost Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ExitHome_Task_Ghost.h">
+      <Filter>Header Files\Game Components\AI\Ghost Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="FleeState_Task_Ghost.h">
+      <Filter>Header Files\Game Components\AI\Ghost Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ReturnHome_Task_Ghost.h">
+      <Filter>Header Files\Game Components\AI\Ghost Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseState_Task_Pacman.h">
+      <Filter>Header Files\Game Components\AI\PacmanTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="DodgeGhostsState_Task_Pacman.h">
+      <Filter>Header Files\Game Components\AI\PacmanTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="ChaseGhostsState_Task_Pacman.h">
+      <Filter>Header Files\Game Components\AI\PacmanTasks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,15 +4,18 @@
 #include "S2D/S2D.h"
 
 #include "Commons.h"
+#include "BaseState_Task_Pacman.h"
 
 class PacmanCharacter final
 {
 public:
-	PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth = 3, const unsigned int spritesOnHeight = 4);
+	PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth = 3, const unsigned int spritesOnHeight = 3, bool isAIControlled = false);
 	~PacmanCharacter();
 
 	void             Render(const unsigned int currentFrameCount);
-	void             Update(const float deltaTime);
+
+	void             UpdateAsPlayerControlled(const float deltaTime);
+	void             UpdateAsAI(BaseState_Pacman& currentState);
 
 	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
 
