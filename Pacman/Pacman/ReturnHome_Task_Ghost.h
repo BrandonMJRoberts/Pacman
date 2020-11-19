@@ -3,6 +3,8 @@
 
 #include "BaseState_Task_Ghost.h"
 
+class Ghost;
+
 class ReturnHomeState_Ghost final : public BaseState_Ghost
 {
 public:
@@ -10,7 +12,7 @@ public:
 	~ReturnHomeState_Ghost() override;
 
 	void OnUpdate() override;
-	void CheckTransitions() override;
+	void CheckTransitions(Ghost* ghost) override;
 
 private:
 	void OnEnter() override;

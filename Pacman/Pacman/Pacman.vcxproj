@@ -84,7 +84,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AIController.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="BaseState_Task_Ghost.cpp" />
@@ -111,7 +110,6 @@
     <ClCompile Include="UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIController.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="BaseState_Task_Ghost.h" />

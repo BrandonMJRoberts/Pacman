@@ -120,9 +120,6 @@
     <ClCompile Include="Stack_FiniteStateMachine.cpp">
       <Filter>Source Files\AI</Filter>
     </ClCompile>
-    <ClCompile Include="AIController.cpp">
-      <Filter>Source Files\AI</Filter>
-    </ClCompile>
     <ClCompile Include="BaseState_Task_Pacman.cpp">
       <Filter>Source Files\AI\Pacman Tasks</Filter>
     </ClCompile>
@@ -198,9 +195,6 @@
       <Filter>Header Files\Game Components\Characters</Filter>
     </ClInclude>
     <ClInclude Include="Stack_FiniteStateMachine.h">
-      <Filter>Header Files\Game Components\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="AIController.h">
       <Filter>Header Files\Game Components\AI</Filter>
     </ClInclude>
     <ClInclude Include="BaseState_Task_Ghost.h">

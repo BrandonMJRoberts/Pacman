@@ -1,4 +1,5 @@
 #include "BaseState_Task_Ghost.h"
+#include "Ghost.h"
 
 // ---------------------------------------------------- //
 
@@ -23,13 +24,6 @@ void BaseState_Ghost::OnUpdate()
 
 // ---------------------------------------------------- //
 
-void BaseState_Ghost::CheckTransitions()
-{
-
-}
-
-// ---------------------------------------------------- //
-
 void BaseState_Ghost::OnEnter()
 {
 
@@ -40,6 +34,18 @@ void BaseState_Ghost::OnEnter()
 void BaseState_Ghost::OnExit()
 {
 
+}
+
+// ---------------------------------------------------- //
+
+void BaseState_Ghost::CheckTransitions(Ghost* ghost)
+{
+	if (ghost)
+	{
+
+	}
+	else
+		return;
 }
 
 // ---------------------------------------------------- //

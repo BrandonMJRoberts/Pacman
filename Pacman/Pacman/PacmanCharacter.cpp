@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include "GameManager.h"
 
+#include "Stack_FiniteStateMachine.h"
+
 #include <iostream>
 
 // ------------------------------------------------------------- //
@@ -26,9 +28,6 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int sprites
 	mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
 	ResetCharacter();
 
-	mCurrentFacingDirection            = FACING_DIRECTION::NONE;
-	mRequestedFacingDirection          = FACING_DIRECTION::NONE;
-
 	mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
 
 	// Setup the rendering rectangle
@@ -41,9 +40,10 @@ PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int sprites
 
 	mCollisionMap = collisionMap;
 
-	mCurrentFrame = 0;
-	mStartFrame   = 0;
-	mEndFrame     = 0;
+
+	mIsAIControlled = isAIControlled;
+	if (mIsAIControlled)
+		mStateMachine = new Stack_FiniteStateMachine_Pacman();
 }
 
 // ------------------------------------------------------------- //
@@ -248,6 +248,16 @@ void PacmanCharacter::CheckForDirectionChange()
 
 // ------------------------------------------------------------- //
 
+void PacmanCharacter::Update(const float deltaTime)
+{
+	if (mIsAIControlled)
+		UpdateAsAI();
+	else
+		UpdateAsPlayerControlled(deltaTime);
+}
+
+// ------------------------------------------------------------- //
+
 void PacmanCharacter::UpdateAsPlayerControlled(const float deltaTime)
 {
 	if(mChangeDirectionInputDelay > 0.0f)
@@ -270,11 +280,16 @@ void PacmanCharacter::UpdateAsPlayerControlled(const float deltaTime)
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::UpdateAsAI(BaseState_Pacman& currentState)
+void PacmanCharacter::UpdateAsAI()
 {
-	currentState.CheckTransitions();
+	if (mStateMachine->PeekStack())
+	{
+		mStateMachine->PeekStack()->OnUpdate();
+		
+		// Now perform the transition checks as to which state we should swap to
+		mStateMachine->PeekStack()->CheckTransitions();
+	}
 }
-
 
 // ------------------------------------------------------------- //
 

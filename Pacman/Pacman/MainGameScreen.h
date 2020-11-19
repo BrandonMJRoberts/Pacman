@@ -8,10 +8,10 @@
 #include <vector>
 
 class PickUps;
-//class PacmanCharacter;
+class PacmanCharacter;
 class Background;
 class DotsHandler;
-//class Ghost;
+class Ghost;
 class AIController;
 
 class MainGameScreen : public BaseMenu
@@ -31,14 +31,14 @@ private:
 
 	SCREENS          InGameInputCheck();
 
-	//PacmanCharacter*    mPlayer;
+	PacmanCharacter*    mPacman;
 
 	PickUps*            mCollectable;
 	Background*         mBackground;
 	DotsHandler*        mDotHandler;
 	AIController*       mAIController;
 
-	//std::vector<Ghost*> mGhosts;
+	std::vector<Ghost*> mGhosts;
 
 	float               mTimeTillNextCollectableSpawn;
 };

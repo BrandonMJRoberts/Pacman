@@ -4,7 +4,10 @@
 #include "S2D/S2D.h"
 
 #include "Commons.h"
+
 #include "BaseState_Task_Pacman.h"
+
+class Stack_FiniteStateMachine_Pacman;
 
 class PacmanCharacter final
 {
@@ -13,55 +16,62 @@ public:
 	~PacmanCharacter();
 
 	void             Render(const unsigned int currentFrameCount);
-
-	void             UpdateAsPlayerControlled(const float deltaTime);
-	void             UpdateAsAI(BaseState_Pacman& currentState);
+	void             Update(const float deltaTime);
 
 	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
-
 	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
 	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
-
 	FACING_DIRECTION GetFacingDirection()     { return mCurrentFacingDirection; }
 
 	void             ResetCharacter();
 
 private:
-	void             HandleInput();
-	bool             EdgeCheck();
-	void             MoveInCurrentDirection(const float deltaTime);
-	void             CheckForDirectionChange();
+	// ----------------------------------------------------------------------------------------------------------------- //
 
-	bool             CanMoveInDirection(FACING_DIRECTION direction);
+	void             HandleInput();
 
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);
+	bool             EdgeCheck();
+
+	bool             CanMoveInDirection(FACING_DIRECTION direction);
+	void             MoveInCurrentDirection(const float deltaTime);
 
 	S2D::Vector2     ConvertPositionToGridPosition(S2D::Vector2 position);
+	void             CheckForDirectionChange();
 
-	char**           mCollisionMap;
+	void             UpdateAsPlayerControlled(const float deltaTime);
+	void             UpdateAsAI();
 
-	S2D::Vector2     mRenderPosition;
-	S2D::Vector2     mCentrePosition;
+	// ----------------------------------------------------------------------------------------------------------------- //
 
-	S2D::Vector2     mStartPosition;
+	char**             mCollisionMap;
 
-	S2D::Texture2D*  mPacmanTexture;
-	S2D::Rect*       mPacmanSourceRect; // Required for the sprite batch rendering
+	S2D::Vector2       mRenderPosition;
+	S2D::Vector2       mCentrePosition;
 
-	unsigned int	 mSingleSpriteWidth;
-	unsigned int	 mSingleSpriteHeight;
+	S2D::Vector2       mStartPosition;
+
+	S2D::Texture2D*    mPacmanTexture;
+	S2D::Rect*         mPacmanSourceRect; // Required for the sprite batch rendering
+
+	unsigned int	   mSingleSpriteWidth;
+	unsigned int	   mSingleSpriteHeight;
 
 	const unsigned int mSpritesOnWidth;
 	const unsigned int mSpritesOnHeight;
 
-	unsigned int     mCurrentFrame;
-	unsigned int     mStartFrame;
-	unsigned int     mEndFrame;
+	unsigned int       mCurrentFrame;
+	unsigned int       mStartFrame;
+	unsigned int       mEndFrame;
 
-	float            mChangeDirectionInputDelay;
+	float              mChangeDirectionInputDelay;
 
-	FACING_DIRECTION mCurrentFacingDirection;
-	FACING_DIRECTION mRequestedFacingDirection;
+	Stack_FiniteStateMachine_Pacman* mStateMachine;
+
+	FACING_DIRECTION   mCurrentFacingDirection;
+	FACING_DIRECTION   mRequestedFacingDirection;
+
+	bool               mIsAIControlled;
 };
 
 #endif

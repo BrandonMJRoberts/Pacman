@@ -10,6 +10,16 @@
 
 // ------------------------------------------------------------------------------------------------------ //
 
+enum class GHOST_STATE_TYPE
+{
+	CHASE       = 0,
+	FLEE,
+	RETURN_HOME,
+	EXIT_HOME
+};
+
+// ------------------------------------------------------------------------------------------------------ //
+
 // Ghost's state machine
 class Stack_FiniteStateMachine_Ghost final
 {
@@ -20,7 +30,7 @@ public:
 
 	BaseState_Ghost*        PeekStack();
 	void                    PopStack();
-	void                    PushToStack(BaseState_Ghost* newState);
+	void                    PushToStack(GHOST_STATE_TYPE newState);
 
 private:
 	std::vector<BaseState_Ghost*> mCurrentStack;

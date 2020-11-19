@@ -14,16 +14,21 @@ char**          Ghost::mCollisionMap = nullptr;
 
 // -------------------------------------------------------------------- //
 
-Ghost::Ghost(S2D::Vector2 startPos, char** collisionMap, GHOST_TYPE ghostType, char* FilePath, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
+Ghost::Ghost(S2D::Vector2 startPos, char** collisionMap, GHOST_TYPE ghostType, bool isAIControlled, char* FilePath, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
 {
 	if(!mCollisionMap)
 		mCollisionMap         = collisionMap;
 
 	mPosition                 = startPos;
 	mThisGhostType            = ghostType;
-	mIsPlayerControlled       = false;
+	mIsPlayerControlled       = !isAIControlled;
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
+
+	mIsGhostAlive             = true;
+
+	// Create the state machine needed
+	mStateMachine             = new Stack_FiniteStateMachine_Ghost(isAIControlled);
 
 	switch (mThisGhostType)
 	{
@@ -114,7 +119,14 @@ void Ghost::Update(const float deltaTime, S2D::Vector2 pacmanPos)
 	else
 	{
 		// Otherwise have the AI make the decision.
-
+		BaseState_Ghost* currentState = mStateMachine->PeekStack();
+		if (currentState)
+		{
+			// Update the current state  
+			currentState->OnUpdate();
+			
+			currentState->CheckTransitions(this);
+		}
 	}
 
 	// Now handle changing of direction
@@ -135,10 +147,10 @@ S2D::Vector2 Ghost::ConvertPositionToGridPosition(S2D::Vector2 position)
 void Ghost::MoveInCurrentDirection(const float deltaTime)
 {
 	// Calculate the current grid postion of pacman's centre
-	S2D::Vector2 centreGridPos = ConvertPositionToGridPosition(mPosition);
-	S2D::Vector2 gridPos = S2D::Vector2(), movementAmount = S2D::Vector2();
+	S2D::Vector2 centreGridPos         = ConvertPositionToGridPosition(mPosition);
+	S2D::Vector2 gridPos               = S2D::Vector2(), movementAmount = S2D::Vector2();
 
-	float ghostMovementDistance = GHOST_MOVEMENT_SPEED * deltaTime;
+	float        ghostMovementDistance = GHOST_MOVEMENT_SPEED * deltaTime;
 
 	// First lock the opposite axis to which we are moving in
 	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
@@ -160,14 +172,14 @@ void Ghost::MoveInCurrentDirection(const float deltaTime)
 		gridPos = ConvertPositionToGridPosition(mPosition + S2D::Vector2(0.0f, mSingleSpriteHeight * 0.4f));// mSingleSpriteHeight / 3.0f));
 
 		movementAmount.Y = ghostMovementDistance;
-		break;
+	break;
 
 	case FACING_DIRECTION::UP:
 		// Convert the projected position of pacman into a grid position
 		gridPos = ConvertPositionToGridPosition(mPosition + S2D::Vector2(0.0f, -1.0f * mSingleSpriteHeight * 0.4f));// (mSingleSpriteHeight / 2.0f)));
 
 		movementAmount.Y = -1.0f * ghostMovementDistance;
-		break;
+	break;
 
 	case FACING_DIRECTION::LEFT:
 
@@ -175,7 +187,7 @@ void Ghost::MoveInCurrentDirection(const float deltaTime)
 		gridPos = ConvertPositionToGridPosition(mPosition + S2D::Vector2(-1.0f * mSingleSpriteWidth * 0.4f, 0.0f)); //(mSingleSpriteWidth / 2.0f), 0.0f));
 
 		movementAmount.X = -1.0f * ghostMovementDistance;
-		break;
+	break;
 
 	case FACING_DIRECTION::RIGHT:
 
@@ -183,15 +195,15 @@ void Ghost::MoveInCurrentDirection(const float deltaTime)
 		gridPos = ConvertPositionToGridPosition(mPosition + S2D::Vector2(mSingleSpriteWidth * 0.4f, 0.0f));
 
 		movementAmount.X = ghostMovementDistance;
-		break;
+	break;
 
 	case FACING_DIRECTION::NONE:
-		break;
+	break;
 
 	default:
 		std::cout << "In an error movement state!" << std::endl;
 		return;
-		break;
+	break;
 	}
 
 	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')

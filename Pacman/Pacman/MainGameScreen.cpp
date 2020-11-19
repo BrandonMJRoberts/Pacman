@@ -4,10 +4,11 @@
 #include "UIManager.h"
 
 #include "PacmanCharacter.h"
+#include "Ghost.h"
+
 #include "Pickups.h"
 #include "Background.h"
 #include "DotsHandler.h"
-#include "AIController.h"
 
 // ------------------------------------------------------------------------------ //
 
@@ -34,10 +35,17 @@ MainGameScreen::~MainGameScreen()
 	delete mDotHandler;
 	mDotHandler = nullptr;
 
-	delete mAIController;
-	mAIController = nullptr;
-
 	UIManager::GetInstance()->RemoveALlCollectedPickups();
+
+	delete mPacman;
+	mPacman = nullptr;
+
+	for (unsigned int i = 0; i < mGhosts.size(); i++)
+	{
+		delete mGhosts[i];
+		mGhosts[i] = nullptr;
+	}
+	mGhosts.clear();
 }
 
 // ------------------------------------------------------------------------------ //
@@ -57,8 +65,14 @@ void MainGameScreen::Render(const unsigned int frameCount)
 	if (mCollectable)
 		mCollectable->Render();
 
-	if(mAIController)
-		mAIController->Render(frameCount);
+	if (mPacman)
+		mPacman->Render(frameCount);
+
+	for (unsigned int i = 0; i < mGhosts.size(); i++)
+	{
+		if (mGhosts[i])
+			mGhosts[i]->Render();
+	}
 }
 
 // ------------------------------------------------------------------------------ //
@@ -66,7 +80,7 @@ void MainGameScreen::Render(const unsigned int frameCount)
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
 	// Update the dots in the level
-	mDotHandler->Update(mAIController->GetPacmanRef().GetCentrePosition(), 9);
+	mDotHandler->Update(mPacman->GetCentrePosition(), 9);
 
 	// First check if the level is over
 	if (GameManager::Instance()->GetRemainingDots() == 0)
@@ -75,7 +89,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
 
 		// Reset the player
-		mAIController->GetPacmanRef().ResetCharacter();
+		mPacman->ResetCharacter();
 
 		// Make sure we change the background colour to being the next level's
 		mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
@@ -84,9 +98,16 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		mCollectable = nullptr;
 	}
 
-	// Player update
-	//mAIController->GetPacmanRef().Update(deltaTime);
-	mAIController->Update(deltaTime);
+	// Ghosts update
+	for (unsigned int i = 0; i < mGhosts.size(); i++)
+	{
+		if (mGhosts[i])
+			mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition());
+	}
+
+	// Pacman update
+	if(mPacman)
+		mPacman->Update(deltaTime);
 
 	HandleCollectable(deltaTime);
 
@@ -108,12 +129,23 @@ void MainGameScreen::LoadInDataForLevel()
 	if (!mDotHandler)
 		mDotHandler = new DotsHandler();
 
-	if (!mAIController)
+	if (!mPacman)
 	{
-		if(mBackground)
-			mAIController = new AIController(mBackground->GetCollisionMap());
+		if(GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, false);
 		else
-			mAIController = new AIController();
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, true);
+	}
+
+	if (mGhosts.size() == 0)
+	{
+		for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
+		{
+			if (((int)GameManager::Instance()->GetPlayerCharacterType()) - 1 == i)
+				mGhosts.push_back(new Ghost(S2D::Vector2(2.0f + i, 2.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", 8, 4));
+			else
+				mGhosts.push_back(new Ghost(S2D::Vector2(2.0f + i, 2.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", 8, 4));
+		}
 	}
 
 	mTimeTillNextCollectableSpawn = 10.0f;
@@ -189,7 +221,7 @@ void MainGameScreen::LoadNextLevel()
 void MainGameScreen::HandleCollectable(const float deltaTime)
 {
 	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mAIController->GetPacmanRef().GetCentrePosition(), 13, mAIController->GetPacmanRef().GetFacingDirection()))
+	if (mCollectable && mCollectable->CheckForCollision(mPacman->GetCentrePosition(), 13, mPacman->GetFacingDirection()))
 	{
 		// Delete this collectable
 		delete mCollectable;

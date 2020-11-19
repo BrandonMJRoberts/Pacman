@@ -1,6 +1,9 @@
 #include "Stack_FiniteStateMachine.h"
 
 #include "ChaseState_Task_Ghost.h"
+#include "FleeState_Task_Ghost.h"
+#include "ExitHome_Task_Ghost.h"
+#include "ReturnHome_Task_Ghost.h"
 
 // --------------------------------------------------------------------------------//
 // -----------------------------  GHOST  ------------------------------------------//
@@ -11,7 +14,7 @@ Stack_FiniteStateMachine_Ghost::Stack_FiniteStateMachine_Ghost(bool enabled)
 	mStateMachineIsEnabled = enabled;
 
 	if(mStateMachineIsEnabled)
-		PushToStack((BaseState_Ghost*) (new ChaseState_Ghost()));
+		PushToStack(GHOST_STATE_TYPE::CHASE);
 }
 
 // ------------------------------------------------------------------------------- //
@@ -26,9 +29,29 @@ Stack_FiniteStateMachine_Ghost::~Stack_FiniteStateMachine_Ghost()
 
 // ------------------------------------------------------------------------------- //
 
-void Stack_FiniteStateMachine_Ghost::PushToStack(BaseState_Ghost* newState)
+void Stack_FiniteStateMachine_Ghost::PushToStack(GHOST_STATE_TYPE newState)
 {
-	mCurrentStack.push_back(newState);
+	switch (newState)
+	{
+	case GHOST_STATE_TYPE::CHASE:
+		mCurrentStack.push_back(new ChaseState_Ghost());
+	break;
+
+	case GHOST_STATE_TYPE::FLEE:
+		mCurrentStack.push_back(new FleeState_Ghost());
+	break;
+
+	case GHOST_STATE_TYPE::RETURN_HOME:
+		mCurrentStack.push_back(new ReturnHomeState_Ghost());
+	break;
+
+	case GHOST_STATE_TYPE::EXIT_HOME:
+		mCurrentStack.push_back(new ExitHomeState_Ghost());
+	break;
+
+	default:
+	break;
+	}
 }
 
 // --------------------------------------------------------------------------------//

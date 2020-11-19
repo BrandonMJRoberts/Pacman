@@ -1,5 +1,7 @@
 #include "ReturnHome_Task_Ghost.h"
 
+#include "Ghost.h"
+
 // ---------------------------------------------------------------- //
 
 ReturnHomeState_Ghost::ReturnHomeState_Ghost() : BaseState_Ghost()
@@ -36,9 +38,21 @@ void ReturnHomeState_Ghost::OnUpdate()
 
 // ---------------------------------------------------------------- //
 
-void ReturnHomeState_Ghost::CheckTransitions()
+void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 {
-
+	if (ghost)
+	{
+		// We can go to the exit home state from here
+		if (ghost->GetIsHome())
+		{
+			// Remove this task and then tell the ghost to leave the home
+			ghost->GetStateMachine()->PopStack();
+			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
+			return;
+		}
+	}
+	else
+		return;
 }
 
 // ---------------------------------------------------------------- //
