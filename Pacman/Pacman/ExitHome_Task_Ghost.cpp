@@ -31,7 +31,7 @@ void ExitHomeState_Ghost::OnExit()
 
 // ---------------------------------------------------------------- //
 
-void ExitHomeState_Ghost::OnUpdate()
+void ExitHomeState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
 
 }

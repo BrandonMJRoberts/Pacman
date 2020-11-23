@@ -9,9 +9,10 @@
 // -----------------------------  GHOST  ------------------------------------------//
 // --------------------------------------------------------------------------------//
 
-Stack_FiniteStateMachine_Ghost::Stack_FiniteStateMachine_Ghost(bool enabled)
+Stack_FiniteStateMachine_Ghost::Stack_FiniteStateMachine_Ghost(GHOST_TYPE ghostColour, bool enabled)
 {
 	mStateMachineIsEnabled = enabled;
+	mGhostColour           = ghostColour;
 
 	if(mStateMachineIsEnabled)
 		PushToStack(GHOST_STATE_TYPE::CHASE);
@@ -34,7 +35,7 @@ void Stack_FiniteStateMachine_Ghost::PushToStack(GHOST_STATE_TYPE newState)
 	switch (newState)
 	{
 	case GHOST_STATE_TYPE::CHASE:
-		mCurrentStack.push_back(new ChaseState_Ghost());
+		mCurrentStack.push_back(new ChaseState_Ghost(mGhostColour));
 	break;
 
 	case GHOST_STATE_TYPE::FLEE:

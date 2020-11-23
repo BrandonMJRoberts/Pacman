@@ -5,7 +5,6 @@
 
 BaseState_Ghost::BaseState_Ghost()
 {
-	OnEnter();
 }
 
 // ---------------------------------------------------- //
@@ -17,9 +16,10 @@ BaseState_Ghost::~BaseState_Ghost()
 
 // ---------------------------------------------------- //
 
-void BaseState_Ghost::OnUpdate()
+void BaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
-
+	// This function is for calculating the target position of the ghost's movement
+	// How it gets there is calculated in the ghost itself
 }
 
 // ---------------------------------------------------- //

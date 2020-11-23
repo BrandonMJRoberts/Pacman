@@ -71,7 +71,7 @@ void MainGameScreen::Render(const unsigned int frameCount)
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
 	{
 		if (mGhosts[i])
-			mGhosts[i]->Render();
+			mGhosts[i]->Render(frameCount);
 	}
 }
 
@@ -102,7 +102,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
 	{
 		if (mGhosts[i])
-			mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition());
+			mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
 	}
 
 	// Pacman update
@@ -142,9 +142,9 @@ void MainGameScreen::LoadInDataForLevel()
 		for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
 		{
 			if (((int)GameManager::Instance()->GetPlayerCharacterType()) - 1 == i)
-				mGhosts.push_back(new Ghost(S2D::Vector2(2.0f + i, 2.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", 8, 4));
+				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4));
 			else
-				mGhosts.push_back(new Ghost(S2D::Vector2(2.0f + i, 2.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", 8, 4));
+				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4));
 		}
 	}
 

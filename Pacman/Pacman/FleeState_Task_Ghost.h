@@ -11,7 +11,7 @@ public:
 	FleeState_Ghost();
 	~FleeState_Ghost() override;
 
-	void OnUpdate() override;
+	void OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection) override;
 	void CheckTransitions(Ghost* ghost) override;
 
 private:

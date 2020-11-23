@@ -68,7 +68,7 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 
 	if (mCurrentFrame > mEndFrame)
 		mCurrentFrame = mStartFrame;
-
+	
 	if (mPacmanSourceRect && mPacmanTexture)
 	{
 		// Calculate the render position

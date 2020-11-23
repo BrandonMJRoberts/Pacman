@@ -32,9 +32,9 @@ void FleeState_Ghost::OnExit()
 
 // ---------------------------------------------------------------- //
 
-void FleeState_Ghost::OnUpdate()
+void FleeState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
-
+	
 }
 
 // ---------------------------------------------------------------- //
@@ -47,6 +47,7 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		if (!GameManager::Instance()->GetIsPlayerPoweredUp())
 		{
 			ghost->GetStateMachine()->PopStack();
+			ghost->SetGhostIsFleeing(false);
 			return;
 		}
 
@@ -54,8 +55,12 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		if (ghost->IsEaten())
 		{
 			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::RETURN_HOME);
+			ghost->SetGhostIsFleeing(false);
+			ghost->SetGhostIsAlive(false);
 			return;
 		}
+
+		ghost->SetGhostIsFleeing(true);
 	}
 	else
 		return;

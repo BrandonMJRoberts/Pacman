@@ -25,7 +25,7 @@ class Stack_FiniteStateMachine_Ghost final
 {
 public:
 	Stack_FiniteStateMachine_Ghost() = delete;
-	Stack_FiniteStateMachine_Ghost(bool enabled = true);
+	Stack_FiniteStateMachine_Ghost(GHOST_TYPE ghostColour, bool enabled = true);
 	~Stack_FiniteStateMachine_Ghost();
 
 	BaseState_Ghost*        PeekStack();
@@ -35,7 +35,8 @@ public:
 private:
 	std::vector<BaseState_Ghost*> mCurrentStack;
 
-	bool mStateMachineIsEnabled;
+	GHOST_TYPE                    mGhostColour;
+	bool                          mStateMachineIsEnabled;
 };
 
 // ------------------------------------------------------------------------------------------------------ //
