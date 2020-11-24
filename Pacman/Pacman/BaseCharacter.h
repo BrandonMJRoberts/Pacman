@@ -58,6 +58,8 @@ protected:
 	unsigned int		             mStartFrame;
 	unsigned int		             mEndFrame;
 
+	unsigned int                     mFramesPerAnimation;
+
 	const float						 mTimePerChangeOfDirection;
 	float							 mTimePerChangeDirectionRemaining;
 	float							 mMovementSpeed;

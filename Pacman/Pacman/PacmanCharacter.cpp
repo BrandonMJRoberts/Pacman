@@ -34,6 +34,8 @@ PacmanCharacter::PacmanCharacter(const char**       collisionMap,
 	mEndFrame     = 1;
 
 	mMovementSpeed = PACMAN_MOVEMENT_SPEED;
+
+	mFramesPerAnimation = 6;
 }
 
 // ------------------------------------------------------------- //

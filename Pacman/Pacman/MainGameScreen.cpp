@@ -142,7 +142,7 @@ void MainGameScreen::LoadInDataForLevel()
 		if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
 			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
 		else
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
 	}
 
 	if (mGhosts.size() == 0)

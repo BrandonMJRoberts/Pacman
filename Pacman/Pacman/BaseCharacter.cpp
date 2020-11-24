@@ -56,6 +56,8 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 
 	mCurrentFacingDirection          = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection        = FACING_DIRECTION::NONE;
+
+	mFramesPerAnimation              = 0;
 }
 
 // -------------------------------------------------------------------------------- //
@@ -76,7 +78,7 @@ BaseCharacter::~BaseCharacter()
 void BaseCharacter::Render(const unsigned int frameCount)
 {
 	// Make the frame loop in the way that has been set
-	if ((frameCount % 6) == 1)
+	if ((frameCount % mFramesPerAnimation) == 1)
 		mCurrentFrame++;
 
 	if (mCurrentFrame > mEndFrame)

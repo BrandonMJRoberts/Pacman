@@ -32,7 +32,10 @@ private:
 
 	void							 CalculateAIMovementDirection();
 
-	Stack_FiniteStateMachine_Ghost*   mStateMachine; // Each ghost has a state machine if it is AI controlled
+	Stack_FiniteStateMachine_Ghost*  mStateMachine; // Each ghost has a state machine if it is AI controlled
+
+	unsigned int                     mColourBaseStartFrame;
+	unsigned int                     mColourBaseEndFrame;
 
 	GHOST_TYPE			             mThisGhostType;
 	bool                             mIsHome;

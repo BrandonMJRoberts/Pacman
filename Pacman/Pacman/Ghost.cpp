@@ -38,25 +38,21 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	switch (mThisGhostType)
 	{
 	case GHOST_TYPE::RED:
-		mCurrentFrame = 0;
 		mStartFrame   = 0;
 		mEndFrame     = 1;
 	break;
 
 	case GHOST_TYPE::ORANGE:
-		mCurrentFrame = 24;
 		mStartFrame   = 24;
 		mEndFrame     = 25;
 	break;
 
 	case GHOST_TYPE::PINK:
-		mCurrentFrame = 8;
 		mStartFrame   = 8;
 		mEndFrame     = 9;
 	break; 
 
 	case GHOST_TYPE::BLUE:
-		mCurrentFrame = 16;
 		mStartFrame   = 16;
 		mEndFrame     = 17;
 	break;
@@ -65,7 +61,13 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	break;
 	}
 
-	mMovementSpeed = GHOST_MOVEMENT_SPEED;
+	mColourBaseEndFrame   = mEndFrame;
+	mColourBaseStartFrame = mStartFrame;
+	mCurrentFrame         = mStartFrame;
+
+	mMovementSpeed        = GHOST_MOVEMENT_SPEED;
+
+	mFramesPerAnimation   =8;
 }
 
 // -------------------------------------------------------------------- //
@@ -89,11 +91,11 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 	// First call the base class update
 	BaseCharacter::Update(deltaTime);
 
-	// First the ghost's movemt 
+	// First check if the ghost is player controlled
 	if (mIsPlayerControlled)
 	{
 		// Handle the player's input to determine which direction the ghost should go
-
+		HandleInput();
 	}
 	else
 	{
@@ -140,38 +142,38 @@ void Ghost::CheckForDirectionChange()
 	else
 	{
 		// If we have changed direction then reset the countdown for the next change of direction
-		mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
+		mTimePerChangeDirectionRemaining = GHOST_CHANGE_DIRECTION_DELAY;
 
 		switch (mRequestedFacingDirection)
 		{
 		case FACING_DIRECTION::DOWN:
-			mStartFrame = 6;
-			mEndFrame = 8;
-			mCurrentFrame = 6;
+			mStartFrame   = mColourBaseStartFrame + 6;
+			mEndFrame     = mColourBaseEndFrame   + 6;
+			mCurrentFrame = mColourBaseStartFrame + 6;
 		break;
 
 		case FACING_DIRECTION::UP:
-			mStartFrame = 4;
-			mEndFrame = 6;
-			mCurrentFrame = 4;
+			mStartFrame   = mColourBaseStartFrame + 4;
+			mEndFrame     = mColourBaseEndFrame   + 4;
+			mCurrentFrame = mColourBaseStartFrame + 4;
 		break;
 
 		case FACING_DIRECTION::LEFT:
-			mStartFrame = 2;
-			mEndFrame = 4;
-			mCurrentFrame = 2;
+			mStartFrame   = mColourBaseStartFrame + 2;
+			mEndFrame     = mColourBaseEndFrame   + 2;
+			mCurrentFrame = mColourBaseStartFrame + 2;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
-			mStartFrame = 0;
-			mEndFrame = 2;
-			mCurrentFrame = 0;
+			mStartFrame   = mColourBaseStartFrame;
+			mEndFrame     = mColourBaseEndFrame;
+			mCurrentFrame = mColourBaseStartFrame;
 		break;
 
 		default:
-			mStartFrame = 8;
-			mEndFrame = 8;
-			mCurrentFrame = 8;
+			mStartFrame   = mColourBaseStartFrame;
+			mEndFrame     = mColourBaseEndFrame;
+			mCurrentFrame = mColourBaseStartFrame;
 		break;
 		}
 
@@ -224,45 +226,45 @@ void Ghost::CalculateAIMovementDirection()
 		{
 			if (movementDifferential.X > checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
 			{
-				mCurrentFacingDirection = FACING_DIRECTION::RIGHT;
+				mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
 			}
 			else if (movementDifferential.X < -checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
 			{
-				mCurrentFacingDirection = FACING_DIRECTION::LEFT;
+				mRequestedFacingDirection = FACING_DIRECTION::LEFT;
 			}
 		}
 		else
 		{
 			if (movementDifferential.Y > checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::UP)
 			{
-				mCurrentFacingDirection = FACING_DIRECTION::DOWN;
+				mRequestedFacingDirection = FACING_DIRECTION::DOWN;
 			}
 			else if (movementDifferential.Y < -checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
 			{
-				mCurrentFacingDirection = FACING_DIRECTION::UP;
+				mRequestedFacingDirection = FACING_DIRECTION::UP;
 			}
 		}
 	}
 	else if (validHorizontalMove || validVerticalMove) // If both options are not valid, but one of them is then move in the valid direction
 	{
 		if (movementDifferential.X > checkingAccuracy && canMoveRight && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
-			mCurrentFacingDirection = FACING_DIRECTION::RIGHT;
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
 		else if (movementDifferential.X < -checkingAccuracy && canMoveLeft && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
-			mCurrentFacingDirection = FACING_DIRECTION::LEFT;
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
 		else if (movementDifferential.Y > checkingAccuracy && canMoveDown && mCurrentFacingDirection != FACING_DIRECTION::UP)
-			mCurrentFacingDirection = FACING_DIRECTION::DOWN;
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
 		else if (movementDifferential.Y < -checkingAccuracy && canMoveUp && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
-			mCurrentFacingDirection = FACING_DIRECTION::UP;
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
 	}
 	else // If neither of the desired moves are valid then just move in a valid direction
 	{
 		if (canMoveDown && mCurrentFacingDirection != FACING_DIRECTION::UP)
-			mCurrentFacingDirection = FACING_DIRECTION::DOWN;
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
 		else if (canMoveUp && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
-			mCurrentFacingDirection = FACING_DIRECTION::UP;
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
 		else if (canMoveLeft && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
-			mCurrentFacingDirection = FACING_DIRECTION::LEFT;
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
 		else if (canMoveRight && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
-			mCurrentFacingDirection = FACING_DIRECTION::RIGHT;
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
 	}
 }
