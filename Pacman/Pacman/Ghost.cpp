@@ -26,24 +26,13 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	         const unsigned int spritesOnWidth, 
 	         const unsigned int spritesOnHeight) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidth, spritesOnHeight)
 {
-	// Store the collsiion map
-	//if(!mCollisionMap)
-	//	mCollisionMap         = collisionMap;
-
-	// Set the default values
-	//mPosition                 = startPos;
 	mThisGhostType            = ghostType;
-	//mIsPlayerControlled       = !isAIControlled;
-	//mCurrentFacingDirection   = FACING_DIRECTION::NONE;
-	//mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
 	//mIsGhostAlive             = true;
 	mGhostIsFleeing           = false;
 
 	// Create the state machine needed
 	mStateMachine             = new Stack_FiniteStateMachine_Ghost(ghostType, isAIControlled);
-
-	//mTimePerChangeDirectionRemaining = mTimePerChangeOfDirection;
 
 	// Set the starting, ending and current frames
 	switch (mThisGhostType)
@@ -77,25 +66,6 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	}
 
 	mMovementSpeed = GHOST_MOVEMENT_SPEED;
-
-	// Load in the sprite sheets
-	//if (!mColouredSpriteSheet || !mFleeSpriteSheet)
-	//{
-	//	LoadInSpriteSheets(FilePathForColoured, FilePathForFlee);
-	//}
-
-	// Setup the render data
-	//if (mColouredSpriteSheet)
-	//{
-	//	mSingleSpriteWidth  = mColouredSpriteSheet->GetWidth() / mSpritesOnWidth;
-	//	mSingleSpriteHeight = mColouredSpriteSheet->GetHeight() / mSpritesOnHeight;
-
-	//	mSourceRect.Width   = mSingleSpriteWidth;
-	//	mSourceRect.Height  = mSingleSpriteHeight;
-	//}
-	//else
-	//	return;
-
 }
 
 // -------------------------------------------------------------------- //
@@ -112,37 +82,6 @@ Ghost::~Ghost()
 	mCollisionMap = nullptr;
 }
 
-// -------------------------------------------------------------------- //
-/*
-void Ghost::Render(const unsigned int currentFrameCount)
-{
-	// Check if we need to change what frame we are rendering
-	if ((currentFrameCount % 12) == 1)
-		mCurrentFrame++;
-
-	// Make sure we loop if needed
-	if (mCurrentFrame > mEndFrame)
-		mCurrentFrame = mStartFrame;
-
-	// Calculate the render position for the ghost
-	S2D::Vector2 mRenderPosition = S2D::Vector2((mPosition * SPRITE_RESOLUTION) - S2D::Vector2(mSingleSpriteWidth / 2.0f, mSingleSpriteHeight / 2.0f));
-
-	// First calculate the source rect
-	mSourceRect.X = float(   (mCurrentFrame % mSpritesOnWidth) * mSingleSpriteWidth);
-	mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidth) * mSingleSpriteHeight);
-
-	// Do the draw call
-	if (mIsGhostAlive && !mGhostIsFleeing)
-	{
-		S2D::SpriteBatch::Draw(mColouredSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mRenderPosition), &mSourceRect);
-	}
-	else if (!mIsGhostAlive || mGhostIsFleeing)
-	{
-		S2D::SpriteBatch::Draw(mFleeSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mRenderPosition), &mSourceRect);
-	}
-
-}
-*/
 // -------------------------------------------------------------------- //
 
 void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FACING_DIRECTION pacmanFacingDirection)
@@ -186,45 +125,61 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 			mTimePerChangeDirectionRemaining = mTimePerChangeOfDirection;
 		}
 	}
-
-	// Now move the ghost in the currently facing direction
-	MoveInCurrentDirection(deltaTime);
 }
 
 // -------------------------------------------------------------------- //
-/*
-bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
+
+void Ghost::CheckForDirectionChange()
 {
-	S2D::Vector2 offset = S2D::Vector2();
-
-	switch (newDir)
+	// Now check to see if the player can change direction 
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
 	{
-	case FACING_DIRECTION::UP:
-		offset.Y = -1;
-	break;
-
-	case FACING_DIRECTION::DOWN:
-		offset.Y = 1;
-	break;
-
-	case FACING_DIRECTION::LEFT:
-		offset.X = -1;
-	break;
-
-	case FACING_DIRECTION::RIGHT:
-		offset.X = 1;
-	break;
+		// Quick out if the player has not entered anything
+		return;
 	}
-
-	// Need to go right to get to the position
-	if (mCollisionMap[(unsigned int)(mCentrePosition.Y + offset.Y)][(unsigned int)(mCentrePosition.X + offset.X)] == '0')
+	else
 	{
-		return true;
+		// If we have changed direction then reset the countdown for the next change of direction
+		mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
+
+		switch (mRequestedFacingDirection)
+		{
+		case FACING_DIRECTION::DOWN:
+			mStartFrame = 6;
+			mEndFrame = 8;
+			mCurrentFrame = 6;
+		break;
+
+		case FACING_DIRECTION::UP:
+			mStartFrame = 4;
+			mEndFrame = 6;
+			mCurrentFrame = 4;
+		break;
+
+		case FACING_DIRECTION::LEFT:
+			mStartFrame = 2;
+			mEndFrame = 4;
+			mCurrentFrame = 2;
+		break;
+
+		case FACING_DIRECTION::RIGHT:
+			mStartFrame = 0;
+			mEndFrame = 2;
+			mCurrentFrame = 0;
+		break;
+
+		default:
+			mStartFrame = 8;
+			mEndFrame = 8;
+			mCurrentFrame = 8;
+		break;
+		}
+
+		// Set the new direction of facing
+		mCurrentFacingDirection = mRequestedFacingDirection;
 	}
-	
-	return false;
 }
-*/
+
 // -------------------------------------------------------------------- //
 
 void Ghost::CalculateAIMovementDirection()
@@ -311,120 +266,3 @@ void Ghost::CalculateAIMovementDirection()
 			mCurrentFacingDirection = FACING_DIRECTION::RIGHT;
 	}
 }
-
-// -------------------------------------------------------------------- //
-/*
-S2D::Vector2 Ghost::ConvertPositionToGridPosition(const S2D::Vector2 position)
-{
-	return S2D::Vector2(position.X / SPRITE_RESOLUTION, position.Y / SPRITE_RESOLUTION);
-}
-
-// -------------------------------------------------------------------- //
-
-void Ghost::MoveInCurrentDirection(const float deltaTime)
-{
-	// Variables that will be needed in this function
-	S2D::Vector2 gridPos               = S2D::Vector2(), movementAmount = S2D::Vector2();
-	float        ghostMovementDistance = (GHOST_MOVEMENT_SPEED * deltaTime) / SPRITE_RESOLUTION;
-
-	// First lock the opposite axis to which we are moving in
-	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
-		mCentrePosition.X = ((int)mCentrePosition.X + 0.5f);
-	else if (mCurrentFacingDirection == FACING_DIRECTION::LEFT || mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
-		mCentrePosition.Y = ((int)mCentrePosition.Y + 0.5f);
-
-	float checkDistance = (mSingleSpriteHeight * 0.4f) / SPRITE_RESOLUTION;
-
-	// Now we need to move the ghost in the direction selected, if we can
-	switch (mCurrentFacingDirection)
-	{
-
-	case FACING_DIRECTION::DOWN:
-		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mCentrePosition + S2D::Vector2(0.0f, checkDistance);
-
-		movementAmount.Y = ghostMovementDistance;
-	break;
-
-	case FACING_DIRECTION::UP:
-		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mCentrePosition + S2D::Vector2(0.0f, -1.0f * checkDistance);
-
-		movementAmount.Y = -1.0f * ghostMovementDistance;
-	break;
-
-	case FACING_DIRECTION::LEFT:
-		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mPosition + S2D::Vector2(-1.0f * checkDistance, 0.0f);
-
-		movementAmount.X = -1.0f * ghostMovementDistance;
-	break;
-
-	case FACING_DIRECTION::RIGHT:
-		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mPosition + S2D::Vector2(checkDistance, 0.0f);
-
-		movementAmount.X = ghostMovementDistance;
-	break;
-
-	case FACING_DIRECTION::NONE:
-	break;
-
-	default:
-		std::cout << "In an error movement state!" << std::endl;
-		return;
-	break;
-	}
-
-	// Check if we can acually go in this direction without going into a wall
-	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
-	{
-		// if so move
-		mPosition.X += movementAmount.X;
-		mPosition.Y += movementAmount.Y;
-	}
-	else
-	{
-		// otherwise lock the position to being the centre of the current grid square
-		if (movementAmount.X > 0)
-			mPosition.X = ((int)mPosition.X + 0.5f);
-		else
-			mPosition.Y = ((int)mPosition.Y + 0.5f);
-
-		// Reset the facing direction to being nothing, so we dont continue to run this code needlessly
-		mCurrentFacingDirection = FACING_DIRECTION::NONE;
-	}
-}
-
-// -------------------------------------------------------------------- //
-
-void Ghost::LoadInSpriteSheets(const char* filePathForColored, const char* filePathForFlee)
-{
-	if (!mColouredSpriteSheet)
-	{
-		mColouredSpriteSheet = new S2D::Texture2D();
-		mColouredSpriteSheet->Load(filePathForColored, false);
-
-		if (!mColouredSpriteSheet)
-		{
-			std::cout << "Failed to load in the ghost sprite sheet" << std::endl;
-			return;
-		}
-	}
-
-	if (!mFleeSpriteSheet)
-	{
-		mFleeSpriteSheet = new S2D::Texture2D();
-		mFleeSpriteSheet->Load(filePathForFlee, false);
-
-		if (!mFleeSpriteSheet)
-		{
-			std::cout << "Failed to load in the ghost sprite sheet" << std::endl;
-			return;
-		}
-	}
-}
-
-// -------------------------------------------------------------------- //
-
-*/

@@ -65,9 +65,9 @@ void DotsHandler::Render(unsigned int currentFrameCount)
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
 		if (mDots[i]->mDotType == DOT_TYPE::SMALL)
-			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->mPosition), mSourceRectSmallDot);
+			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), mSourceRectSmallDot);
 		else
-			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + mDots[i]->mPosition), mSourceRectLargeDot);
+			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), mSourceRectLargeDot);
 	}
 }
 
@@ -111,12 +111,12 @@ void DotsHandler::LoadInDotData()
 
 		if (typeOfDot == 1)
 		{
-			mDots.push_back(new Dot(S2D::Vector2(float((xPos * SPRITE_RESOLUTION)), float((yPos * SPRITE_RESOLUTION))), DOT_TYPE::SMALL));
+			mDots.push_back(new Dot(S2D::Vector2((float)xPos, (float)yPos), DOT_TYPE::SMALL));
 			continue;
 		}
 		else if (typeOfDot == 2)
 		{
-			mDots.push_back(new Dot(S2D::Vector2(float(xPos * SPRITE_RESOLUTION), float(yPos * SPRITE_RESOLUTION)), DOT_TYPE::LARGE));
+			mDots.push_back(new Dot(S2D::Vector2((float)xPos, (float)yPos), DOT_TYPE::LARGE));
 			continue;
 		}
 		else
@@ -130,7 +130,7 @@ void DotsHandler::LoadInDotData()
 
 // ----------------------------------------------------------------- //
 
-void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned int pacmanDimensions)
+void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pacmanDimensions)
 {
 	if (mDots.size() == 0)
 	{
@@ -143,9 +143,9 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const unsigned
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
 		// The X lines up correctly
-		if (mDots[i]->mPosition.X + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.X - pacmanDimensions && mDots[i]->mPosition.X + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.X + pacmanDimensions)
+		if (mDots[i]->mPosition.X + 0.5f > pacmanCentrePosition.X - pacmanDimensions && mDots[i]->mPosition.X + 0.5f < pacmanCentrePosition.X + pacmanDimensions)
 		{
-			if (mDots[i]->mPosition.Y + HALF_SPRITE_RESOLUTION > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->mPosition.Y + HALF_SPRITE_RESOLUTION < pacmanCentrePosition.Y + pacmanDimensions)
+			if (mDots[i]->mPosition.Y + 0.5f > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->mPosition.Y + 0.5f < pacmanCentrePosition.Y + pacmanDimensions)
 			{
 				// Add score to the player's score based on the type of dot it is
 				if (mDots[i]->mDotType == DOT_TYPE::SMALL)

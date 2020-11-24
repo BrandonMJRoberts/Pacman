@@ -84,7 +84,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	// Update the dots in the level
 	if (mPacman)
 	{
-		mDotHandler->Update(mPacman->GetCentrePosition(), 9);
+		mDotHandler->Update(mPacman->GetCentrePosition(), 0.8f);
 	}
 
 	// First check if the level is over
@@ -229,7 +229,7 @@ void MainGameScreen::LoadNextLevel()
 void MainGameScreen::HandleCollectable(const float deltaTime)
 {
 	// Collectable collision
-	if (mCollectable && mCollectable->CheckForCollision(mPacman->GetCentrePosition(), 13, mPacman->GetFacingDirection()))
+	if (mCollectable && mCollectable->CheckForCollision(mPacman->GetCentrePosition(), 0.8f, mPacman->GetFacingDirection()))
 	{
 		// Delete this collectable
 		delete mCollectable;

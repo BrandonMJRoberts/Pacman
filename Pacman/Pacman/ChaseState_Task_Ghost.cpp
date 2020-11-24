@@ -37,18 +37,16 @@ void ChaseState_Ghost::OnExit()
 
 void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
-	S2D::Vector2 positionalOffset;
+	S2D::Vector2 positionalOffset = S2D::Vector2();
 
 	switch (mColourOfGhost)
 	{
 	case GHOST_TYPE::RED:
 		// To pos
-		targetPositionRef = S2D::Vector2(int(pacmanPos.X / SPRITE_RESOLUTION), int(pacmanPos.Y / SPRITE_RESOLUTION));
+		targetPositionRef = pacmanPos;
 	return;
 
 	case GHOST_TYPE::PINK:
-		positionalOffset = S2D::Vector2();
-
 		// In front
 		switch (pacmanFacingDirection)
 		{
@@ -73,10 +71,8 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 		}
 
 		// If so then set to move there
-		targetPositionRef = S2D::Vector2( (pacmanPos.X / SPRITE_RESOLUTION) + positionalOffset.X, (pacmanPos.Y / SPRITE_RESOLUTION) + positionalOffset.Y);
-		return;
-
-	break;
+		targetPositionRef = pacmanPos + positionalOffset;
+	return;
 
 	case GHOST_TYPE::ORANGE:
 		// Random
@@ -94,9 +90,6 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 	break;
 
 	case GHOST_TYPE::BLUE:
-		// Behind
-		positionalOffset = S2D::Vector2();
-
 		// In front
 		switch (pacmanFacingDirection)
 		{
@@ -120,10 +113,8 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 		break;
 		}
 
-		// If so then set to move there
-		targetPositionRef = S2D::Vector2((pacmanPos.X / SPRITE_RESOLUTION) + positionalOffset.X, (pacmanPos.Y / SPRITE_RESOLUTION) + positionalOffset.Y);
-		return;
-	break;
+		targetPositionRef = pacmanPos + positionalOffset;
+	return;
 
 	default:
 	return;

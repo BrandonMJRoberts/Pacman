@@ -107,7 +107,16 @@ void BaseCharacter::Render(const unsigned int frameCount)
 
 void BaseCharacter::Update(const float deltaTime)
 {
+	if (mTimePerChangeDirectionRemaining > 0.0f)
+		mTimePerChangeDirectionRemaining -= deltaTime;
 
+	// Now check if the player has hit the edge of the playable area so loop
+	EdgeCheck();
+
+	// Now move the player in the correct direction
+	MoveInCurrentDirection(deltaTime);
+
+	CheckForDirectionChange();
 }
 
 // -------------------------------------------------------------------------------- //
@@ -297,7 +306,7 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 	}
 
 	// Now check if we can actually go to the new position
-	if (gridPos.X > 0.0f && gridPos.X < SCREEN_WIDTH / SPRITE_RESOLUTION && gridPos.Y > 0.0f && gridPos.Y < SCREEN_HEIGHT / SPRITE_RESOLUTION && mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
+	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1') //gridPos.X > 0.0f && gridPos.X < SCREEN_WIDTH / SPRITE_RESOLUTION && gridPos.Y > 0.0f && gridPos.Y < SCREEN_HEIGHT / SPRITE_RESOLUTION && 
 	{
 		mCentrePosition.X += movementAmount.X;
 		mCentrePosition.Y += movementAmount.Y;
@@ -323,19 +332,19 @@ bool BaseCharacter::CanTurnToDirection(const FACING_DIRECTION newDir)
 	{
 	case FACING_DIRECTION::UP:
 		offset.Y = -1;
-		break;
+	break;
 
 	case FACING_DIRECTION::DOWN:
 		offset.Y = 1;
-		break;
+	break;
 
 	case FACING_DIRECTION::LEFT:
 		offset.X = -1;
-		break;
+	break;
 
 	case FACING_DIRECTION::RIGHT:
 		offset.X = 1;
-		break;
+	break;
 	}
 
 	// Need to go right to get to the position
@@ -345,6 +354,26 @@ bool BaseCharacter::CanTurnToDirection(const FACING_DIRECTION newDir)
 	}
 
 	return false;
+}
+
+// ------------------------------------------------------------- //
+
+void BaseCharacter::CheckForDirectionChange()
+{
+	// Now check to see if the player can change direction 
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
+	{
+		// Quick out if the player has not entered anything
+		return;
+	}
+	else
+	{
+		// If we have changed direction then reset the countdown for the next change of direction
+		mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
+
+		// Set the new direction of facing
+		mCurrentFacingDirection = mRequestedFacingDirection;
+	}
 }
 
 // ------------------------------------------------------------- //

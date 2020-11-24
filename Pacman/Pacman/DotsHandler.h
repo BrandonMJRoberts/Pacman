@@ -32,7 +32,7 @@ public:
 	DotsHandler();
 	~DotsHandler();
 
-	void Update(const S2D::Vector2 pacmanPosition, const unsigned int pacmanDimensions);
+	void Update(const S2D::Vector2 pacmanPosition, const float pacmanDimensions);
 	void Render(const unsigned int currentFrameCount);
 
 private:
