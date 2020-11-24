@@ -36,11 +36,13 @@ private:
 	S2D::Vector2       mSetNamePosition;
 
 	S2D::Texture2D*    mSelectorSpriteSheet;
-	S2D::Rect*         mSelectorSourceRenderRect;
+	S2D::Rect          mSelectorSourceRenderRect;
 	S2D::Vector2       mSelectorPosition;
 
 	unsigned int       mSelectorSpriteCurrentFrame;
-	const unsigned int mMaxSelectorSpriteFrames;
+	unsigned int       mSelectorSpriteStartFrame;
+	unsigned int       mSelectorSpriteEndFrame;
+
 	const unsigned int mAmountOfRenderedFramesPerAnimationFrame;
 
 	float              mSingleSpriteWidth;

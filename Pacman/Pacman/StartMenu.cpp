@@ -12,7 +12,7 @@
 
 // -------------------------------------------------------- //
 
-StartMenu::StartMenu() : BaseMenu(), mMaxSelectorSpriteFrames(2), mAmountOfRenderedFramesPerAnimationFrame(10), mAmountOfSpitesOnSelectorHeight(5), mAmountOfSpitesOnSelectorWidth(2)
+StartMenu::StartMenu() : BaseMenu(), mAmountOfRenderedFramesPerAnimationFrame(6), mAmountOfSpitesOnSelectorHeight(3), mAmountOfSpitesOnSelectorWidth(4)
 {
 	// Load in the selector sprite sheet
 	mSelectorSpriteSheet = new S2D::Texture2D();
@@ -26,8 +26,7 @@ StartMenu::StartMenu() : BaseMenu(), mMaxSelectorSpriteFrames(2), mAmountOfRende
 	mSingleSpriteWidth              = float(mSelectorSpriteSheet->GetWidth() / mAmountOfSpitesOnSelectorWidth);
 	mSingleSpriteHeight             = float(mSelectorSpriteSheet->GetHeight() / mAmountOfSpitesOnSelectorHeight);
 
-	mSelectorSourceRenderRect       = new S2D::Rect(0, 0, (unsigned int)mSingleSpriteWidth, (unsigned int)mSingleSpriteHeight - 1);
-	mSelectorSpriteCurrentFrame     = 0;
+	mSelectorSourceRenderRect       = S2D::Rect(0, 0, (unsigned int)mSingleSpriteWidth, (unsigned int)mSingleSpriteHeight - 1);
 
 	mStartGamePosition              = S2D::Vector2(350, 250);
 	mHighScoresPosition             = S2D::Vector2(350, 300);
@@ -44,6 +43,10 @@ StartMenu::StartMenu() : BaseMenu(), mMaxSelectorSpriteFrames(2), mAmountOfRende
 	// Setup the text renderer
 	mTextRenderer                   = new TextRenderer("Textures/UI/Font.png", 15, 21);
 
+	mSelectorSpriteCurrentFrame     = 8;
+	mSelectorSpriteEndFrame         = 10;
+	mSelectorSpriteStartFrame       = 8;
+
 }
 
 // -------------------------------------------------------- //
@@ -55,10 +58,6 @@ StartMenu::~StartMenu()
 
 	delete mSelectorSpriteSheet;
 	mSelectorSpriteSheet = nullptr;
-
-	delete mSelectorSourceRenderRect;
-	mSelectorSourceRenderRect = nullptr;
-
 }
 
 // -------------------------------------------------------- //
@@ -68,41 +67,18 @@ void StartMenu::Render(const unsigned int frameCount)
 	if (mSelectorSpriteSheet)
 	{
 		// Handle which frame of animation the sprite is on
-		if (frameCount % mAmountOfRenderedFramesPerAnimationFrame == 0)
+		if (frameCount % mAmountOfRenderedFramesPerAnimationFrame == 1)
 		{
 			mSelectorSpriteCurrentFrame++;
 		}
 
-		if (mSelectorSpriteCurrentFrame >= mMaxSelectorSpriteFrames)
-			mSelectorSpriteCurrentFrame = 0;
+		if (mSelectorSpriteCurrentFrame > mSelectorSpriteEndFrame)
+			mSelectorSpriteCurrentFrame = mSelectorSpriteStartFrame;
 
-		mSelectorSourceRenderRect->X = mSelectorSpriteCurrentFrame * mSingleSpriteWidth;
+		mSelectorSourceRenderRect.X =    (mSelectorSpriteCurrentFrame % mAmountOfSpitesOnSelectorWidth) * mSingleSpriteWidth;
+		mSelectorSourceRenderRect.Y = int(mSelectorSpriteCurrentFrame / mAmountOfSpitesOnSelectorWidth) * mSingleSpriteHeight;
 
-		// Now handle which sprite representation should be shown
-		switch (GameManager::Instance()->GetPlayerCharacterType())
-		{
-		case PLAYER_CHARACTER_TYPE::RED_GHOST:
-			mSelectorSourceRenderRect->Y = 0.0f;
-		break;
-
-		case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
-			mSelectorSourceRenderRect->Y = 2 * mSingleSpriteHeight;
-		break;
-
-		case PLAYER_CHARACTER_TYPE::PINK_GHOST:
-			mSelectorSourceRenderRect->Y = mSingleSpriteHeight;
-		break;
-
-		case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
-			mSelectorSourceRenderRect->Y = 3 * mSingleSpriteHeight;
-		break;
-
-		case PLAYER_CHARACTER_TYPE::PACMAN:
-			mSelectorSourceRenderRect->Y = 4 * mSingleSpriteHeight;
-		break;
-		}
-
-		S2D::SpriteBatch::Draw(mSelectorSpriteSheet, &mSelectorPosition, mSelectorSourceRenderRect);
+		S2D::SpriteBatch::Draw(mSelectorSpriteSheet, &mSelectorPosition, &mSelectorSourceRenderRect);
 	}
 
 	mTextRenderer->RenderFromRight("START GAME",       20, mStartGamePosition,       2);
@@ -141,23 +117,56 @@ SCREENS StartMenu::Update(const float deltaTime)
 			{
 			case SELECTION_OPTIONS::START_GAME:
 				return SCREENS::IN_GAME;
-				break;
+			break;
 
 			case SELECTION_OPTIONS::HIGHSCORES:
 				return SCREENS::HIGH_SCORES;
-				break;
+			break;
 
 			case SELECTION_OPTIONS::QUIT:
 				return SCREENS::QUIT;
-				break;
+			break;
 
 			case SELECTION_OPTIONS::CHANGE_PLAYER:
 				GameManager::Instance()->IncrementPlayerCharacter();
+
+				switch (GameManager::Instance()->GetPlayerCharacterType())
+				{
+				case PLAYER_CHARACTER_TYPE::RED_GHOST:
+					mSelectorSpriteCurrentFrame = 0;
+					mSelectorSpriteEndFrame     = 1;
+					mSelectorSpriteStartFrame   = 0;
 				break;
+
+				case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+					mSelectorSpriteCurrentFrame = 4;
+					mSelectorSpriteEndFrame     = 5;
+					mSelectorSpriteStartFrame   = 4;
+				break;
+
+				case PLAYER_CHARACTER_TYPE::PINK_GHOST:
+					mSelectorSpriteCurrentFrame = 2;
+					mSelectorSpriteEndFrame     = 3;
+					mSelectorSpriteStartFrame   = 2;
+				break;
+
+				case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
+					mSelectorSpriteCurrentFrame = 6;
+					mSelectorSpriteEndFrame     = 7;
+					mSelectorSpriteStartFrame   = 6;
+				break;
+
+				case PLAYER_CHARACTER_TYPE::PACMAN:
+					mSelectorSpriteCurrentFrame = 8;
+					mSelectorSpriteEndFrame     = 10;
+					mSelectorSpriteStartFrame   = 8;
+				break;
+				}
+			break;
 
 			default:
 				return SCREENS::SAME;
-				break;
+			break;
 			}
 		}
 		else
