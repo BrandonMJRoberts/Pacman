@@ -4,71 +4,73 @@
 #include "S2D/S2D.h"
 #include "Commons.h"
 
+#include "BaseCharacter.h"
+
 // ------------------------------------------------------------------------------- //
 
 #include "Stack_FiniteStateMachine.h"
 
-class Ghost final
+class Ghost final : public BaseCharacter
 {
 public:
 	Ghost() = delete; // Make it so you cannot create a default ghost type
-	Ghost(const S2D::Vector2 startPos, char** collisionMap, const GHOST_TYPE ghostType, const bool isAIControlled, const char* FilePathForColoured, const char* FilePathForFlee, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight);
-	~Ghost();
+	Ghost(const S2D::Vector2 startPos, const char** const collisionMap, const GHOST_TYPE ghostType, const bool isAIControlled, const char* FilePathForColoured, const char* FilePathForFlee, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight);
+	~Ghost() override;
 
-	void Render(const unsigned int currentFrameCount);
+	//void Render(const unsigned int currentFrameCount) override;
 	void Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FACING_DIRECTION pacmanFacingDirection);
 
-	void SetIsPlayerControlled()                       { mIsPlayerControlled = true; }
+	//void SetIsPlayerControlled()                       { mIsPlayerControlled = true; }
 
 	Stack_FiniteStateMachine_Ghost*  GetStateMachine() { return mStateMachine; }
 
-	bool IsEaten()                                     { return !mIsGhostAlive; }
-	void SetGhostIsAlive(bool newVal)                  { mIsGhostAlive = newVal; }
+	//bool IsAlive()                                     { return !mIsAlive; }
+	//void SetGhostIsAlive(bool newVal)                  { mIsGhostAlive = newVal; }
 
 	bool GetIsHome()                                   { return mIsHome; }
 	void SetIsHome(bool newVal)                        { mIsHome = newVal; }
 
 	void SetGhostIsFleeing(bool newVal)                { mGhostIsFleeing = newVal; }
 
-	void SetTargetPosition(S2D::Vector2 newPos)        { mTargetPositon = newPos; }
+	//void SetTargetPosition(S2D::Vector2 newPos)        { mTargetPositon = newPos; }
 
 private:
-	void                             LoadInSpriteSheets(const char* filePathForColored, const char* filePathForFlee);
+	//void                             LoadInSpriteSheets(const char* filePathForColored, const char* filePathForFlee);
 
-	void                             MoveInCurrentDirection(const float deltaTime);
-	S2D::Vector2                     ConvertPositionToGridPosition(const S2D::Vector2 position);
+	//void                             MoveInCurrentDirection(const float deltaTime);
+	//S2D::Vector2                     ConvertPositionToGridPosition(const S2D::Vector2 position);
 
-	bool							 CanTurnToDirection(const FACING_DIRECTION newDir);
+	//bool							 CanTurnToDirection(const FACING_DIRECTION newDir);
 	void							 CalculateAIMovementDirection();
 
-	S2D::Vector2                     mPosition;
-	S2D::Vector2                     mTargetPositon;
+	//S2D::Vector2                     mCentrePosition;
+	//S2D::Vector2                     mTargetPositon;
 
-	static S2D::Texture2D*           mColouredSpriteSheet; 
-	static S2D::Texture2D*           mFleeSpriteSheet;
-	static S2D::Rect		         mSourceRect;
+	//static S2D::Texture2D*           mColouredSpriteSheet; 
+	//static S2D::Texture2D*           mFleeSpriteSheet;
+	//static S2D::Rect		         mSourceRect;
 
 	Stack_FiniteStateMachine_Ghost*   mStateMachine; // Each ghost has a state machine if it is AI controlled
 
-	const unsigned int               mSpritesOnWidth;
-	const unsigned int               mSpritesOnHeight;
-	static unsigned int              mSingleSpriteWidth;
-	static unsigned int              mSingleSpriteHeight;
-	static char**                    mCollisionMap;
+	//const unsigned int               mSpritesOnWidth;
+	//const unsigned int               mSpritesOnHeight;
+	//static unsigned int              mSingleSpriteWidth;
+	//static unsigned int              mSingleSpriteHeight;
+	//static char**                    mCollisionMap;
 
-	FACING_DIRECTION                 mCurrentFacingDirection;
-	FACING_DIRECTION                 mRequestedFacingDirection;
+	//FACING_DIRECTION                 mCurrentFacingDirection;
+	//FACING_DIRECTION                 mRequestedFacingDirection;
 
-	unsigned int		             mCurrentFrame;
-	unsigned int		             mStartFrame;
-	unsigned int		             mEndFrame;
+//	unsigned int		             mCurrentFrame;
+	//unsigned int		             mStartFrame;
+	//unsigned int		             mEndFrame;
 
-	const float						 mTimePerChangeOfDirection;
-	float							 mTimePerChangeDirectionRemaining;
+	//const float						 mTimePerChangeOfDirection;
+	//float							 mTimePerChangeDirectionRemaining;
 
 	GHOST_TYPE			             mThisGhostType;
-	bool							 mIsPlayerControlled;
-	bool                             mIsGhostAlive;
+	//bool							 mIsPlayerControlled;
+	//bool                             mIsGhostAlive;
 	bool                             mIsHome;
 	bool                             mGhostIsFleeing;
 

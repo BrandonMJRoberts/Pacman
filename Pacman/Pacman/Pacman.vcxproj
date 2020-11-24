@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="BaseCharacter.cpp" />
     <ClCompile Include="BaseState_Task_Ghost.cpp" />
     <ClCompile Include="BaseState_Task_Pacman.cpp" />
     <ClCompile Include="ChaseGhostsState_Task_Pacman.cpp" />
@@ -112,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="BaseCharacter.h" />
     <ClInclude Include="BaseState_Task_Ghost.h" />
     <ClInclude Include="BaseState_Task_Pacman.h" />
     <ClInclude Include="ChaseGhostsState_Task_Pacman.h" />

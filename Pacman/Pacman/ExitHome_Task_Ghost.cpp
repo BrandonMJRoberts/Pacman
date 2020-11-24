@@ -46,6 +46,7 @@ void ExitHomeState_Ghost::CheckTransitions(Ghost* ghost)
 		{
 			// Then remove this task from the list
 			ghost->GetStateMachine()->PopStack();
+			ghost->SetIsAlive(true);
 			return;
 		}
 	}

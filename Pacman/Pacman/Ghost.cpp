@@ -6,37 +6,44 @@
 
 #include <iostream>
 
-S2D::Texture2D* Ghost::mColouredSpriteSheet = nullptr;
-S2D::Texture2D* Ghost::mFleeSpriteSheet = nullptr;
+//S2D::Texture2D* Ghost::mColouredSpriteSheet = nullptr;
+//S2D::Texture2D* Ghost::mFleeSpriteSheet = nullptr;
 
-S2D::Rect       Ghost::mSourceRect  = S2D::Rect();
+//S2D::Rect       Ghost::mSourceRect  = S2D::Rect();
 
-unsigned int    Ghost::mSingleSpriteWidth  = 0;
-unsigned int    Ghost::mSingleSpriteHeight = 0;
-char**          Ghost::mCollisionMap = nullptr;
+//unsigned int    Ghost::mSingleSpriteWidth  = 0;
+//unsigned int    Ghost::mSingleSpriteHeight = 0;
+//char**          Ghost::mCollisionMap = nullptr;
 
 // -------------------------------------------------------------------- //
 
-Ghost::Ghost(const S2D::Vector2 startPos, char** collisionMap, const GHOST_TYPE ghostType, const bool isAIControlled, const char* FilePathForColoured, const char* FilePathForFlee, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight), mTimePerChangeOfDirection(GHOST_CHANGE_DIRECTION_DELAY)
+Ghost::Ghost(const S2D::Vector2 startPos, 
+	         const char**       collisionMap, 
+	         const GHOST_TYPE   ghostType, 
+	         const bool         isAIControlled, 
+	         const char*        filePathForMainSpriteSheet, 
+	         const char*        filePathForAlternateSpriteSheet, 
+	         const unsigned int spritesOnWidth, 
+	         const unsigned int spritesOnHeight) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidth, spritesOnHeight)
 {
 	// Store the collsiion map
-	if(!mCollisionMap)
-		mCollisionMap         = collisionMap;
+	//if(!mCollisionMap)
+	//	mCollisionMap         = collisionMap;
 
 	// Set the default values
-	mPosition                 = startPos;
+	//mPosition                 = startPos;
 	mThisGhostType            = ghostType;
-	mIsPlayerControlled       = !isAIControlled;
-	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
-	mRequestedFacingDirection = FACING_DIRECTION::NONE;
+	//mIsPlayerControlled       = !isAIControlled;
+	//mCurrentFacingDirection   = FACING_DIRECTION::NONE;
+	//mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
-	mIsGhostAlive             = true;
+	//mIsGhostAlive             = true;
 	mGhostIsFleeing           = false;
 
 	// Create the state machine needed
 	mStateMachine             = new Stack_FiniteStateMachine_Ghost(ghostType, isAIControlled);
 
-	mTimePerChangeDirectionRemaining = mTimePerChangeOfDirection;
+	//mTimePerChangeDirectionRemaining = mTimePerChangeOfDirection;
 
 	// Set the starting, ending and current frames
 	switch (mThisGhostType)
@@ -69,23 +76,25 @@ Ghost::Ghost(const S2D::Vector2 startPos, char** collisionMap, const GHOST_TYPE 
 	break;
 	}
 
+	mMovementSpeed = GHOST_MOVEMENT_SPEED;
+
 	// Load in the sprite sheets
-	if (!mColouredSpriteSheet || !mFleeSpriteSheet)
-	{
-		LoadInSpriteSheets(FilePathForColoured, FilePathForFlee);
-	}
+	//if (!mColouredSpriteSheet || !mFleeSpriteSheet)
+	//{
+	//	LoadInSpriteSheets(FilePathForColoured, FilePathForFlee);
+	//}
 
 	// Setup the render data
-	if (mColouredSpriteSheet)
-	{
-		mSingleSpriteWidth  = mColouredSpriteSheet->GetWidth() / mSpritesOnWidth;
-		mSingleSpriteHeight = mColouredSpriteSheet->GetHeight() / mSpritesOnHeight;
+	//if (mColouredSpriteSheet)
+	//{
+	//	mSingleSpriteWidth  = mColouredSpriteSheet->GetWidth() / mSpritesOnWidth;
+	//	mSingleSpriteHeight = mColouredSpriteSheet->GetHeight() / mSpritesOnHeight;
 
-		mSourceRect.Width   = mSingleSpriteWidth;
-		mSourceRect.Height  = mSingleSpriteHeight;
-	}
-	else
-		return;
+	//	mSourceRect.Width   = mSingleSpriteWidth;
+	//	mSourceRect.Height  = mSingleSpriteHeight;
+	//}
+	//else
+	//	return;
 
 }
 
@@ -94,17 +103,17 @@ Ghost::Ghost(const S2D::Vector2 startPos, char** collisionMap, const GHOST_TYPE 
 Ghost::~Ghost()
 {
 	// Clear up the memory used
-	delete mColouredSpriteSheet;
-	mColouredSpriteSheet = nullptr;
+	delete mMainSpriteSheet;
+	mMainSpriteSheet = nullptr;
 
-	delete mFleeSpriteSheet;
-	mFleeSpriteSheet = nullptr;
+	delete mAlternateSpritesSheet;
+	mAlternateSpritesSheet = nullptr;
 
 	mCollisionMap = nullptr;
 }
 
 // -------------------------------------------------------------------- //
-
+/*
 void Ghost::Render(const unsigned int currentFrameCount)
 {
 	// Check if we need to change what frame we are rendering
@@ -133,11 +142,14 @@ void Ghost::Render(const unsigned int currentFrameCount)
 	}
 
 }
-
+*/
 // -------------------------------------------------------------------- //
 
 void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FACING_DIRECTION pacmanFacingDirection)
 {
+	// First call the base class update
+	BaseCharacter::Update(deltaTime);
+
 	// First the ghost's movemt 
 	if (mIsPlayerControlled)
 	{
@@ -155,7 +167,7 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 				// Update the current state  
 				currentState->OnUpdate(mTargetPositon, pacmanPos, pacmanFacingDirection);
 			}
-			else if (mThisGhostType == GHOST_TYPE::ORANGE && mPosition == mTargetPositon)
+			else if (mThisGhostType == GHOST_TYPE::ORANGE && mCentrePosition == mTargetPositon)
 			{
 				currentState->OnUpdate(mTargetPositon, pacmanPos, pacmanFacingDirection);
 			}
@@ -180,7 +192,7 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 }
 
 // -------------------------------------------------------------------- //
-
+/*
 bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
 {
 	S2D::Vector2 offset = S2D::Vector2();
@@ -205,20 +217,20 @@ bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
 	}
 
 	// Need to go right to get to the position
-	if (mCollisionMap[(unsigned int)(mPosition.Y + offset.Y)][(unsigned int)(mPosition.X + offset.X)] == '0')
+	if (mCollisionMap[(unsigned int)(mCentrePosition.Y + offset.Y)][(unsigned int)(mCentrePosition.X + offset.X)] == '0')
 	{
 		return true;
 	}
 	
 	return false;
 }
-
+*/
 // -------------------------------------------------------------------- //
 
 void Ghost::CalculateAIMovementDirection()
 {
 	// Now calculate where we need to go to get to the taget position
-	S2D::Vector2 movementDifferential = mTargetPositon - mPosition;
+	S2D::Vector2 movementDifferential = mTargetPositon - mCentrePosition;
 
 	float checkingAccuracy            = 0.5f;
 
@@ -301,7 +313,7 @@ void Ghost::CalculateAIMovementDirection()
 }
 
 // -------------------------------------------------------------------- //
-
+/*
 S2D::Vector2 Ghost::ConvertPositionToGridPosition(const S2D::Vector2 position)
 {
 	return S2D::Vector2(position.X / SPRITE_RESOLUTION, position.Y / SPRITE_RESOLUTION);
@@ -317,9 +329,9 @@ void Ghost::MoveInCurrentDirection(const float deltaTime)
 
 	// First lock the opposite axis to which we are moving in
 	if (mCurrentFacingDirection == FACING_DIRECTION::DOWN || mCurrentFacingDirection == FACING_DIRECTION::UP)
-		mPosition.X = ((int)mPosition.X + 0.5f);
+		mCentrePosition.X = ((int)mCentrePosition.X + 0.5f);
 	else if (mCurrentFacingDirection == FACING_DIRECTION::LEFT || mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
-		mPosition.Y = ((int)mPosition.Y + 0.5f);
+		mCentrePosition.Y = ((int)mCentrePosition.Y + 0.5f);
 
 	float checkDistance = (mSingleSpriteHeight * 0.4f) / SPRITE_RESOLUTION;
 
@@ -329,14 +341,14 @@ void Ghost::MoveInCurrentDirection(const float deltaTime)
 
 	case FACING_DIRECTION::DOWN:
 		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mPosition + S2D::Vector2(0.0f, checkDistance);
+		gridPos          = mCentrePosition + S2D::Vector2(0.0f, checkDistance);
 
 		movementAmount.Y = ghostMovementDistance;
 	break;
 
 	case FACING_DIRECTION::UP:
 		// Store the projected position into the grid pos variable for furture comparisons
-		gridPos          = mPosition + S2D::Vector2(0.0f, -1.0f * checkDistance);
+		gridPos          = mCentrePosition + S2D::Vector2(0.0f, -1.0f * checkDistance);
 
 		movementAmount.Y = -1.0f * ghostMovementDistance;
 	break;
@@ -414,3 +426,5 @@ void Ghost::LoadInSpriteSheets(const char* filePathForColored, const char* fileP
 }
 
 // -------------------------------------------------------------------- //
+
+*/

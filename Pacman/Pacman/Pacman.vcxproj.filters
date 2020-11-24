@@ -141,6 +141,9 @@
     <ClCompile Include="ChaseGhostsState_Task_Pacman.cpp">
       <Filter>Source Files\AI\Pacman Tasks</Filter>
     </ClCompile>
+    <ClCompile Include="BaseCharacter.cpp">
+      <Filter>Source Files\Game Components\Characters</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pacman.h">
@@ -220,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="ChaseGhostsState_Task_Pacman.h">
       <Filter>Header Files\Game Components\AI\PacmanTasks</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCharacter.h">
+      <Filter>Header Files\Game Components\Characters</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

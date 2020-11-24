@@ -36,7 +36,7 @@ MainGameScreen::~MainGameScreen()
 	mDotHandler = nullptr;
 
 	UIManager::GetInstance()->RemoveALlCollectedPickups();
-
+	
 	delete mPacman;
 	mPacman = nullptr;
 
@@ -46,6 +46,7 @@ MainGameScreen::~MainGameScreen()
 		mGhosts[i] = nullptr;
 	}
 	mGhosts.clear();
+
 }
 
 // ------------------------------------------------------------------------------ //
@@ -65,9 +66,10 @@ void MainGameScreen::Render(const unsigned int frameCount)
 	if (mCollectable)
 		mCollectable->Render();
 
-	if (mPacman)
+	if(mPacman)
 		mPacman->Render(frameCount);
 
+	// Render all of the ghosts
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
 	{
 		if (mGhosts[i])
@@ -80,7 +82,10 @@ void MainGameScreen::Render(const unsigned int frameCount)
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
 	// Update the dots in the level
-	mDotHandler->Update(mPacman->GetCentrePosition(), 9);
+	if (mPacman)
+	{
+		mDotHandler->Update(mPacman->GetCentrePosition(), 9);
+	}
 
 	// First check if the level is over
 	if (GameManager::Instance()->GetRemainingDots() == 0)
@@ -98,16 +103,16 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		mCollectable = nullptr;
 	}
 
-	// Ghosts update
+	// Now update pacman
+	if (mPacman)
+		mPacman->Update(deltaTime);
+
+	// Update all ghosts
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
 	{
 		if (mGhosts[i])
 			mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
 	}
-
-	// Pacman update
-	if(mPacman)
-		mPacman->Update(deltaTime);
 
 	HandleCollectable(deltaTime);
 
@@ -123,18 +128,21 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 void MainGameScreen::LoadInDataForLevel()
 {
+	// Load in the background
 	if (!mBackground)
 		mBackground = new Background(14, 4);
 
+	// Create the dots handler
 	if (!mDotHandler)
 		mDotHandler = new DotsHandler();
 
+	// Load in pacman
 	if (!mPacman)
 	{
-		if(GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, false);
+		if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
 		else
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, true);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
 	}
 
 	if (mGhosts.size() == 0)

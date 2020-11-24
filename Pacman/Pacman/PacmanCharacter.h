@@ -6,35 +6,37 @@
 #include "Commons.h"
 
 #include "BaseState_Task_Pacman.h"
+#include "BaseCharacter.h"
 
 class Stack_FiniteStateMachine_Pacman;
 
-class PacmanCharacter final
+class PacmanCharacter final : public BaseCharacter
 {
 public:
-	PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth = 3, const unsigned int spritesOnHeight = 3, bool isAIControlled = false);
-	~PacmanCharacter();
+	PacmanCharacter() = delete;
+	PacmanCharacter(const char** const collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight, const S2D::Vector2 startPositon, const char* filePathForMainSpriteSheet, const char* filePathForAlternateSpriteSheet, bool isAIControlled);
+	~PacmanCharacter() override;
 
-	void             Render(const unsigned int currentFrameCount);
-	void             Update(const float deltaTime);
+	//void             Render(const unsigned int currentFrameCount) override;
+	void             Update(const float deltaTime) override;
 
-	S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
-	S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
-	S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
-	FACING_DIRECTION GetFacingDirection()     { return mCurrentFacingDirection; }
+	//S2D::Vector2     GetCentrePosition()      { return mCentrePosition; }
+	//S2D::Texture2D*  GetTexture()             { return mPacmanTexture; }
+	//S2D::Rect*       GetRect()                { return mPacmanSourceRect; }
+	//FACING_DIRECTION GetFacingDirection()     { return mCurrentFacingDirection; }
 
-	void             ResetCharacter();
+	//void             ResetCharacter();
 
 private:
 	// ----------------------------------------------------------------------------------------------------------------- //
 
-	void             HandleInput();
+	//void             HandleInput();
 
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);
-	bool             EdgeCheck();
+	//bool             EdgeCheck();
 
-	bool             CanMoveInDirection(FACING_DIRECTION direction);
-	void             MoveInCurrentDirection(const float deltaTime);
+	//bool             CanMoveInDirection(FACING_DIRECTION direction);
+	//void             MoveInCurrentDirection(const float deltaTime);
 
 	S2D::Vector2     ConvertPositionToGridPosition(S2D::Vector2 position);
 	void             CheckForDirectionChange();
@@ -44,34 +46,34 @@ private:
 
 	// ----------------------------------------------------------------------------------------------------------------- //
 
-	char**             mCollisionMap;
+	//char**             mCollisionMap;
 
-	S2D::Vector2       mRenderPosition;
-	S2D::Vector2       mCentrePosition;
+	//S2D::Vector2       mRenderPosition;
+	//S2D::Vector2       mCentrePosition;
 
-	S2D::Vector2       mStartPosition;
+	//S2D::Vector2       mStartPosition;
 
-	S2D::Texture2D*    mPacmanTexture;
-	S2D::Rect*         mPacmanSourceRect; // Required for the sprite batch rendering
+	//S2D::Texture2D*    mPacmanTexture;
+	//S2D::Rect*         mPacmanSourceRect; // Required for the sprite batch rendering
 
-	unsigned int	   mSingleSpriteWidth;
-	unsigned int	   mSingleSpriteHeight;
+	//unsigned int	   mSingleSpriteWidth;
+	//unsigned int	   mSingleSpriteHeight;
 
-	const unsigned int mSpritesOnWidth;
-	const unsigned int mSpritesOnHeight;
+	//const unsigned int mSpritesOnWidth;
+	//const unsigned int mSpritesOnHeight;
 
-	unsigned int       mCurrentFrame;
-	unsigned int       mStartFrame;
-	unsigned int       mEndFrame;
+	//unsigned int       mCurrentFrame;
+	//unsigned int       mStartFrame;
+	//unsigned int       mEndFrame;
 
-	float              mChangeDirectionInputDelay;
+	//float              mChangeDirectionInputDelay;
 
 	Stack_FiniteStateMachine_Pacman* mStateMachine;
 
-	FACING_DIRECTION   mCurrentFacingDirection;
-	FACING_DIRECTION   mRequestedFacingDirection;
+	//FACING_DIRECTION   mCurrentFacingDirection;
+	//FACING_DIRECTION   mRequestedFacingDirection;
 
-	bool               mIsAIControlled;
+	//bool               mIsAIControlled;
 };
 
 #endif

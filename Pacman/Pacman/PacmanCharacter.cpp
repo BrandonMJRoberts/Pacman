@@ -9,60 +9,83 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight, bool isAIControlled) : mSpritesOnWidth(spritesOnWidth), mSpritesOnHeight(spritesOnHeight)
+PacmanCharacter::PacmanCharacter(const char**       collisionMap, 
+	                             const unsigned int spritesOnWidth, 
+	                             const unsigned int spritesOnHeight, 
+	                             const S2D::Vector2 startPositon, 
+	                             const char*        filePathForMainSpriteSheet, 
+	                             const char*        filePathForAlternateSpriteSheet, 
+	                             bool               isAIControlled) : BaseCharacter(collisionMap,
+													                                startPositon,
+									                                                isAIControlled, 
+									                                                filePathForMainSpriteSheet, 
+									                                                filePathForAlternateSpriteSheet, 
+									                                                spritesOnWidth, 
+									                                                spritesOnHeight)
 {
 	// Load in the texture
-	mPacmanTexture                     = new S2D::Texture2D();
-	mPacmanTexture->Load("Textures/Pacman/PacmanSprites.png", false);
-	if (!mPacmanTexture)
-	{
-		std::cout << "Failed to load the pacman sprite." << std::endl;
-		return;
-	}
+	//mPacmanTexture                     = new S2D::Texture2D();
+	//mPacmanTexture->Load("Textures/Pacman/PacmanSprites.png", false);
+	//if (!mPacmanTexture)
+	//{
+	//	std::cout << "Failed to load the pacman sprite." << std::endl;
+	//	return;
+	//}
 
 	// Set the width and height variables
-	mSingleSpriteWidth                 = mPacmanTexture->GetWidth()  / spritesOnWidth;
-	mSingleSpriteHeight                = mPacmanTexture->GetHeight() / spritesOnHeight;
+	//mSingleSpriteWidth                 = mPacmanTexture->GetWidth()  / spritesOnWidth;
+	//mSingleSpriteHeight                = mPacmanTexture->GetHeight() / spritesOnHeight;
 
 	// Set the starting position
-	mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
-	ResetCharacter();
+	//mStartPosition                     = S2D::Vector2(14 * SPRITE_RESOLUTION, 23.5 * SPRITE_RESOLUTION);
+	//ResetCharacter();
 
-	mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
+	//mChangeDirectionInputDelay         = PLAYER_CHANGE_DIRECTION_DELAY;
 
 	// Setup the rendering rectangle
-	mPacmanSourceRect                  = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
-	if (!mPacmanSourceRect)
-	{
-		std::cout << "Failed to setup the pacman render rectangle." << std::endl;
-		return;
-	}
+	//mPacmanSourceRect                  = new S2D::Rect(0.0f, 0.0f, mSingleSpriteWidth, mSingleSpriteHeight);
+	//if (!mPacmanSourceRect)
+	//{
+	//	std::cout << "Failed to setup the pacman render rectangle." << std::endl;
+	//	return;
+	//}
 
-	mCollisionMap = collisionMap;
+	//mCollisionMap = collisionMap;
 
 
-	mIsAIControlled = isAIControlled;
-	if (mIsAIControlled)
+	//mIsAIControlled = isAIControlled;
+
+	// Setup the state machine that is needed for the AI controls
+	if (!mIsPlayerControlled)
 		mStateMachine = new Stack_FiniteStateMachine_Pacman();
+	else
+		mStateMachine = nullptr;
+
+	mCurrentFrame = 0;
+	mStartFrame   = 0;
+	mEndFrame     = 1;
+
+	mMovementSpeed = PACMAN_MOVEMENT_SPEED;
 }
 
 // ------------------------------------------------------------- //
 
 PacmanCharacter::~PacmanCharacter()
 {
-	delete mPacmanSourceRect;
-		mPacmanSourceRect = nullptr;
+	delete mMainSpriteSheet;
+	mMainSpriteSheet = nullptr;
 
-	delete mPacmanTexture;
-		mPacmanTexture = nullptr;
+	delete mAlternateSpritesSheet;
+	mAlternateSpritesSheet = nullptr;
 
 	mCollisionMap = nullptr;
 }
 
 // ------------------------------------------------------------- //
-
+	/*
 void PacmanCharacter::Render(unsigned int currentFrameCount)
 {
+
 	if ((currentFrameCount % 6) == 1)
 		mCurrentFrame++;
 
@@ -91,9 +114,10 @@ void PacmanCharacter::Render(unsigned int currentFrameCount)
 							   mPacmanSourceRect); // Draws Pacman
 	}
 }
+*/
 
 // ------------------------------------------------------------- //
-
+/*
 bool PacmanCharacter::EdgeCheck()
 {
 	// First check if pacman is going to go off the screen
@@ -191,13 +215,13 @@ void PacmanCharacter::MoveInCurrentDirection(const float deltaTime)
 		mCurrentFacingDirection = FACING_DIRECTION::NONE;
 	}
 }
-
+*/
 // ------------------------------------------------------------- //
 
 void PacmanCharacter::CheckForDirectionChange()
 {
 	// Now check to see if the player can change direction 
-	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mChangeDirectionInputDelay > 0.0f)
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
 	{
 		// Quick out if the player has not entered anything
 		return;
@@ -205,7 +229,7 @@ void PacmanCharacter::CheckForDirectionChange()
 	else
 	{
 		// If we have changed direction then reset the countdown for the next change of direction
-		mChangeDirectionInputDelay = PLAYER_CHANGE_DIRECTION_DELAY;
+		mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
 
 		switch (mRequestedFacingDirection)
 		{
@@ -250,18 +274,22 @@ void PacmanCharacter::CheckForDirectionChange()
 
 void PacmanCharacter::Update(const float deltaTime)
 {
-	if (mIsAIControlled)
-		UpdateAsAI();
-	else
+	// First call the base update function to do the generic update calls
+	BaseCharacter::Update(deltaTime);
+
+	// Now do this class specific update functionality
+	if (mIsPlayerControlled)
 		UpdateAsPlayerControlled(deltaTime);
+	else
+		UpdateAsAI();
 }
 
 // ------------------------------------------------------------- //
 
 void PacmanCharacter::UpdateAsPlayerControlled(const float deltaTime)
 {
-	if(mChangeDirectionInputDelay > 0.0f)
-		mChangeDirectionInputDelay -= deltaTime;
+	if(mTimePerChangeDirectionRemaining > 0.0f)
+		mTimePerChangeDirectionRemaining -= deltaTime;
 
 	// Now check if the player has hit the edge of the playable area so loop
 	EdgeCheck();
@@ -292,7 +320,7 @@ void PacmanCharacter::UpdateAsAI()
 }
 
 // ------------------------------------------------------------- //
-
+/*
 void PacmanCharacter::HandleInput()
 {
 	// Reset the requested direction
@@ -357,7 +385,7 @@ void PacmanCharacter::HandleInput()
 		}
 	}
 }
-
+*/
 // ------------------------------------------------------------- //
 
 S2D::Vector2 PacmanCharacter::ConvertPositionToGridPosition(S2D::Vector2 position)
@@ -369,12 +397,12 @@ S2D::Vector2 PacmanCharacter::ConvertPositionToGridPosition(S2D::Vector2 positio
 
 void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height)
 {
-	delete mPacmanSourceRect;
-	mPacmanSourceRect = new S2D::Rect(x, y, width, height);
+	//delete mPacmanSourceRect;
+	mSourceRect = S2D::Rect(x, y, width, height);
 }
 
 // ------------------------------------------------------------- //
-
+/*
 void PacmanCharacter::ResetCharacter()
 {
 	mCentrePosition           = mStartPosition; 
@@ -385,9 +413,9 @@ void PacmanCharacter::ResetCharacter()
 	mEndFrame     = 8;
 	mCurrentFrame = 8;
 }
-
+*/
 // ----------------------------------------------------------------- //
-
+/*
 bool PacmanCharacter::CanMoveInDirection(FACING_DIRECTION direction)
 {
 	S2D::Vector2 gridPos = S2D::Vector2();
@@ -434,5 +462,5 @@ bool PacmanCharacter::CanMoveInDirection(FACING_DIRECTION direction)
 		return false;
 	}
 }
-
+*/
 // ----------------------------------------------------------------- //

@@ -52,11 +52,11 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		}
 
 		// Must still have time remaining in the powerup
-		if (ghost->IsEaten())
+		if (!ghost->IsAlive())
 		{
 			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::RETURN_HOME);
 			ghost->SetGhostIsFleeing(false);
-			ghost->SetGhostIsAlive(false);
+			//ghost->SetIsAlive(false);
 			return;
 		}
 

@@ -85,6 +85,7 @@ void Background::Render()
 
 void Background::LoadInCollisionMap()
 {
+	// First clear up the memory if there is any initialise already
 	if (mCollisionMap)
 	{
 		for (unsigned int row = 0; row < mHeight; row++)
@@ -95,7 +96,9 @@ void Background::LoadInCollisionMap()
 		delete[] mCollisionMap;
 		mCollisionMap = nullptr;
 	}
+	
 
+	// now open the file containing the collision data
 	std::ifstream file;
 	file.open("CollisionMaps/" + to_string(GameManager::Instance()->GetCurrentLevel()) + ".txt");
 	if (!file.is_open())
@@ -104,6 +107,7 @@ void Background::LoadInCollisionMap()
 		return;
 	}
 
+	// Variables we need to load the data in - these are here as we dont want to allocate the memory for this if we are going to return on the line above
 	char*             charLine = new char[100];
 	std::string       sLine    = "";
 	std::stringstream ssLine;
@@ -125,6 +129,7 @@ void Background::LoadInCollisionMap()
 			continue;
 		}
 
+		// Now we need to allocate the data needed for this map
 		if (!mCollisionMap)
 		{
 			mCollisionMap = new char* [mHeight];
@@ -135,6 +140,7 @@ void Background::LoadInCollisionMap()
 			}
 		}
 
+		// Only keep allocating data as long as we are within the correct bounds
 		if (mCollisionMap && currentRow < mHeight)
 		{
 			for (unsigned int charID = 0; charID < sLine.size(); charID++)

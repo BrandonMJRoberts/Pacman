@@ -13,7 +13,7 @@ public:
 	void			Render();
 	void		    Update();
 
-	char**          GetCollisionMap()    { return mCollisionMap; }
+	const char**    GetCollisionMap()    { return (const char**)mCollisionMap; }
 	unsigned int    GetCollisionWidth()  { return mWidth;  }
 	unsigned int    GetCollisionHeight() { return mHeight; }
 
