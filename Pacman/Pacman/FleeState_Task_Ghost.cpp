@@ -51,12 +51,11 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 			return;
 		}
 
-		// Must still have time remaining in the powerup
+		// Pacman must have eaten this ghost then
 		if (!ghost->IsAlive())
 		{
 			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::RETURN_HOME);
 			ghost->SetGhostIsFleeing(false);
-			//ghost->SetIsAlive(false);
 			return;
 		}
 

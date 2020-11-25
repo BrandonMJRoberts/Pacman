@@ -17,6 +17,7 @@ public:
 	Ghost(const S2D::Vector2 startPos, const char** const collisionMap, const GHOST_TYPE ghostType, const bool isAIControlled, const char* FilePathForColoured, const char* FilePathForFlee, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight);
 	~Ghost() override;
 
+	void Render(const unsigned int frameCount) override;
 	void Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FACING_DIRECTION pacmanFacingDirection);
 
 	Stack_FiniteStateMachine_Ghost*  GetStateMachine() { return mStateMachine; }
@@ -26,6 +27,7 @@ public:
 	void SetIsHome(bool newVal)                        { mIsHome = newVal; }
 
 	void SetGhostIsFleeing(bool newVal)                { mGhostIsFleeing = newVal; }
+	bool GetIfGhostIsEaten()                           { return mGhostIsEaten; }
 
 private:
 	void CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
@@ -40,6 +42,7 @@ private:
 	GHOST_TYPE			             mThisGhostType;
 	bool                             mIsHome;
 	bool                             mGhostIsFleeing;
+	bool                             mGhostIsEaten;
 
 };
 

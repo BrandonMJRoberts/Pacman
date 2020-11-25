@@ -38,39 +38,39 @@ void ChaseState_Ghost::OnExit()
 void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
 	S2D::Vector2 positionalOffset = S2D::Vector2();
+	float projectDistance = 2.0f;
 
 	switch (mColourOfGhost)
 	{
 	case GHOST_TYPE::RED:
-		// To pos
+		// Go to pacman's exact position
 		targetPositionRef = pacmanPos;
 	return;
 
 	case GHOST_TYPE::PINK:
-		// In front
+		// Go in front of pacman
 		switch (pacmanFacingDirection)
 		{
 		case FACING_DIRECTION::UP:
-			positionalOffset.Y = -1;
+			positionalOffset.Y = -projectDistance;
 		break;
 
 		case FACING_DIRECTION::DOWN:
-			positionalOffset.Y = 1;
+			positionalOffset.Y = projectDistance;
 		break;
 
 		case FACING_DIRECTION::LEFT:
-			positionalOffset.X = -1;
+			positionalOffset.X = -projectDistance;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
-			positionalOffset.X = 1;
+			positionalOffset.X = projectDistance;
 		break;
 
 		default:
 		break;
 		}
 
-		// If so then set to move there
 		targetPositionRef = pacmanPos + positionalOffset;
 	return;
 
@@ -90,23 +90,25 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 	break;
 
 	case GHOST_TYPE::BLUE:
+
+
 		// In front
 		switch (pacmanFacingDirection)
 		{
 		case FACING_DIRECTION::UP:
-			positionalOffset.Y = 1;
+			positionalOffset.Y = projectDistance;
 		break;
 
 		case FACING_DIRECTION::DOWN:
-			positionalOffset.Y = -1;
+			positionalOffset.Y = -projectDistance;
 		break;
 
 		case FACING_DIRECTION::LEFT:
-			positionalOffset.X = 1;
+			positionalOffset.X = projectDistance;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
-			positionalOffset.X = -1;
+			positionalOffset.X = -projectDistance;
 		break;
 
 		default:
@@ -130,7 +132,10 @@ void ChaseState_Ghost::CheckTransitions(Ghost* ghost)
 	{
 		// From here we can transition into FLEE only
 		if (GameManager::Instance()->GetIsPlayerPoweredUp())
-			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::FLEE);
+		{
+			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::FLEE);	
+			ghost->SetTargetPosition(ghost->GetCentrePosition());
+		}
 	}
 	else
 		return;

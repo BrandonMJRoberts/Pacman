@@ -6,15 +6,6 @@
 
 #include <iostream>
 
-//S2D::Texture2D* Ghost::mColouredSpriteSheet = nullptr;
-//S2D::Texture2D* Ghost::mFleeSpriteSheet = nullptr;
-
-//S2D::Rect       Ghost::mSourceRect  = S2D::Rect();
-
-//unsigned int    Ghost::mSingleSpriteWidth  = 0;
-//unsigned int    Ghost::mSingleSpriteHeight = 0;
-//char**          Ghost::mCollisionMap = nullptr;
-
 // -------------------------------------------------------------------- //
 
 Ghost::Ghost(const S2D::Vector2 startPos, 
@@ -28,8 +19,9 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 {
 	mThisGhostType            = ghostType;
 
-	//mIsGhostAlive             = true;
+	mIsAlive                  = true;
 	mGhostIsFleeing           = false;
+	mGhostIsEaten             = false;
 
 	// Create the state machine needed
 	mStateMachine             = new Stack_FiniteStateMachine_Ghost(ghostType, isAIControlled);
@@ -67,7 +59,7 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 
 	mMovementSpeed        = GHOST_MOVEMENT_SPEED;
 
-	mFramesPerAnimation   =8;
+	mFramesPerAnimation   = 8;
 }
 
 // -------------------------------------------------------------------- //
@@ -191,8 +183,8 @@ void Ghost::CalculateAIMovementDirection()
 
 	float checkingAccuracy            = 0.5f;
 
-	// Check if we have arrived at the target position - if so then stop moveing
-	if (movementDifferential.X <= checkingAccuracy && movementDifferential.X > -checkingAccuracy && movementDifferential.Y <= checkingAccuracy && movementDifferential.Y > -checkingAccuracy)
+	// Check if we have arrived at the target position - if so then stop moving
+	if (movementDifferential.LengthSquared() < checkingAccuracy)
 	{
 		mCurrentFacingDirection = FACING_DIRECTION::NONE;
 		return;
@@ -204,67 +196,149 @@ void Ghost::CalculateAIMovementDirection()
 	bool canMoveRight = CanTurnToDirection(FACING_DIRECTION::RIGHT);
 	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT);
 
-	bool validVerticalMove   = false;
-	bool validHorizontalMove = false;
-
-	// Now check if the directions you want to go are valid moves
-	if (movementDifferential.Y > checkingAccuracy && canMoveDown)
-		validVerticalMove = true;
-	else if (movementDifferential.Y < -checkingAccuracy && canMoveUp)
-		validVerticalMove = true;
-
-	if (movementDifferential.X > checkingAccuracy && canMoveRight)
-		validHorizontalMove = true;
-	else if (movementDifferential.X < -checkingAccuracy && canMoveLeft)
-		validHorizontalMove = true;
-
-	// If you have two valid axis of movement then choose the axis that has the largest distance remaining
-	if (validHorizontalMove && validVerticalMove)
+	// Quick exit if stuck in a wall somewhere
+	if (!canMoveDown && !canMoveLeft && !canMoveRight && !canMoveLeft)
 	{
-		// Then choose the option that minimses the distance
-		if (abs(movementDifferential.X) > abs(movementDifferential.Y))
+		mRequestedFacingDirection = FACING_DIRECTION::NONE;
+		return;
+	}
+
+	bool validXMove = false, validYMove = false;
+
+	// First check if there is a movement that minimises the distance
+	if ((movementDifferential.X > checkingAccuracy && canMoveRight) || (movementDifferential.X < -checkingAccuracy && canMoveLeft))
+		validXMove = true;
+
+	if ((movementDifferential.Y > checkingAccuracy && canMoveDown) || (movementDifferential.Y < -checkingAccuracy && canMoveUp))
+		validYMove = true;
+
+	// If both options are possible then move in the direction that reduces the distance overall
+	if (validYMove && validXMove)
+	{
+		// If the difference in the X axis is more than the Y axis movement by such a degree then move in the x axis
+		if (abs(movementDifferential.X) - abs(movementDifferential.Y) > 1.0f)
 		{
-			if (movementDifferential.X > checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
+			if (movementDifferential.X > checkingAccuracy)
 			{
 				mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
 			}
-			else if (movementDifferential.X < -checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
+			else if (movementDifferential.X < -checkingAccuracy)
 			{
 				mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			}
+
+			return;
+		}
+		else // Otherwise always choose the Y axis
+		{
+			if (movementDifferential.Y > checkingAccuracy)
+			{
+				mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+			}
+			else if (movementDifferential.Y < -checkingAccuracy)
+			{
+				mRequestedFacingDirection = FACING_DIRECTION::UP;
+			}
+
+			return;
+		}
+	}
+	else if (validXMove || validYMove)
+	{
+		// If only one of the moves are valid then do that one
+		if (validXMove)
+		{
+			if (mCurrentFacingDirection != FACING_DIRECTION::LEFT && movementDifferential.X > checkingAccuracy)
+			{
+				mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+				return;
+			}
+
+			if (mCurrentFacingDirection != FACING_DIRECTION::RIGHT && movementDifferential.X < -checkingAccuracy)
+			{
+				mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+				return;
 			}
 		}
 		else
 		{
-			if (movementDifferential.Y > checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::UP)
+			if (mCurrentFacingDirection != FACING_DIRECTION::UP && movementDifferential.Y > checkingAccuracy)
 			{
 				mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+				return;
 			}
-			else if (movementDifferential.Y < -checkingAccuracy && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
+
+			if (mCurrentFacingDirection != FACING_DIRECTION::DOWN && movementDifferential.Y < -checkingAccuracy)
 			{
 				mRequestedFacingDirection = FACING_DIRECTION::UP;
+				return;
 			}
 		}
 	}
-	else if (validHorizontalMove || validVerticalMove) // If both options are not valid, but one of them is then move in the valid direction
+	else
 	{
-		if (movementDifferential.X > checkingAccuracy && canMoveRight && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
-			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
-		else if (movementDifferential.X < -checkingAccuracy && canMoveLeft && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
-			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
-		else if (movementDifferential.Y > checkingAccuracy && canMoveDown && mCurrentFacingDirection != FACING_DIRECTION::UP)
-			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
-		else if (movementDifferential.Y < -checkingAccuracy && canMoveUp && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
-			mRequestedFacingDirection = FACING_DIRECTION::UP;
+		// If neither good option is avaliable then move away in the direction you are closest to pacman with
+		if (abs(movementDifferential.X) < abs(movementDifferential.Y))
+		{
+			if (movementDifferential.X > 0)
+				mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			else
+				mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+		}
+		else
+		{
+			if (movementDifferential.Y > 0)
+				mRequestedFacingDirection = FACING_DIRECTION::UP;
+			else
+				mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+		}
+
+		return;
 	}
-	else // If neither of the desired moves are valid then just move in a valid direction
+
+	return;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::Render(const unsigned int frameCount)
+{
+	// Make the frame loop in the way that has been set
+	if ((frameCount % mFramesPerAnimation) == 1)
+		mCurrentFrame++;
+
+	if (mCurrentFrame > mEndFrame)
+		mCurrentFrame = mStartFrame;
+
+	// First perform the checks to avoid crashing here
+	if (mUsingMainSpriteSheet)
+		if (!mMainSpriteSheet)
+			return;
+		else
+			if (!mAlternateSpritesSheet)
+				return;
+
+	// First calculate the source rect
+	mSourceRect.X = float((mCurrentFrame % mSpritesOnWidth) * mSingleSpriteWidth);
+	mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidth) * mSingleSpriteHeight);
+
+	// Now calculate the render position
+	S2D::Vector2 mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
+	if (mIsAlive && !mGhostIsFleeing && !mGhostIsEaten)
 	{
-		if (canMoveDown && mCurrentFacingDirection != FACING_DIRECTION::UP)
-			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
-		else if (canMoveUp && mCurrentFacingDirection != FACING_DIRECTION::DOWN)
-			mRequestedFacingDirection = FACING_DIRECTION::UP;
-		else if (canMoveLeft && mCurrentFacingDirection != FACING_DIRECTION::RIGHT)
-			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
-		else if (canMoveRight && mCurrentFacingDirection != FACING_DIRECTION::LEFT)
-			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mMainSpriteSheet,
+			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                 &mSourceRect); // Draws Pacman
+	}
+	else if (!mIsAlive || mGhostIsFleeing || mGhostIsEaten)
+	{
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
+			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                 &mSourceRect); // Draws Pacman
 	}
 }
+
+// ------------------------------------------------------------------------------------------------------------------------- //

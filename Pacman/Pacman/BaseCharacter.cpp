@@ -58,6 +58,8 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	mRequestedFacingDirection        = FACING_DIRECTION::NONE;
 
 	mFramesPerAnimation              = 0;
+
+	mIsAlive                         = true;
 }
 
 // -------------------------------------------------------------------------------- //
@@ -99,10 +101,20 @@ void BaseCharacter::Render(const unsigned int frameCount)
 	// Now calculate the render position
 	S2D::Vector2 mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
 
-	// Now render the character in the correct position, 0.0 being the top left of the screen
-	S2D::SpriteBatch::Draw(mMainSpriteSheet,
-		                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
-		                   &mSourceRect); // Draws Pacman
+	if (mIsAlive && mMainSpriteSheet)
+	{
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mMainSpriteSheet,
+							 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+							 &mSourceRect); // Draws Pacman
+	}
+	else if(!mIsAlive && mAlternateSpritesSheet)
+	{
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
+			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                 &mSourceRect); // Draws Pacman
+	}
 }
 
 // -------------------------------------------------------------------------------- //
