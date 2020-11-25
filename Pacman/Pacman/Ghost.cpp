@@ -14,8 +14,10 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	         const bool         isAIControlled, 
 	         const char*        filePathForMainSpriteSheet, 
 	         const char*        filePathForAlternateSpriteSheet, 
-	         const unsigned int spritesOnWidth, 
-	         const unsigned int spritesOnHeight) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidth, spritesOnHeight)
+	         const unsigned int spritesOnWidthMain, 
+	         const unsigned int spritesOnHeightMain, 
+			 const unsigned int spritesOnWidthAlternate,
+			 const unsigned int spritesOnHeightAlternate) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate)
 {
 	mThisGhostType            = ghostType;
 
@@ -118,6 +120,8 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 
 			mTimePerChangeDirectionRemaining = mTimePerChangeOfDirection;
 		}
+
+		//CheckForDirectionChange();
 	}
 }
 
@@ -136,37 +140,40 @@ void Ghost::CheckForDirectionChange()
 		// If we have changed direction then reset the countdown for the next change of direction
 		mTimePerChangeDirectionRemaining = GHOST_CHANGE_DIRECTION_DELAY;
 
-		switch (mRequestedFacingDirection)
+		if (mIsAlive && !mGhostIsEaten && !mGhostIsFleeing)
 		{
-		case FACING_DIRECTION::DOWN:
-			mStartFrame   = mColourBaseStartFrame + 6;
-			mEndFrame     = mColourBaseEndFrame   + 6;
-			mCurrentFrame = mColourBaseStartFrame + 6;
-		break;
+			switch (mRequestedFacingDirection)
+			{
+			case FACING_DIRECTION::DOWN:
+				mStartFrame   = mColourBaseStartFrame + 6;
+				mEndFrame     = mColourBaseEndFrame + 6;
+				mCurrentFrame = mColourBaseStartFrame + 6;
+			break;
 
-		case FACING_DIRECTION::UP:
-			mStartFrame   = mColourBaseStartFrame + 4;
-			mEndFrame     = mColourBaseEndFrame   + 4;
-			mCurrentFrame = mColourBaseStartFrame + 4;
-		break;
+			case FACING_DIRECTION::UP:
+				mStartFrame   = mColourBaseStartFrame + 4;
+				mEndFrame     = mColourBaseEndFrame + 4;
+				mCurrentFrame = mColourBaseStartFrame + 4;
+			break;
 
-		case FACING_DIRECTION::LEFT:
-			mStartFrame   = mColourBaseStartFrame + 2;
-			mEndFrame     = mColourBaseEndFrame   + 2;
-			mCurrentFrame = mColourBaseStartFrame + 2;
-		break;
+			case FACING_DIRECTION::LEFT:
+				mStartFrame   = mColourBaseStartFrame + 2;
+				mEndFrame     = mColourBaseEndFrame + 2;
+				mCurrentFrame = mColourBaseStartFrame + 2;
+			break;
 
-		case FACING_DIRECTION::RIGHT:
-			mStartFrame   = mColourBaseStartFrame;
-			mEndFrame     = mColourBaseEndFrame;
-			mCurrentFrame = mColourBaseStartFrame;
-		break;
+			case FACING_DIRECTION::RIGHT:
+				mStartFrame   = mColourBaseStartFrame;
+				mEndFrame     = mColourBaseEndFrame;
+				mCurrentFrame = mColourBaseStartFrame;
+			break;
 
-		default:
-			mStartFrame   = mColourBaseStartFrame;
-			mEndFrame     = mColourBaseEndFrame;
-			mCurrentFrame = mColourBaseStartFrame;
-		break;
+			default:
+				mStartFrame   = mColourBaseStartFrame;
+				mEndFrame     = mColourBaseEndFrame;
+				mCurrentFrame = mColourBaseStartFrame;
+			break;
+			}
 		}
 
 		// Set the new direction of facing
@@ -318,15 +325,17 @@ void Ghost::Render(const unsigned int frameCount)
 			if (!mAlternateSpritesSheet)
 				return;
 
-	// First calculate the source rect
-	mSourceRect.X = float((mCurrentFrame % mSpritesOnWidth) * mSingleSpriteWidth);
-	mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidth) * mSingleSpriteHeight);
-
 	// Now calculate the render position
-	S2D::Vector2 mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+	S2D::Vector2 mRenderPosition;
 
 	if (mIsAlive && !mGhostIsFleeing && !mGhostIsEaten)
 	{
+		// First calculate the source rect
+		mSourceRect.X   = float((mCurrentFrame % mSpritesOnWidthMain) * mSingleSpriteWidthMain);
+		mSourceRect.Y   = float(int(mCurrentFrame / mSpritesOnWidthMain) * mSingleSpriteHeightMain);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthMain * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightMain * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mMainSpriteSheet,
 			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
@@ -334,10 +343,70 @@ void Ghost::Render(const unsigned int frameCount)
 	}
 	else if (!mIsAlive || mGhostIsFleeing || mGhostIsEaten)
 	{
+		// First calculate the source rect
+		mSourceRect.X   = float((mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
+		mSourceRect.Y   = float(int(mCurrentFrame / mSpritesOnWidthAlternate) * mSingleSpriteHeightAlternate);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthAlternate * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightAlternate * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
 			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
 			                 &mSourceRect); // Draws Pacman
+	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::SetGhostIsFleeing(bool newVal)
+{
+	mGhostIsFleeing = newVal;
+
+	if (!newVal)
+		return;
+	else
+	{
+		mStartFrame   = 0;
+		mEndFrame     = 1;
+		mCurrentFrame = 1;
+	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::SetGhostIsEaten(bool newVal)
+{
+	mGhostIsEaten = newVal;
+
+	if (!newVal)
+		return;
+	else
+	{
+		switch (mCurrentFacingDirection)
+		{
+		case FACING_DIRECTION::DOWN:
+			mStartFrame = 7;
+		break;
+
+		case FACING_DIRECTION::UP:
+			mStartFrame = 6;
+		break;
+
+		case FACING_DIRECTION::LEFT:
+			mStartFrame = 5;
+		break;
+
+		case FACING_DIRECTION::RIGHT:
+			mStartFrame = 4;
+		break;
+
+		default:
+			mStartFrame = 4;
+		break;
+		}
+
+		mEndFrame    = mStartFrame;
+		mCurrentFrame = mStartFrame;
 	}
 }
 

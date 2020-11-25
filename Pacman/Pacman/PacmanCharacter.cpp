@@ -10,8 +10,10 @@
 // ------------------------------------------------------------- //
 
 PacmanCharacter::PacmanCharacter(const char**       collisionMap, 
-	                             const unsigned int spritesOnWidth, 
-	                             const unsigned int spritesOnHeight, 
+	                             const unsigned int spritesOnWidthMain, 
+	                             const unsigned int spritesOnHeightMain, 
+								 const unsigned int spritesOnWidthAlternate,
+								 const unsigned int spritesOnHeightAlternate,
 	                             const S2D::Vector2 startPositon, 
 	                             const char*        filePathForMainSpriteSheet, 
 	                             const char*        filePathForAlternateSpriteSheet, 
@@ -20,8 +22,10 @@ PacmanCharacter::PacmanCharacter(const char**       collisionMap,
 									                                                isAIControlled, 
 									                                                filePathForMainSpriteSheet, 
 									                                                filePathForAlternateSpriteSheet, 
-									                                                spritesOnWidth, 
-									                                                spritesOnHeight)
+									                                                spritesOnWidthMain, 
+									                                                spritesOnHeightMain,
+																					spritesOnWidthAlternate,
+																					spritesOnHeightAlternate)
 {
 	// Setup the state machine that is needed for the AI controls
 	if (!mIsPlayerControlled)
@@ -70,25 +74,25 @@ void PacmanCharacter::CheckForDirectionChange()
 		{
 		case FACING_DIRECTION::DOWN:
 			mStartFrame   = 6;
-			mEndFrame     = 8;
+			mEndFrame     = 7;
 			mCurrentFrame = 6;
 		break;
 
 		case FACING_DIRECTION::UP:
 			mStartFrame   = 4;
-			mEndFrame     = 6;
+			mEndFrame     = 5;
 			mCurrentFrame = 4;
 		break;
 
 		case FACING_DIRECTION::LEFT:
 			mStartFrame   = 2;
-			mEndFrame     = 4;
+			mEndFrame     = 3;
 			mCurrentFrame = 2;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
 			mStartFrame   = 0;
-			mEndFrame     = 2;
+			mEndFrame     = 1;
 			mCurrentFrame = 0;
 		break;
 
@@ -108,14 +112,17 @@ void PacmanCharacter::CheckForDirectionChange()
 
 void PacmanCharacter::Update(const float deltaTime)
 {
-	// First call the base update function to do the generic update calls
-	BaseCharacter::Update(deltaTime);
+	if (mIsAlive)
+	{
+		// First call the base update function to do the generic update calls
+		BaseCharacter::Update(deltaTime);
 
-	// Now do this class specific update functionality
-	if (mIsPlayerControlled)
-		UpdateAsPlayerControlled(deltaTime);
-	else
-		UpdateAsAI();
+		// Now do this class specific update functionality
+		if (mIsPlayerControlled)
+			UpdateAsPlayerControlled(deltaTime);
+		else
+			UpdateAsAI();
+	}
 }
 
 // ------------------------------------------------------------- //
@@ -147,8 +154,28 @@ void PacmanCharacter::UpdateAsAI()
 
 void PacmanCharacter::ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height)
 {
-	//delete mPacmanSourceRect;
 	mSourceRect = S2D::Rect(x, y, width, height);
+}
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::SetIsAlive(bool newVal)
+{
+	if (newVal)
+		mIsAlive = newVal;
+	else
+	{
+		if (mIsAlive)
+		{
+			mStartFrame   = 0;
+			mEndFrame     = 11;
+			mCurrentFrame = 0;
+
+			mCurrentFacingDirection = FACING_DIRECTION::NONE;
+
+			mIsAlive = newVal;
+		}
+	}
 }
 
 // ------------------------------------------------------------- //

@@ -12,11 +12,15 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	                         const bool         isAIControlled, 
 	                         const char*        filePathForMainSpriteSheet, 
 	                         const char*        filePathForAlternateSpriteSheet, 
-	                         const unsigned int spritesOnWidth, 
-	                         const unsigned int spritesOnHeight) : mSpritesOnHeight(spritesOnHeight),
-	                                                               mSpritesOnWidth(spritesOnWidth), 
-	                                                               mCollisionMap(collisionMap), 
-	                                                               mTimePerChangeOfDirection(PLAYER_CHANGE_DIRECTION_DELAY)
+	                         const unsigned int spritesOnWidthMain, 
+	                         const unsigned int spritesOnHeightMain,
+							 const unsigned int spritesOnWidthAlternate,
+							 const unsigned int spritesOnHeightAlternate) : mSpritesOnHeightMain(spritesOnHeightMain),
+																			mSpritesOnWidthMain(spritesOnWidthMain),
+																			mSpritesOnHeightAlternate(spritesOnHeightAlternate),
+																			mSpritesOnWidthAlternate(spritesOnWidthAlternate),
+																			mCollisionMap(collisionMap), 
+																			mTimePerChangeOfDirection(PLAYER_CHANGE_DIRECTION_DELAY)
 {
 	// Load in the sprite sheets
 	mMainSpriteSheet = new S2D::Texture2D();
@@ -36,8 +40,11 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	}
 
 	// Calculate the single sprite width and height
-	mSingleSpriteHeight              = mMainSpriteSheet->GetHeight() / spritesOnHeight;
-	mSingleSpriteWidth               = mMainSpriteSheet->GetWidth() / spritesOnWidth;
+	mSingleSpriteHeightMain              = mMainSpriteSheet->GetHeight() / spritesOnHeightMain;
+	mSingleSpriteWidthMain               = mMainSpriteSheet->GetWidth() / spritesOnWidthMain;
+
+	mSingleSpriteHeightAlternate         = mAlternateSpritesSheet->GetHeight() / spritesOnHeightAlternate;
+	mSingleSpriteWidthAlternate          = mAlternateSpritesSheet->GetWidth() / spritesOnWidthAlternate;
 
 	// Set if the character is AI controlled
 	mIsPlayerControlled              = !isAIControlled;
@@ -51,8 +58,8 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	mUsingMainSpriteSheet            = true;
 	mMovementSpeed                   = 0.0f;
 
-	mSourceRect.Width                = mSingleSpriteWidth;
-	mSourceRect.Height               = mSingleSpriteHeight;
+	mSourceRect.Width                = mSingleSpriteWidthMain;
+	mSourceRect.Height               = mSingleSpriteHeightMain;
 
 	mCurrentFacingDirection          = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection        = FACING_DIRECTION::NONE;
@@ -94,22 +101,29 @@ void BaseCharacter::Render(const unsigned int frameCount)
 		if (!mAlternateSpritesSheet)
 			return;
 
-	// First calculate the source rect
-	mSourceRect.X = float(   (mCurrentFrame % mSpritesOnWidth) * mSingleSpriteWidth);
-	mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidth) * mSingleSpriteHeight);
+	S2D::Vector2 mRenderPosition;
 
-	// Now calculate the render position
-	S2D::Vector2 mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
-
-	if (mIsAlive && mMainSpriteSheet)
+	if (mIsAlive)
 	{
+		// First calculate the source rect
+		mSourceRect.X = float((mCurrentFrame % mSpritesOnWidthMain) * mSingleSpriteWidthMain);
+		mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidthMain) * mSingleSpriteHeightMain);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthMain * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightMain * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mMainSpriteSheet,
 							 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
 							 &mSourceRect); // Draws Pacman
 	}
-	else if(!mIsAlive && mAlternateSpritesSheet)
+	else
 	{
+		// First calculate the source rect
+		mSourceRect.X = float((mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
+		mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidthAlternate) * mSingleSpriteHeightAlternate);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthAlternate * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightAlternate * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
 			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
@@ -222,19 +236,19 @@ bool BaseCharacter::CanMoveInDirection(FACING_DIRECTION direction)
 	switch (direction)
 	{
 	case FACING_DIRECTION::DOWN:
-		gridPos = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y + (mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION);
+		gridPos = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y + (mSingleSpriteHeightMain * 0.5f) / SPRITE_RESOLUTION);
 	break;
 
 	case FACING_DIRECTION::UP:
-		gridPos = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y - (mSingleSpriteHeight * 0.5f) / SPRITE_RESOLUTION);
+		gridPos = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y - (mSingleSpriteHeightMain * 0.5f) / SPRITE_RESOLUTION);
 	break;
 
 	case FACING_DIRECTION::LEFT:
-		gridPos = S2D::Vector2(mCentrePosition.X - (mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION, mCentrePosition.Y);
+		gridPos = S2D::Vector2(mCentrePosition.X - (mSingleSpriteWidthMain * 0.5f) / SPRITE_RESOLUTION, mCentrePosition.Y);
 	break;
 
 	case FACING_DIRECTION::RIGHT:
-		gridPos = S2D::Vector2(mCentrePosition.X + (mSingleSpriteWidth * 0.5f) / SPRITE_RESOLUTION, mCentrePosition.Y);
+		gridPos = S2D::Vector2(mCentrePosition.X + (mSingleSpriteWidthMain * 0.5f) / SPRITE_RESOLUTION, mCentrePosition.Y);
 	break;
 	}
 
@@ -292,22 +306,22 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 	switch (mCurrentFacingDirection)
 	{
 	case FACING_DIRECTION::DOWN:
-		gridPos          = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y + (mSingleSpriteHeight * 0.4f) / SPRITE_RESOLUTION);
+		gridPos          = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y + (mSingleSpriteHeightMain * 0.4f) / SPRITE_RESOLUTION);
 		movementAmount.Y = characterMovementDistance;
 	break;
 
 	case FACING_DIRECTION::UP:
-		gridPos          = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y - (mSingleSpriteHeight * 0.4f) / SPRITE_RESOLUTION);
+		gridPos          = S2D::Vector2(mCentrePosition.X, mCentrePosition.Y - (mSingleSpriteHeightMain * 0.4f) / SPRITE_RESOLUTION);
 		movementAmount.Y = -1.0f * characterMovementDistance;
 	break;
 
 	case FACING_DIRECTION::LEFT:
-		gridPos          = S2D::Vector2(mCentrePosition.X - (mSingleSpriteWidth * 0.4f) / SPRITE_RESOLUTION, mCentrePosition.Y);
+		gridPos          = S2D::Vector2(mCentrePosition.X - (mSingleSpriteWidthMain * 0.4f) / SPRITE_RESOLUTION, mCentrePosition.Y);
 		movementAmount.X = -1.0f * characterMovementDistance;
 	break;
 
 	case FACING_DIRECTION::RIGHT:
-		gridPos          = S2D::Vector2(mCentrePosition.X + (mSingleSpriteWidth * 0.4f) / SPRITE_RESOLUTION, mCentrePosition.Y);
+		gridPos          = S2D::Vector2(mCentrePosition.X + (mSingleSpriteWidthMain * 0.4f) / SPRITE_RESOLUTION, mCentrePosition.Y);
 		movementAmount.X = characterMovementDistance;
 	break;
 

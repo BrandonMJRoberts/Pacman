@@ -28,7 +28,9 @@ public:
 	void                 ResetDotsEatenCount()                                { mDotsCollectedThisGame = 0; }
 
 	unsigned int         GetAmountOfGhostsEatenthisGame()                     { return mGhostsEatenThisGame; }
-	void                 IncrementGhostsEatenCount()                          { mGhostsEatenThisGame++; }
+	void                 IncrementGhostsEatenCount();
+
+	unsigned int         GetAmountOfGhostsEatenStreak()                       { return mGhostsEatenStreak; }
 	void                 ResetGhostsEatenCount()                              { mGhostsEatenThisGame = 0; }
 
 	// Levels
@@ -112,6 +114,7 @@ private:
 
 	unsigned int        mDotsCollectedThisGame;
 	unsigned int        mGhostsEatenThisGame;
+	unsigned int        mGhostsEatenStreak; // For points calculations
 
 	int                 mPointsRemainingTillNextLife;
 	float               mTimeRemainingInPoweredUpState;

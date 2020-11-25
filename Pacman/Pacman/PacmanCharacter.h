@@ -14,10 +14,19 @@ class PacmanCharacter final : public BaseCharacter
 {
 public:
 	PacmanCharacter() = delete;
-	PacmanCharacter(const char** const collisionMap, const unsigned int spritesOnWidth, const unsigned int spritesOnHeight, const S2D::Vector2 startPositon, const char* filePathForMainSpriteSheet, const char* filePathForAlternateSpriteSheet, bool isAIControlled);
+	PacmanCharacter(const char** const collisionMap, 
+		            const unsigned int spritesOnWidthMain, 
+		            const unsigned int spritesOnHeightMain, 
+					const unsigned int spritesOnWidthAlternate,
+					const unsigned int spritesOnHeightAlternate,
+		            const S2D::Vector2 startPositon, 
+		            const char*        filePathForMainSpriteSheet, 
+		            const char*        filePathForAlternateSpriteSheet, 
+		            bool               isAIControlled);
 	~PacmanCharacter() override;
 
 	void             Update(const float deltaTime) override;
+	void             SetIsAlive(bool newVal) override;
 private:
 
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);

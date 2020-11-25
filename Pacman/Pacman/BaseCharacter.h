@@ -11,7 +11,7 @@ public:
 	BaseCharacter(const char** const collisionMap,                    const S2D::Vector2 startPosition, 
 		          const bool         isAIControlled,                  const char*        filePathForMainSpriteSheet, 
 		          const char*        filePathForAlternateSpriteSheet, const unsigned int spritesOnWidth, 
-		          const unsigned int spritesOnHeight);
+		          const unsigned int spritesOnHeight,                 const unsigned int spritesOnWidthAlternate, const unsigned int spritesOnHeightAlternate);
 	virtual          ~BaseCharacter();
 
 	virtual void     Render(const unsigned int frameCount);
@@ -20,7 +20,7 @@ public:
 	void             SetIsPlayerControlled()                             { mIsPlayerControlled = true; } 
 
 	bool             IsAlive()                                           const { return mIsAlive; }
-	void             SetIsAlive(bool newVal)                             { mIsAlive = newVal; } 
+	virtual void     SetIsAlive(bool newVal)                             { mIsAlive = newVal; } 
 
 	void             SetTargetPosition(S2D::Vector2 newPos)              { mTargetPositon = newPos; } 
 
@@ -45,10 +45,16 @@ protected:
 	S2D::Texture2D*                  mAlternateSpritesSheet; // The alternate sprite sheet
 	S2D::Rect		                 mSourceRect;            // Portion of sprite sheet to be rendered
 
-	const unsigned int               mSpritesOnWidth;
-	const unsigned int               mSpritesOnHeight;
-	unsigned int					 mSingleSpriteWidth;
-	unsigned int					 mSingleSpriteHeight;
+	const unsigned int               mSpritesOnWidthMain;
+	const unsigned int               mSpritesOnHeightMain;
+	const unsigned int               mSpritesOnWidthAlternate;
+	const unsigned int               mSpritesOnHeightAlternate;
+
+	unsigned int					 mSingleSpriteWidthMain;
+	unsigned int					 mSingleSpriteHeightMain;
+	unsigned int					 mSingleSpriteWidthAlternate;
+	unsigned int					 mSingleSpriteHeightAlternate;
+
 	const char**                     mCollisionMap;
 
 	FACING_DIRECTION                 mCurrentFacingDirection;

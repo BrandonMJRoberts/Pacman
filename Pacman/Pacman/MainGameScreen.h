@@ -30,6 +30,8 @@ private:
 	void             SpawnNextCollectable();
 	void             HandleCollectable(const float deltaTime);
 
+	void             CheckForCharacterCollisions();
+
 	SCREENS          InGameInputCheck();
 
 	PickUps*            mCollectable;

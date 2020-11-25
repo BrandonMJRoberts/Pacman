@@ -70,7 +70,9 @@ void GameManager::SetVariablesToStartingValues()
 
 	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
 
-	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
+	mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
+
+	mGhostsEatenStreak = 0;
 }
 
 // ---------------------------------------------------------------- //
@@ -286,3 +288,32 @@ unsigned int GameManager::LoadInCurrentHighScore()
 }
 
 // ---------------------------------------------------------------- //
+
+void GameManager::IncrementGhostsEatenCount()
+{
+	mGhostsEatenThisGame++; 
+	mGhostsEatenStreak++;
+
+	switch (mGhostsEatenStreak)
+	{
+	case 1:
+		AddToScore(100);
+	break;
+
+	case 2:
+		AddToScore(300);
+	break;
+
+	case 3:
+		AddToScore(700);
+	break;
+
+	case 4:
+		AddToScore(1000);
+	break;
+
+	default:
+		AddToScore(1000);
+	break;
+	}
+}

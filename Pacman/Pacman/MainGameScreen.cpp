@@ -84,7 +84,8 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	// Update the dots in the level
 	if (mPacman)
 	{
-		mDotHandler->Update(mPacman->GetCentrePosition(), 0.8f);
+		mPacman->Update(deltaTime);
+		mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
 	}
 
 	// First check if the level is over
@@ -103,10 +104,6 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		mCollectable = nullptr;
 	}
 
-	// Now update pacman
-	if (mPacman)
-		mPacman->Update(deltaTime);
-
 	// Update all ghosts
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
 	{
@@ -115,6 +112,9 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	}
 
 	HandleCollectable(deltaTime);
+
+	// Now check if pacman has collided with any of the ghosts
+	CheckForCharacterCollisions();
 
 	// Update the game manager
 	GameManager::Instance()->Update(deltaTime);
@@ -140,9 +140,9 @@ void MainGameScreen::LoadInDataForLevel()
 	if (!mPacman)
 	{
 		if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 4, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
 		else
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 4, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
 	}
 
 	if (mGhosts.size() == 0)
@@ -150,9 +150,9 @@ void MainGameScreen::LoadInDataForLevel()
 		for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
 		{
 			if (((int)GameManager::Instance()->GetPlayerCharacterType()) - 1 == i)
-				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4));
+				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));
 			else
-				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4));
+				mGhosts.push_back(new Ghost(S2D::Vector2(1.0f, 1.0), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));
 		}
 	}
 
@@ -251,3 +251,45 @@ void MainGameScreen::HandleCollectable(const float deltaTime)
 		}
 	}
 }
+
+// ------------------------------------------------------------------------------ //
+
+void MainGameScreen::CheckForCharacterCollisions()
+{
+	if (mPacman)
+	{
+		S2D::Vector2 ghostCentre, pacmanCentre = mPacman->GetCentrePosition();
+		float accuracy = 0.5f;
+
+		// Loop through all of the ghosts and check for collisions
+		for (unsigned int i = 0; i < mGhosts.size(); i++)
+		{
+			if (mGhosts[i] && !mGhosts[i]->GetIfGhostIsEaten())
+			{
+				ghostCentre = mGhosts[i]->GetCentrePosition();
+
+				if ((ghostCentre.X == pacmanCentre.X && ghostCentre.Y + accuracy > pacmanCentre.Y - accuracy && ghostCentre.Y - accuracy < pacmanCentre.Y + accuracy) ||
+					(ghostCentre.Y == pacmanCentre.Y && ghostCentre.X + accuracy > pacmanCentre.X - accuracy && ghostCentre.X - accuracy < pacmanCentre.X + accuracy))
+				{
+					GameManager* GM = GameManager::Instance();
+
+					if (GM->GetIsPlayerPoweredUp())
+					{
+						mGhosts[i]->SetGhostIsEaten(true);
+						mGhosts[i]->SetIsAlive(false);
+
+						GM->IncrementGhostsEatenCount();
+
+						UIManager::GetInstance()->DisplayPoints(mPacman->GetCentrePosition(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
+					}
+					else
+					{
+						mPacman->SetIsAlive(false);
+					}
+				}
+			}
+		}
+	}
+}
+
+// ------------------------------------------------------------------------------ //
