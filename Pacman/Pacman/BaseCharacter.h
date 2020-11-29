@@ -38,8 +38,10 @@ protected:
 	virtual	void                     CheckForDirectionChange(); // This function is for setting start and end frames for specific directional sprites
 
 	S2D::Vector2                     mCentrePosition;        // Current position
-	S2D::Vector2                     mTargetPositon;         // AI move to position
 	S2D::Vector2                     mStartPosition;         // Position to be reset to if the level restarts
+
+	S2D::Vector2                     mTargetPositon;         // AI move to position
+	S2D::Vector2                     mMoveToPos;
 
 	S2D::Texture2D*                  mMainSpriteSheet;       // The default main sprite sheet
 	S2D::Texture2D*                  mAlternateSpritesSheet; // The alternate sprite sheet

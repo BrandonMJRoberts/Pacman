@@ -117,6 +117,14 @@ void PacmanCharacter::Update(const float deltaTime)
 		// First call the base update function to do the generic update calls
 		BaseCharacter::Update(deltaTime);
 
+		if (mTimePerChangeDirectionRemaining > 0.0f)
+			mTimePerChangeDirectionRemaining -= deltaTime;
+
+		// Now move the player in the correct direction
+		MoveInCurrentDirection(deltaTime);
+
+		CheckForDirectionChange();
+
 		// Now do this class specific update functionality
 		if (mIsPlayerControlled)
 			UpdateAsPlayerControlled(deltaTime);

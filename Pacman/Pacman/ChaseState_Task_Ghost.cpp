@@ -38,7 +38,7 @@ void ChaseState_Ghost::OnExit()
 void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
 	S2D::Vector2 positionalOffset = S2D::Vector2();
-	float projectDistance = 2.0f;
+	float        projectDistance  = 0.2f;
 
 	switch (mColourOfGhost)
 	{
@@ -71,7 +71,7 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 		break;
 		}
 
-		targetPositionRef = pacmanPos + positionalOffset;
+		targetPositionRef = S2D::Vector2((int)pacmanPos.X + positionalOffset.X, (int)pacmanPos.Y + positionalOffset.Y);
 	return;
 
 	case GHOST_TYPE::ORANGE:
@@ -87,10 +87,11 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 
 		//targetPositionRef = randomPos;
 		//return;
-	break;
+
+		targetPositionRef = S2D::Vector2((int)pacmanPos.X + positionalOffset.X, (int)pacmanPos.Y + positionalOffset.Y);
+	return;
 
 	case GHOST_TYPE::BLUE:
-
 
 		// In front
 		switch (pacmanFacingDirection)
@@ -115,7 +116,7 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 		break;
 		}
 
-		targetPositionRef = pacmanPos + positionalOffset;
+		targetPositionRef = S2D::Vector2((int)pacmanPos.X + positionalOffset.X, (int)pacmanPos.Y + positionalOffset.Y);
 	return;
 
 	default:

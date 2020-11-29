@@ -65,6 +65,7 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	mRequestedFacingDirection        = FACING_DIRECTION::NONE;
 
 	mFramesPerAnimation              = 0;
+	mMoveToPos                       = mCentrePosition;
 
 	mIsAlive                         = true;
 }
@@ -135,16 +136,16 @@ void BaseCharacter::Render(const unsigned int frameCount)
 
 void BaseCharacter::Update(const float deltaTime)
 {
-	if (mTimePerChangeDirectionRemaining > 0.0f)
-		mTimePerChangeDirectionRemaining -= deltaTime;
+	//if (mTimePerChangeDirectionRemaining > 0.0f)
+	//	mTimePerChangeDirectionRemaining -= deltaTime;
 
 	// Now check if the player has hit the edge of the playable area so loop
 	EdgeCheck();
 
 	// Now move the player in the correct direction
-	MoveInCurrentDirection(deltaTime);
+	//MoveInCurrentDirection(deltaTime);
 
-	CheckForDirectionChange();
+	//CheckForDirectionChange();
 }
 
 // -------------------------------------------------------------------------------- //
@@ -271,12 +272,14 @@ bool BaseCharacter::EdgeCheck()
 	if (mCentrePosition.X + 0.5f <= 0 && mCurrentFacingDirection == FACING_DIRECTION::LEFT)
 	{
 		mCentrePosition.X = unsigned int(SCREEN_WIDTH / SPRITE_RESOLUTION);
+		mMoveToPos        = mCentrePosition;
 		return true;
 	}
 
 	if (mCentrePosition.X - 0.5f >= unsigned int(SCREEN_WIDTH / SPRITE_RESOLUTION) && mCurrentFacingDirection == FACING_DIRECTION::RIGHT)
 	{
-		mCentrePosition.X = 0;
+		mCentrePosition.X = 0.0f;
+		mMoveToPos        = mCentrePosition;
 		return true;
 	}
 
@@ -334,7 +337,7 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 	}
 
 	// Now check if we can actually go to the new position
-	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1') //gridPos.X > 0.0f && gridPos.X < SCREEN_WIDTH / SPRITE_RESOLUTION && gridPos.Y > 0.0f && gridPos.Y < SCREEN_HEIGHT / SPRITE_RESOLUTION && 
+	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
 	{
 		mCentrePosition.X += movementAmount.X;
 		mCentrePosition.Y += movementAmount.Y;
@@ -354,29 +357,33 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 
 bool BaseCharacter::CanTurnToDirection(const FACING_DIRECTION newDir)
 {
-	S2D::Vector2 offset = S2D::Vector2();
+	S2D::Vector2 offset = S2D::Vector2(0.0f, 0.0f);
 
 	switch (newDir)
 	{
 	case FACING_DIRECTION::UP:
-		offset.Y = -1;
+		offset.X = 0.5f;
+		offset.Y = -0.5f;
 	break;
 
 	case FACING_DIRECTION::DOWN:
-		offset.Y = 1;
+		offset.X = 0.5f;
+		offset.Y = 1.5f;
 	break;
 
 	case FACING_DIRECTION::LEFT:
-		offset.X = -1;
+		offset.X = -0.5f;
+		offset.Y = 0.5f;
 	break;
 
 	case FACING_DIRECTION::RIGHT:
-		offset.X = 1;
+		offset.X = 1.5f;
+		offset.Y = 0.5f;
 	break;
 	}
 
 	// Need to go right to get to the position
-	if (mCollisionMap[(unsigned int)(mCentrePosition.Y + offset.Y)][(unsigned int)(mCentrePosition.X + offset.X)] == '0')
+	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0')
 	{
 		return true;
 	}
