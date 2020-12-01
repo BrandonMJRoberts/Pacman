@@ -11,3 +11,6 @@
   - In life and after death
 - Looping around the screen when you exit from the left or right
   - This works for both Pacman and the Ghosts respectivly
+- Fully working collision with the maze and other characters
+- Having the characters being locked to the grid to prevent the player from becoming stuck in the maze
+- Having a display in the main game of the player's current score and the current highscore
