@@ -1,5 +1,3 @@
-# Pacman
-
 ## This repo is for my university project to make Pacman
 
 ### The main features of this project are:
