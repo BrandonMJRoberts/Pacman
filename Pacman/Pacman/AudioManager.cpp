@@ -15,78 +15,102 @@ AudioManager::AudioManager()
 
 	if (!mDotCollectionSFX)
 		std::cout << "Failed to load the dot collection SFX" << std::endl;
+	mDotCollectionSFX->SetLooping(false);
+
 
 	mEatingFruitSFX         = new S2D::SoundEffect();
 	mEatingFruitSFX->Load("Audio/eat_fruit.wav");
 
 	if (!mEatingFruitSFX)
 		std::cout << "Failed to load the eating friut SFX" << std::endl;
+	mEatingFruitSFX->SetLooping(false);
+
 
 	mExtraLifeAllocationSFX = new S2D::SoundEffect();
 	mExtraLifeAllocationSFX->Load("Audio/extend.wav");
 
 	if (!mExtraLifeAllocationSFX)
 		std::cout << "Failed to load the extra life allocation SFX" << std::endl;
+	mExtraLifeAllocationSFX->SetLooping(false);
+
 
 	mDeathSFX_1             = new S2D::SoundEffect();
 	mDeathSFX_1->Load("Audio/death_1.wav");
 
 	if (!mDeathSFX_1)
 		std::cout << "Failed to load the death 2 SFX" << std::endl;
+	mDeathSFX_1->SetLooping(false);
+
 
 	mDeathSFX_2             = new S2D::SoundEffect();
 	mDeathSFX_2->Load("Audio/death_2.wav");
 
 	if (!mDeathSFX_2)
 		std::cout << "Failed to load the death 2 SFX" << std::endl;
+	mDeathSFX_2->SetLooping(false);
 
 	mEatingGhostSFX         = new S2D::SoundEffect();
 	mEatingGhostSFX->Load("Audio/eat_ghost.wav");
 
 	if (!mEatingGhostSFX)
 		std::cout << "Failed to load the eating ghost SFX" << std::endl;
+	mEatingGhostSFX->SetLooping(false);
+
 
 	mGhostGoingToHomeSFX    = new S2D::SoundEffect();
 	mGhostGoingToHomeSFX->Load("Audio/retreating.wav");
 
 	if (!mGhostGoingToHomeSFX)
 		std::cout << "Failed to load the ghost going home SFX" << std::endl;
+	mGhostGoingToHomeSFX->SetLooping(true);
+
 
 	mGhostFleeingSFX_1      = new S2D::SoundEffect();
 	mGhostFleeingSFX_1->Load("Audio/siren_1.wav");
 
 	if (!mGhostFleeingSFX_1)
 		std::cout << "Failed to load the ghost fleeing 1 SFX" << std::endl;
+	mGhostFleeingSFX_1->SetLooping(true);
+
 
 	mGhostFleeingSFX_2      = new S2D::SoundEffect();
 	mGhostFleeingSFX_2->Load("Audio/siren_2.wav");
 
 	if (!mGhostFleeingSFX_2)
 		std::cout << "Failed to load the ghost fleeing 2 SFX" << std::endl;
+	mGhostFleeingSFX_2->SetLooping(true);
+
 
 	mGhostFleeingSFX_3      = new S2D::SoundEffect();
 	mGhostFleeingSFX_3->Load("Audio/siren_3.wav");
 
 	if (!mGhostFleeingSFX_3)
 		std::cout << "Failed to load the ghost fleeing 3 SFX" << std::endl;
+	mGhostFleeingSFX_3->SetLooping(true);
+
 
 	mGhostFleeingSFX_4      = new S2D::SoundEffect();
 	mGhostFleeingSFX_4->Load("Audio/siren_4.wav");
 
 	if (!mGhostFleeingSFX_4)
 		std::cout << "Failed to load the ghost fleeing 4 SFX" << std::endl;
+	mGhostFleeingSFX_4->SetLooping(true);
+
 
 	mGhostFleeingSFX_5      = new S2D::SoundEffect();
 	mGhostFleeingSFX_5->Load("Audio/siren_5.wav");
 
 	if (!mGhostFleeingSFX_5)
 		std::cout << "Failed to load the ghost fleeing 5 SFX" << std::endl;
+	mGhostFleeingSFX_5->SetLooping(true);
+
 
 	mGameStartSFX           = new S2D::SoundEffect();
 	mGameStartSFX->Load("Audio/game_start.wav");
 
 	if (!mGameStartSFX)
 		std::cout << "Failed to load the game start SFX" << std::endl;
+	mGameStartSFX->SetLooping(false);
 }
 
 // -------------------------------------------------------------------------- //
@@ -147,8 +171,10 @@ AudioManager* AudioManager::GetInstance()
 
 void AudioManager::PlayDotCollectionSFX()
 {
-	if(mDotCollectionSFX->GetState() != S2D::SoundEffectState::PLAYING && mDotCollectionSFX)
+	if (mDotCollectionSFX->GetState() != S2D::SoundEffectState::PLAYING && mDotCollectionSFX)
+	{
 		S2D::Audio::Play(mDotCollectionSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -156,7 +182,9 @@ void AudioManager::PlayDotCollectionSFX()
 void AudioManager::PlayEatingFruitSFX()
 {
 	if (mEatingFruitSFX->GetState() != S2D::SoundEffectState::PLAYING && mEatingFruitSFX)
+	{
 		S2D::Audio::Play(mEatingFruitSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -164,7 +192,9 @@ void AudioManager::PlayEatingFruitSFX()
 void AudioManager::PlayExtraLifeSFX()
 {
 	if (mExtraLifeAllocationSFX->GetState() != S2D::SoundEffectState::PLAYING && mExtraLifeAllocationSFX)
+	{
 		S2D::Audio::Play(mExtraLifeAllocationSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -172,7 +202,8 @@ void AudioManager::PlayExtraLifeSFX()
 void AudioManager::PlayPacmanDeathSFX_1()
 {
 	if (mDeathSFX_1->GetState() != S2D::SoundEffectState::PLAYING && mDeathSFX_1)
-		S2D::Audio::Play(mDeathSFX_1);
+	{
+		S2D::Audio::Play(mDeathSFX_1);	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -180,7 +211,9 @@ void AudioManager::PlayPacmanDeathSFX_1()
 void AudioManager::PlayPacmanDeathSFX_2()
 {
 	if (mDeathSFX_2->GetState() != S2D::SoundEffectState::PLAYING && mDeathSFX_2)
+	{
 		S2D::Audio::Play(mDeathSFX_2);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -188,7 +221,9 @@ void AudioManager::PlayPacmanDeathSFX_2()
 void AudioManager::PlayEatingGhostSFX()
 {
 	if (mEatingGhostSFX->GetState() != S2D::SoundEffectState::PLAYING && mEatingGhostSFX)
+	{
 		S2D::Audio::Play(mEatingGhostSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -196,7 +231,9 @@ void AudioManager::PlayEatingGhostSFX()
 void AudioManager::PlayGhostGoingToHomeSFX()
 {
 	if (mGhostGoingToHomeSFX->GetState() != S2D::SoundEffectState::PLAYING && mGhostGoingToHomeSFX)
+	{
 		S2D::Audio::Play(mGhostGoingToHomeSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -204,7 +241,9 @@ void AudioManager::PlayGhostGoingToHomeSFX()
 void AudioManager::PlayGhostFleeingSFX_1()
 {
 	if (mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_1)
+	{
 		S2D::Audio::Play(mGhostFleeingSFX_1);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -212,7 +251,9 @@ void AudioManager::PlayGhostFleeingSFX_1()
 void AudioManager::PlayGhostFleeingSFX_2()
 {
 	if (mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_2)
+	{
 		S2D::Audio::Play(mGhostFleeingSFX_2);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -220,7 +261,9 @@ void AudioManager::PlayGhostFleeingSFX_2()
 void AudioManager::PlayGhostFleeingSFX_3()
 {
 	if (mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_3)
+	{
 		S2D::Audio::Play(mGhostFleeingSFX_3);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -228,7 +271,9 @@ void AudioManager::PlayGhostFleeingSFX_3()
 void AudioManager::PlayGhostFleeingSFX_4()
 {
 	if (mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_4)
+	{
 		S2D::Audio::Play(mGhostFleeingSFX_4);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -236,7 +281,9 @@ void AudioManager::PlayGhostFleeingSFX_4()
 void AudioManager::PlayGhostFleeingSFX_5()
 {
 	if (mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_5)
+	{
 		S2D::Audio::Play(mGhostFleeingSFX_5);
+	}
 }
 
 // -------------------------------------------------------------------------- //
@@ -244,7 +291,9 @@ void AudioManager::PlayGhostFleeingSFX_5()
 void AudioManager::PlayGameStartSFX()
 {
 	if (mGameStartSFX->GetState() != S2D::SoundEffectState::PLAYING && mGameStartSFX)
+	{
 		S2D::Audio::Play(mGameStartSFX);
+	}
 }
 
 // -------------------------------------------------------------------------- //

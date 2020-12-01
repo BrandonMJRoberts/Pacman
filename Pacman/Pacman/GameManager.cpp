@@ -53,6 +53,7 @@ void GameManager::SetVariablesToStartingValues()
 	mGhostsEatenThisGame           = 0;
 
 	mRemainingDots                 = 0;
+	mAmountOfPacmanDeathsThisGame  = 0;
 
 	mExtraLifeCount                = STARTING_LIFE_COUNT;
 	mPlayerIsPoweredUp             = false;

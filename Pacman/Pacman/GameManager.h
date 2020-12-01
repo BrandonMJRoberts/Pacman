@@ -94,6 +94,9 @@ public:
 
 	// Save score
 	void                  SaveOutScoreToLeaderboard();
+
+	void                  IncreasePacmanDeathCounter()                        { ++mAmountOfPacmanDeathsThisGame; }
+	unsigned int          GetAmountOfPacmanDeathsThisGame()                   { return mAmountOfPacmanDeathsThisGame; }
 private:
 	GameManager();
 	void                SetDotCounts();
@@ -115,6 +118,8 @@ private:
 	unsigned int        mDotsCollectedThisGame;
 	unsigned int        mGhostsEatenThisGame;
 	unsigned int        mGhostsEatenStreak; // For points calculations
+
+	unsigned int        mAmountOfPacmanDeathsThisGame;
 
 	int                 mPointsRemainingTillNextLife;
 	float               mTimeRemainingInPoweredUpState;
