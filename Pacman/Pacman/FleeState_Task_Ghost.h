@@ -8,7 +8,7 @@ class Ghost;
 class FleeState_Ghost final : public BaseState_Ghost
 {
 public:
-	FleeState_Ghost();
+	FleeState_Ghost(GHOST_TYPE colourOfGhost);
 	~FleeState_Ghost() override;
 
 	void OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection) override;
@@ -17,6 +17,8 @@ public:
 private:
 	void OnEnter() override;
 	void OnExit() override;
+
+	GHOST_TYPE mGhostColour;
 };
 
 #endif

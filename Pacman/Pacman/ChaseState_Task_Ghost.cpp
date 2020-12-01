@@ -38,7 +38,7 @@ void ChaseState_Ghost::OnExit()
 void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection)
 {
 	S2D::Vector2 positionalOffset = S2D::Vector2();
-	float        projectDistance  = 0.2f;
+	float        projectDistance  = 1.5f;
 
 	switch (mColourOfGhost)
 	{

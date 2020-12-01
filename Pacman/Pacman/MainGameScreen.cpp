@@ -9,6 +9,7 @@
 #include "Pickups.h"
 #include "Background.h"
 #include "DotsHandler.h"
+#include "AudioManager.h"
 
 // ------------------------------------------------------------------------------ //
 
@@ -114,7 +115,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 	HandleCollectable(deltaTime);
 
 	// Now check if pacman has collided with any of the ghosts
-	//CheckForCharacterCollisions();
+	CheckForCharacterCollisions();
 
 	// Update the game manager
 	GameManager::Instance()->Update(deltaTime);
@@ -281,10 +282,14 @@ void MainGameScreen::CheckForCharacterCollisions()
 						GM->IncrementGhostsEatenCount();
 
 						UIManager::GetInstance()->DisplayPoints(mPacman->GetCentrePosition(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
+
+						AudioManager::GetInstance()->PlayEatingGhostSFX();
 					}
 					else
 					{
 						mPacman->SetIsAlive(false);
+
+						AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
 					}
 				}
 			}

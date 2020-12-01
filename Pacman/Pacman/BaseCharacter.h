@@ -17,12 +17,13 @@ public:
 	virtual void     Render(const unsigned int frameCount);
 	virtual void     Update(const float deltaTime);
 
-	void             SetIsPlayerControlled()                             { mIsPlayerControlled = true; } 
+	void             SetIsPlayerControlled()                                   { mIsPlayerControlled = true; } 
 
 	bool             IsAlive()                                           const { return mIsAlive; }
-	virtual void     SetIsAlive(bool newVal)                             { mIsAlive = newVal; } 
+	virtual void     SetIsAlive(bool newVal)                                   { mIsAlive = newVal; if (mIsAlive) mMovementSpeed = GHOST_MOVEMENT_SPEED; else mMovementSpeed = GHOST_EYE_MOVEMENT_SPEED ;
+	}
 
-	void             SetTargetPosition(S2D::Vector2 newPos)              { mTargetPositon = newPos; } 
+	void             SetTargetPosition(S2D::Vector2 newPos)                    { mTargetPositon = newPos; } 
 
 	FACING_DIRECTION GetFacingDirection()                                const { return mCurrentFacingDirection; }
 	S2D::Vector2     GetCentrePosition()                                 const { return mCentrePosition; }

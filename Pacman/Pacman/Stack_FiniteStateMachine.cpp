@@ -39,7 +39,7 @@ void Stack_FiniteStateMachine_Ghost::PushToStack(GHOST_STATE_TYPE newState)
 	break;
 
 	case GHOST_STATE_TYPE::FLEE:
-		mCurrentStack.push_back(new FleeState_Ghost());
+		mCurrentStack.push_back(new FleeState_Ghost(mGhostColour));
 	break;
 
 	case GHOST_STATE_TYPE::RETURN_HOME:

@@ -110,42 +110,11 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 			currentState->CheckTransitions(this);
 		}
 
-		// Calculate the distance from where we are to the position we want to go to
-		double movementDiff = S2D::Vector2::Distance(mCentrePosition, mMoveToPos);
-
-		if(mThisGhostType == GHOST_TYPE::RED)
-			std::cout << "Distance to point = " << movementDiff << std::endl;
-
 		// If we are at the next position to be moved to then calculate another one
-	    if(movementDiff < accuracy)
+	    if(S2D::Vector2::Distance(mCentrePosition, mMoveToPos) < accuracy)
 		{
 			CalculateAIMovementDirection(); // Now calclate where we need to actually move to - the centre of which segment
 			CheckForDirectionChange();      // Check if the ghost should change facing direction
-
-			if (mThisGhostType == GHOST_TYPE::RED)
-			{
-				std::cout << "This pos = "             << mCentrePosition.X << " " << mCentrePosition.Y << std::endl;
-				std::cout << "Reset pos: MoveToPos = " << mMoveToPos.X      << " " << mMoveToPos.Y      << std::endl;
-
-				switch (mCurrentFacingDirection)
-				{
-				case FACING_DIRECTION::DOWN:
-					std::cout << "Facing down" << std::endl;
-				break;
-
-				case FACING_DIRECTION::UP:
-					std::cout << "Facing up" << std::endl;
-				break;
-
-				case FACING_DIRECTION::LEFT:
-					std::cout << "Facing left" << std::endl;
-				break;
-
-				case FACING_DIRECTION::RIGHT:
-					std::cout << "Facing right" << std::endl;
-				break;
-				}
-			}
 		}
 	}
 }
@@ -200,6 +169,47 @@ void Ghost::CheckForDirectionChange()
 			break;
 			}
 		}
+		else if (mGhostIsEaten)
+		{
+			switch (mRequestedFacingDirection)
+			{
+			case FACING_DIRECTION::DOWN:
+				mStartFrame   = 7;
+				mEndFrame     = 7;
+				mCurrentFrame = 7;
+			break;
+
+			case FACING_DIRECTION::UP:
+				mStartFrame   = 6;
+				mEndFrame     = 6;
+				mCurrentFrame = 6;
+			break;
+
+			case FACING_DIRECTION::LEFT:
+				mStartFrame   = 5;
+				mEndFrame     = 5;
+				mCurrentFrame = 5;
+			break;
+
+			case FACING_DIRECTION::RIGHT:
+				mStartFrame   = 4;
+				mEndFrame     = 4;
+				mCurrentFrame = 4;
+			break;
+
+			default:
+				mStartFrame   = 4;
+				mEndFrame     = 4;
+				mCurrentFrame = 4;
+			break;
+			}
+		}
+		else if (mGhostIsFleeing && !mGhostIsEaten)
+		{
+			mStartFrame   = 0;
+			mEndFrame     = 1;
+			mCurrentFrame = 0;
+		}
 
 		// Set the new direction of facing
 		mCurrentFacingDirection = mRequestedFacingDirection;
@@ -246,10 +256,10 @@ void Ghost::CalculateAIMovementDirection()
 	S2D::Vector2 movementDifferential = mTargetPositon - mCentrePosition;
 
 	// First calculate which movements are valid and then choose which one is the best for the current situation
-	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP) && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
+	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP)    && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
 	bool canMoveDown  = CanTurnToDirection(FACING_DIRECTION::DOWN)  && mCurrentFacingDirection != FACING_DIRECTION::UP;
 	bool canMoveRight = CanTurnToDirection(FACING_DIRECTION::RIGHT) && mCurrentFacingDirection != FACING_DIRECTION::LEFT;
-	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
+	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT)  && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
 
 	// So that you only consider the alternate axis if beyond a certain amount
 	float accuracy = 0.5f;
