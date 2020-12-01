@@ -412,3 +412,15 @@ void BaseCharacter::CheckForDirectionChange()
 }
 
 // ------------------------------------------------------------- //
+
+void BaseCharacter::SetIsAlive(const bool newVal)
+{
+	mIsAlive = newVal; 
+
+	if (mIsAlive) 
+		mMovementSpeed = GHOST_MOVEMENT_SPEED; 
+	else 
+		mMovementSpeed = GHOST_EYE_MOVEMENT_SPEED;
+}
+
+// ------------------------------------------------------------- //

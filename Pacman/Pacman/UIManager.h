@@ -23,6 +23,8 @@ public:
 
 	void RemoveALlCollectedPickups();
 
+	void ResetExtraLifeSprite();
+
 private:
 	UIManager();
 
@@ -43,7 +45,8 @@ private:
 	// Extra Lives
 	S2D::Vector2	       mExtraLivesStartTopRightPos;
 	S2D::Texture2D*		   mExtraLivesSpriteSheet;
-	S2D::Rect*             mExtraLifeRenderRect;
+	const unsigned int     mAmountOfSpritesOnExtraLifeSpriteSheet;
+	S2D::Rect              mExtraLifeSourceRenderRect;
 
 	// In Maze Points
 	S2D::Texture2D*		   mPointsSpriteSheet;

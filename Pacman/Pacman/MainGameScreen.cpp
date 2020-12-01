@@ -18,6 +18,7 @@ MainGameScreen::MainGameScreen() : BaseMenu()
 	LoadInDataForLevel();
 
 	UIManager::GetInstance()->AddCollectedPickup(GameManager::Instance()->GetThisLevelCollectableType());
+	UIManager::GetInstance()->ResetExtraLifeSprite();
 }
 
 // ------------------------------------------------------------------------------ //
@@ -150,7 +151,7 @@ void MainGameScreen::LoadInDataForLevel()
 	{
 		for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
 		{
-			if (((int)GameManager::Instance()->GetPlayerCharacterType()) - 1 == i)
+			if (GameManager::Instance()->GetPlayerCharacterType() == (PLAYER_CHARACTER_TYPE)(i + 1))
 				mGhosts.push_back(new Ghost(S2D::Vector2(1.5f, 1.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));
 			else
 				mGhosts.push_back(new Ghost(S2D::Vector2(1.5f, 1.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));

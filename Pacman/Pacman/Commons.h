@@ -27,11 +27,11 @@ enum class SELECTION_OPTIONS : char
 
 enum class PLAYER_CHARACTER_TYPE : char
 {
-	PACMAN       = 0x00,
-	RED_GHOST    = 0x01,
-	BLUE_GHOST   = 0x02,
-	ORANGE_GHOST = 0x04,
-	PINK_GHOST   = 0x08
+	PACMAN       = 0,
+	RED_GHOST    = 1,
+	BLUE_GHOST   = 2,
+	PINK_GHOST   = 3,
+	ORANGE_GHOST = 4
 };
 
 // ------------------------------------------------------------------ //

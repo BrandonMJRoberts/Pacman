@@ -20,10 +20,9 @@ public:
 	void             SetIsPlayerControlled()                                   { mIsPlayerControlled = true; } 
 
 	bool             IsAlive()                                           const { return mIsAlive; }
-	virtual void     SetIsAlive(bool newVal)                                   { mIsAlive = newVal; if (mIsAlive) mMovementSpeed = GHOST_MOVEMENT_SPEED; else mMovementSpeed = GHOST_EYE_MOVEMENT_SPEED ;
-	}
+	virtual void     SetIsAlive(const bool newVal);
 
-	void             SetTargetPosition(S2D::Vector2 newPos)                    { mTargetPositon = newPos; } 
+	void             SetTargetPosition(const S2D::Vector2 newPos)              { mTargetPositon = newPos; } 
 
 	FACING_DIRECTION GetFacingDirection()                                const { return mCurrentFacingDirection; }
 	S2D::Vector2     GetCentrePosition()                                 const { return mCentrePosition; }

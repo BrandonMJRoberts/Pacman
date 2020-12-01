@@ -12,7 +12,7 @@ UIManager* UIManager::mInstance = nullptr;
 
 // ---------------------------------------------------------------- //
 
-UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOfSpritesOnPointsSpriteSheetWidth(4)
+UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOfSpritesOnPointsSpriteSheetWidth(4), mAmountOfSpritesOnExtraLifeSpriteSheet(5)
 {
 	// First load in the sprite sheets we need
 	mExtraLivesSpriteSheet       = new S2D::Texture2D();
@@ -36,9 +36,6 @@ UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOf
 	mPlayerNamePosition            = S2D::Vector2(96, 50);
 	mHighScoreTextPosition         = S2D::Vector2(288, 50);
 
-	// Setup the extra life render rect
-	mExtraLifeRenderRect           = new S2D::Rect(0, 0, mExtraLivesSpriteSheet->GetWidth(), mExtraLivesSpriteSheet->GetHeight());
-
 	mPointsSingleSpriteWidth       = mPointsSpriteSheet->GetWidth() / mAmountOfSpritesOnPointsSpriteSheetWidth;
 	mPointsSingleSpriteHeight      = mPointsSpriteSheet->GetHeight() / mAmountOfSpritesOnPointsSpriteSheetHeight;
 	mPointsSourceRect              = new S2D::Rect(0, 0, mPointsSingleSpriteWidth, mPointsSingleSpriteHeight);
@@ -58,9 +55,6 @@ UIManager::~UIManager()
 
 	delete mPointsSpriteSheet;
 		mPointsSpriteSheet = nullptr;
-
-	delete mExtraLifeRenderRect;
-		mExtraLifeRenderRect = nullptr;
 
 	delete mTextRenderer;
 		mTextRenderer = nullptr;
@@ -161,16 +155,55 @@ void UIManager::RenderCollectables()
 
 void UIManager::RenderExtraLives()
 {
-	if (mExtraLivesSpriteSheet && mExtraLifeRenderRect)
+	// Ensure that the render rects are setup
+	if (mExtraLivesSpriteSheet)
 	{
+		if (mExtraLifeSourceRenderRect.X == 0)
+		{
+			float xOffset = 0.0f, extraLifeSingleSpriteWidth = mExtraLivesSpriteSheet->GetWidth() / mAmountOfSpritesOnExtraLifeSpriteSheet;
+
+			switch (GameManager::Instance()->GetPlayerCharacterType())
+			{
+			case PLAYER_CHARACTER_TYPE::PACMAN:
+				xOffset = 0.0f;
+			break;
+
+			case PLAYER_CHARACTER_TYPE::RED_GHOST:
+				xOffset = extraLifeSingleSpriteWidth;
+			break;
+
+			case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+				xOffset = 3 * extraLifeSingleSpriteWidth;
+			break;
+
+			case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
+				xOffset = 4 * extraLifeSingleSpriteWidth;
+			break;
+
+			case PLAYER_CHARACTER_TYPE::PINK_GHOST:
+				xOffset = 2 * extraLifeSingleSpriteWidth;
+			break;
+			}
+
+			// Setup the extra life render rect
+			mExtraLifeSourceRenderRect = S2D::Rect(xOffset, 0, extraLifeSingleSpriteWidth, mExtraLivesSpriteSheet->GetHeight());
+		}
+
 		// Now render the extra lives icons
 		for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
 		{
 			S2D::SpriteBatch::Draw( mExtraLivesSpriteSheet,
 				                  &(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f)),
-				                    mExtraLifeRenderRect);
+				                  &(mExtraLifeSourceRenderRect));
 		}
 	}
+}
+
+// ---------------------------------------------------------------- //
+
+void UIManager::ResetExtraLifeSprite()
+{
+	mExtraLifeSourceRenderRect = S2D::Rect();
 }
 
 // ---------------------------------------------------------------- //

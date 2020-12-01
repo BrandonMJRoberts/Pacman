@@ -47,6 +47,8 @@ StartMenu::StartMenu() : BaseMenu(), mAmountOfRenderedFramesPerAnimationFrame(6)
 	mSelectorSpriteEndFrame         = 10;
 	mSelectorSpriteStartFrame       = 8;
 
+	GameManager::Instance()->SetPlayerCharacter(PLAYER_CHARACTER_TYPE::PACMAN);
+
 }
 
 // -------------------------------------------------------- //

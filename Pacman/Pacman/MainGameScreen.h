@@ -12,10 +12,8 @@ class PacmanCharacter;
 class Background;
 class DotsHandler;
 class Ghost;
-//class AIController;
-//class BaseCharacter;
 
-class MainGameScreen : public BaseMenu
+class MainGameScreen final : public BaseMenu
 {
 public:
 	MainGameScreen();
@@ -40,8 +38,6 @@ private:
 
 	std::vector<Ghost*> mGhosts; 
 	PacmanCharacter*    mPacman;
-
-	//std::vector<Ghost*> mGhosts;
 
 	float               mTimeTillNextCollectableSpawn;
 };
