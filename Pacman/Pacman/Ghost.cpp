@@ -62,7 +62,7 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 
 	mMovementSpeed			  = GHOST_MOVEMENT_SPEED;
 
-	mFramesPerAnimation       = 8;
+	mFramesPerAnimation       = 10;
 	mDoorIsOpen               = false;
 } 
 
@@ -340,12 +340,29 @@ void Ghost::CalculateAIMovementDirection()
 
 void Ghost::Render(const unsigned int frameCount)
 {
-	// Make the frame loop in the way that has been set
-	if ((frameCount % mFramesPerAnimation) == 1)
+	// First calculate the amount of frames that have passed since the last run through
+	int deltaFrames;
+
+	// we must have looped around the FPS limit higher up, so account for this
+	if (frameCount < mPriorFrameCount)
+		deltaFrames = (FRAME_RATE - mPriorFrameCount) + frameCount; // Set the frame progression to be the remainder required to hit the FPS limit, and then add the current frame count
+	else
+		deltaFrames = frameCount - mPriorFrameCount;
+
+	// Add these frames onto the count
+	mFrameProgression += deltaFrames;
+
+	mPriorFrameCount = frameCount;
+
+	if (mFrameProgression > mFramesPerAnimation)
+	{
+		mFrameProgression -= mFramesPerAnimation;
+
 		mCurrentFrame++;
 
-	if (mCurrentFrame > mEndFrame)
-		mCurrentFrame = mStartFrame;
+		if (mCurrentFrame > mEndFrame)
+			mCurrentFrame = mStartFrame;
+	}
 
 	// First perform the checks to avoid crashing here
 	if (mUsingMainSpriteSheet)

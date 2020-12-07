@@ -33,11 +33,11 @@ PacmanCharacter::PacmanCharacter(char** const       collisionMap,
 	else
 		mStateMachine = nullptr;
 
-	mCurrentFrame = 0;
-	mStartFrame   = 0;
-	mEndFrame     = 1;
+	mCurrentFrame       = 8;
+	mStartFrame         = 8;
+	mEndFrame           = 8;
 
-	mMovementSpeed = PACMAN_MOVEMENT_SPEED;
+	mMovementSpeed      = PACMAN_MOVEMENT_SPEED;
 
 	mFramesPerAnimation = 6;
 }
@@ -74,25 +74,25 @@ void PacmanCharacter::CheckForDirectionChange()
 		{
 		case FACING_DIRECTION::DOWN:
 			mStartFrame   = 6;
-			mEndFrame     = 7;
+			mEndFrame     = 8;
 			mCurrentFrame = 6;
 		break;
 
 		case FACING_DIRECTION::UP:
 			mStartFrame   = 4;
-			mEndFrame     = 5;
+			mEndFrame     = 6;
 			mCurrentFrame = 4;
 		break;
 
 		case FACING_DIRECTION::LEFT:
 			mStartFrame   = 2;
-			mEndFrame     = 3;
+			mEndFrame     = 4;
 			mCurrentFrame = 2;
 		break;
 
 		case FACING_DIRECTION::RIGHT:
 			mStartFrame   = 0;
-			mEndFrame     = 1;
+			mEndFrame     = 2;
 			mCurrentFrame = 0;
 		break;
 
@@ -183,6 +183,77 @@ void PacmanCharacter::SetIsAlive(bool newVal)
 
 			mIsAlive = newVal;
 		}
+	}
+}
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::Render(const unsigned int frameCount)
+{
+	// First calculate the amount of frames that have passed since the last run through
+	int deltaFrames;
+
+	// we must have looped around the FPS limit higher up, so account for this
+	if (frameCount < mPriorFrameCount)
+		deltaFrames = (FRAME_RATE - mPriorFrameCount) + frameCount; // Set the frame progression to be the remainder required to hit the FPS limit, and then add the current frame count
+	else
+		deltaFrames = frameCount - mPriorFrameCount;
+
+	// Add these frames onto the count
+	mFrameProgression += deltaFrames;
+
+	mPriorFrameCount = frameCount;
+
+	// If enough frames have progressed then update the animation
+	if (mFrameProgression > mFramesPerAnimation)
+	{
+		mFrameProgression -= mFramesPerAnimation;
+
+		// Increment the current frame
+		mCurrentFrame++;
+
+		// This is the pacman specific code - this is done to reduce the required size of the sprite sheet to save memory
+		if (mCurrentFrame == mEndFrame && mCurrentFrame != 8)
+			mCurrentFrame = 8;
+		else if (mCurrentFrame > mEndFrame)
+			mCurrentFrame = mStartFrame;
+	}
+
+	// First perform the checks to avoid crashing here
+	if (mUsingMainSpriteSheet)
+		if (!mMainSpriteSheet)
+			return;
+		else
+			if (!mAlternateSpritesSheet)
+				return;
+
+	S2D::Vector2 mRenderPosition;
+
+	if (mIsAlive)
+	{
+		// First calculate the source rect
+		mSourceRect.X = float(   (mCurrentFrame % mSpritesOnWidthMain) * mSingleSpriteWidthMain);
+		mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidthMain) * mSingleSpriteHeightMain);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthMain * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightMain * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mMainSpriteSheet,
+			&(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			&mSourceRect); // Draws Pacman
+	}
+	else
+	{
+		// First calculate the source rect
+		mSourceRect.X = float((mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
+		mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidthAlternate) * mSingleSpriteHeightAlternate);
+
+		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthAlternate * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightAlternate * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
+
+		// Now render the character in the correct position, 0.0 being the top left of the screen
+		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
+			&(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			&mSourceRect); // Draws Pacman
 	}
 }
 

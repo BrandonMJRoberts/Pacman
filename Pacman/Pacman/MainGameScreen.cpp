@@ -17,6 +17,8 @@ MainGameScreen::MainGameScreen() : BaseMenu()
 {
 	LoadInDataForLevel();
 
+	GameManager::Instance()->ResetPreGameTimer();
+
 	UIManager::GetInstance()->AddCollectedPickup(GameManager::Instance()->GetThisLevelCollectableType());
 	UIManager::GetInstance()->ResetExtraLifeSprite();
 }

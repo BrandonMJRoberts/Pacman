@@ -27,6 +27,8 @@ public:
 
 	void             Update(const float deltaTime) override;
 	void             SetIsAlive(bool newVal) override;
+
+	void             Render(const unsigned int frameCount) override;
 private:
 
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);

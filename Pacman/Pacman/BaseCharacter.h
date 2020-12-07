@@ -57,6 +57,9 @@ protected:
 	unsigned int					 mSingleSpriteWidthAlternate;
 	unsigned int					 mSingleSpriteHeightAlternate;
 
+	unsigned int                     mFrameProgression;
+	unsigned int                     mPriorFrameCount;
+
 	char**                           mCollisionMap;
 
 	FACING_DIRECTION                 mCurrentFacingDirection;

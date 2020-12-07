@@ -98,13 +98,14 @@ public:
 	void                  IncreasePacmanDeathCounter()                        { ++mAmountOfPacmanDeathsThisGame; }
 	unsigned int          GetAmountOfPacmanDeathsThisGame()             const { return mAmountOfPacmanDeathsThisGame; }
 
-	bool GetIsInPreGameState()                                          const { return mInPreGameState; }
+	bool                  GetIsInPreGameState()                         const { return mInPreGameState; }
+	void                  ResetPreGameTimer() { mTimeRemainingInPreGameState = TIME_IN_PRE_GAME; mInPreGameState = true; }
 
 private:
 	GameManager();
 	void                SetDotCounts();
-	void                SetVariablesToStartingValues();
 	unsigned int        LoadInCurrentHighScore();
+	void                SetVariablesToStartingValues();
 
 	// static instance
 	static GameManager* mInstance;
