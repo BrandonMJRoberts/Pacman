@@ -15,7 +15,7 @@ class Ghost final : public BaseCharacter
 public:
 	Ghost() = delete; // Make it so you cannot create a default ghost type
 	Ghost(const S2D::Vector2 startPos, 
-		  const char** const collisionMap, 
+		  char** const       collisionMap, 
 		  const GHOST_TYPE   ghostType, 
 		  const bool		 isAIControlled, 
 		  const char*        filePathForColoured, 
@@ -40,6 +40,8 @@ public:
 	void SetGhostIsEaten(bool newVal);
 	bool GetIfGhostIsEaten()                           { return mGhostIsEaten; }
 
+	void ToggleDoorToHome();
+
 private:
 	void CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
 
@@ -55,6 +57,7 @@ private:
 	bool                             mIsHome;
 	bool                             mGhostIsFleeing;
 	bool                             mGhostIsEaten;
+	bool                             mDoorIsOpen;
 
 };
 

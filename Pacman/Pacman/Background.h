@@ -13,9 +13,9 @@ public:
 	void			Render();
 	void		    Update();
 
-	const char**    GetCollisionMap()    { return (const char**)mCollisionMap; }
-	unsigned int    GetCollisionWidth()  { return mWidth;  }
-	unsigned int    GetCollisionHeight() { return mHeight; }
+	char** const    GetCollisionMap()    const { return mCollisionMap; }
+	unsigned int    GetCollisionWidth()  const { return mWidth;  }
+	unsigned int    GetCollisionHeight() const { return mHeight; }
 
 	void            ChangeColourIndex(const unsigned int newIndex);
 

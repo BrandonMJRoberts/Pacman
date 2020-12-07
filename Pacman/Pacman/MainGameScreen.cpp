@@ -207,6 +207,8 @@ SCREENS MainGameScreen::InGameInputCheck()
 		gm->ResetDotsEatenCount();                         // Reset the dots eaten count
 		gm->ResetGhostsEatenCount();					   // Reset the ghosts eaten count
 
+		AudioManager::GetInstance()->StopAllAudio();
+
 		return SCREENS::MAIN_MENU;
 	}
 
@@ -236,7 +238,7 @@ void MainGameScreen::HandleCollectable(const float deltaTime)
 			SpawnNextCollectable();
 
 			// Reset the time to a random amount
-			mTimeTillNextCollectableSpawn = 5; //= float((rand() % 40) + 15);
+			mTimeTillNextCollectableSpawn = float((rand() % 40) + 15);
 		}
 	}
 }
@@ -286,6 +288,9 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 							// Play the correct audio track
 							AudioManager::GetInstance()->PlayEatingGhostSFX();
+
+							// Also play the sfx for the ghosts going to their home
+							AudioManager::GetInstance()->PlayGhostGoingToHomeSFX();
 						}
 					}
 					else
@@ -304,7 +309,10 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 							mPacman->SetIsAlive(false);
 
-							AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
+							if (GameManager::Instance()->GetExtraLivesCount() > 1)
+								AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
+							else
+								AudioManager::GetInstance()->PlayPacmanDeathSFX_2();
 						}
 					}
 				}

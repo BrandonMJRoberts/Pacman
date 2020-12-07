@@ -97,7 +97,6 @@ void Background::LoadInCollisionMap()
 		mCollisionMap = nullptr;
 	}
 	
-
 	// now open the file containing the collision data
 	std::ifstream file;
 	file.open("CollisionMaps/" + to_string(GameManager::Instance()->GetCurrentLevel()) + ".txt");

@@ -9,7 +9,7 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(const char**       collisionMap, 
+PacmanCharacter::PacmanCharacter(char** const       collisionMap, 
 	                             const unsigned int spritesOnWidthMain, 
 	                             const unsigned int spritesOnHeightMain, 
 								 const unsigned int spritesOnWidthAlternate,

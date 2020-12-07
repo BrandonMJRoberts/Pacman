@@ -17,14 +17,12 @@ AudioManager::AudioManager()
 		std::cout << "Failed to load the dot collection SFX" << std::endl;
 	mDotCollectionSFX->SetLooping(false);
 
-
 	mEatingFruitSFX         = new S2D::SoundEffect();
 	mEatingFruitSFX->Load("Audio/eat_fruit.wav");
 
 	if (!mEatingFruitSFX)
 		std::cout << "Failed to load the eating friut SFX" << std::endl;
 	mEatingFruitSFX->SetLooping(false);
-
 
 	mExtraLifeAllocationSFX = new S2D::SoundEffect();
 	mExtraLifeAllocationSFX->Load("Audio/extend.wav");
@@ -220,7 +218,7 @@ void AudioManager::PlayPacmanDeathSFX_2()
 
 void AudioManager::PlayEatingGhostSFX()
 {
-	if (mEatingGhostSFX->GetState() != S2D::SoundEffectState::PLAYING && mEatingGhostSFX)
+	if (mEatingGhostSFX)
 	{
 		S2D::Audio::Play(mEatingGhostSFX);
 	}
@@ -240,9 +238,20 @@ void AudioManager::PlayGhostGoingToHomeSFX()
 
 void AudioManager::PlayGhostFleeingSFX_1()
 {
-	if (mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_1)
+	if (mGhostFleeingSFX_1 &&
+		mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING && 
+		mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING && 
+		mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING)
 	{
 		S2D::Audio::Play(mGhostFleeingSFX_1);
+
+		// Pause all other fleeing SFX
+		PauseGhostFleeingSFX_2();
+		PauseGhostFleeingSFX_3();
+		PauseGhostFleeingSFX_4();
+		PauseGhostFleeingSFX_5();
 	}
 }
 
@@ -250,9 +259,20 @@ void AudioManager::PlayGhostFleeingSFX_1()
 
 void AudioManager::PlayGhostFleeingSFX_2()
 {
-	if (mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_2)
+	if (mGhostFleeingSFX_2 &&
+		mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING)
 	{
 		S2D::Audio::Play(mGhostFleeingSFX_2);
+
+		// Pause all other fleeing SFX
+		PauseGhostFleeingSFX_1();
+		PauseGhostFleeingSFX_3();
+		PauseGhostFleeingSFX_4();
+		PauseGhostFleeingSFX_5();
 	}
 }
 
@@ -260,9 +280,20 @@ void AudioManager::PlayGhostFleeingSFX_2()
 
 void AudioManager::PlayGhostFleeingSFX_3()
 {
-	if (mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_3)
+	if (mGhostFleeingSFX_3 &&
+		mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING)
 	{
 		S2D::Audio::Play(mGhostFleeingSFX_3);
+
+		// Pause all other fleeing SFX
+		PauseGhostFleeingSFX_1();
+		PauseGhostFleeingSFX_2();
+		PauseGhostFleeingSFX_4();
+		PauseGhostFleeingSFX_5();
 	}
 }
 
@@ -270,9 +301,20 @@ void AudioManager::PlayGhostFleeingSFX_3()
 
 void AudioManager::PlayGhostFleeingSFX_4()
 {
-	if (mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_4)
+	if (mGhostFleeingSFX_4 &&
+		mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING)
 	{
 		S2D::Audio::Play(mGhostFleeingSFX_4);
+
+		// Pause all other fleeing SFX
+		PauseGhostFleeingSFX_1();
+		PauseGhostFleeingSFX_2();
+		PauseGhostFleeingSFX_3();
+		PauseGhostFleeingSFX_5();
 	}
 }
 
@@ -280,9 +322,20 @@ void AudioManager::PlayGhostFleeingSFX_4()
 
 void AudioManager::PlayGhostFleeingSFX_5()
 {
-	if (mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING && mGhostFleeingSFX_5)
+	if (mGhostFleeingSFX_5 &&
+		mGhostFleeingSFX_1->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_2->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_3->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_4->GetState() != S2D::SoundEffectState::PLAYING &&
+		mGhostFleeingSFX_5->GetState() != S2D::SoundEffectState::PLAYING)
 	{
 		S2D::Audio::Play(mGhostFleeingSFX_5);
+
+		// Pause all other fleeing SFX
+		PauseGhostFleeingSFX_1();
+		PauseGhostFleeingSFX_2();
+		PauseGhostFleeingSFX_3();
+		PauseGhostFleeingSFX_4();
 	}
 }
 
@@ -294,6 +347,50 @@ void AudioManager::PlayGameStartSFX()
 	{
 		S2D::Audio::Play(mGameStartSFX);
 	}
+}
+
+// -------------------------------------------------------------------------- //
+
+void AudioManager::StopAllAudio()
+{
+	if (mDotCollectionSFX)
+		S2D::Audio::Stop(mDotCollectionSFX);
+
+	if (mEatingFruitSFX)
+		S2D::Audio::Stop(mEatingFruitSFX);
+
+	if (mExtraLifeAllocationSFX)
+		S2D::Audio::Stop(mExtraLifeAllocationSFX);
+
+	if (mDeathSFX_1)
+		S2D::Audio::Stop(mDeathSFX_1);
+
+	if(mDeathSFX_2)
+		S2D::Audio::Stop(mDeathSFX_2);
+
+	if(mEatingGhostSFX)
+		S2D::Audio::Stop(mEatingGhostSFX);
+
+	if(mGhostGoingToHomeSFX)
+		S2D::Audio::Stop(mGhostGoingToHomeSFX);
+
+	if (mGhostFleeingSFX_1)
+		S2D::Audio::Stop(mGhostFleeingSFX_1);
+
+	if (mGhostFleeingSFX_2)
+		S2D::Audio::Stop(mGhostFleeingSFX_2);
+
+	if (mGhostFleeingSFX_3)
+		S2D::Audio::Stop(mGhostFleeingSFX_3);
+
+	if (mGhostFleeingSFX_4)
+		S2D::Audio::Stop(mGhostFleeingSFX_4);
+
+	if (mGhostFleeingSFX_5)
+		S2D::Audio::Stop(mGhostFleeingSFX_5);
+
+	if (mGameStartSFX)
+		S2D::Audio::Stop(mGameStartSFX);
 }
 
 // -------------------------------------------------------------------------- //

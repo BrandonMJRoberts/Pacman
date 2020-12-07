@@ -27,7 +27,15 @@ public:
 	void PlayGhostFleeingSFX_4();
 	void PlayGhostFleeingSFX_5();
 
+	void PauseGhostFleeingSFX_1() { if (mGhostFleeingSFX_1) S2D::Audio::Pause(mGhostFleeingSFX_1); }
+	void PauseGhostFleeingSFX_2() { if (mGhostFleeingSFX_2) S2D::Audio::Pause(mGhostFleeingSFX_2); }
+	void PauseGhostFleeingSFX_3() { if (mGhostFleeingSFX_3) S2D::Audio::Pause(mGhostFleeingSFX_3); }
+	void PauseGhostFleeingSFX_4() { if (mGhostFleeingSFX_4) S2D::Audio::Pause(mGhostFleeingSFX_4); }
+	void PauseGhostFleeingSFX_5() { if (mGhostFleeingSFX_5) S2D::Audio::Pause(mGhostFleeingSFX_5); }
+
 	void PlayGameStartSFX();
+
+	void StopAllAudio();
 
 private:
 	AudioManager();

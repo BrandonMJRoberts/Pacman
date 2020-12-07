@@ -4,6 +4,7 @@
 #include "GameManager.h"
 
 #include "TextRenderer.h"
+#include "AudioManager.h"
 
 #include <string>
 #include <vector>
@@ -118,6 +119,10 @@ SCREENS StartMenu::Update(const float deltaTime)
 			switch (buttonPress)
 			{
 			case SELECTION_OPTIONS::START_GAME:
+
+				// Play the audio for the game start
+				AudioManager::GetInstance()->PlayGameStartSFX();
+
 				return SCREENS::IN_GAME;
 			break;
 
@@ -130,8 +135,13 @@ SCREENS StartMenu::Update(const float deltaTime)
 			break;
 
 			case SELECTION_OPTIONS::CHANGE_PLAYER:
+
 				GameManager::Instance()->IncrementPlayerCharacter();
 
+				// Play a sound effect to make the game feel more interactive to the user
+				AudioManager::GetInstance()->PlayDotCollectionSFX();
+
+				// Change the sprite sheet to be the correct character
 				switch (GameManager::Instance()->GetPlayerCharacterType())
 				{
 				case PLAYER_CHARACTER_TYPE::RED_GHOST:

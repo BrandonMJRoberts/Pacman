@@ -156,6 +156,8 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pa
 				{
 					GameManager::Instance()->AddToScore(50);
 					GameManager::Instance()->SetPlayerPoweredUp(true);
+
+					AudioManager::GetInstance()->PlayGhostFleeingSFX_1();
 				}
 
 				Dot* placeholder        = mDots[mDots.size() - 1];

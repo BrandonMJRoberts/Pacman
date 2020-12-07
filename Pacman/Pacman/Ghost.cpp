@@ -9,7 +9,7 @@
 // -------------------------------------------------------------------- //
 
 Ghost::Ghost(const S2D::Vector2 startPos, 
-	         const char**       collisionMap, 
+	         char** const       collisionMap, 
 	         const GHOST_TYPE   ghostType, 
 	         const bool         isAIControlled, 
 	         const char*        filePathForMainSpriteSheet, 
@@ -63,7 +63,8 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	mMovementSpeed			  = GHOST_MOVEMENT_SPEED;
 
 	mFramesPerAnimation       = 8;
-}
+	mDoorIsOpen               = false;
+} 
 
 // -------------------------------------------------------------------- //
 
@@ -434,9 +435,26 @@ void Ghost::SetGhostIsEaten(bool newVal)
 		break;
 		}
 
-		mEndFrame    = mStartFrame;
+		mEndFrame     = mStartFrame;
 		mCurrentFrame = mStartFrame;
 	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::ToggleDoorToHome()
+{
+	// First convert the collision map into a non-const array and then change the door to be open/closed
+	if (mDoorIsOpen)
+	{
+		mCollisionMap[14][12] = '1';
+	}
+	else
+	{
+		mCollisionMap[14][12] = '0';
+	}
+
+	mDoorIsOpen = !mDoorIsOpen;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //

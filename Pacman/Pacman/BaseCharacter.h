@@ -8,7 +8,7 @@ class BaseCharacter abstract
 {
 public:
 	BaseCharacter() = delete;
-	BaseCharacter(const char** const collisionMap,                    const S2D::Vector2 startPosition, 
+	BaseCharacter(char** const       collisionMap,                    const S2D::Vector2 startPosition, 
 		          const bool         isAIControlled,                  const char*        filePathForMainSpriteSheet, 
 		          const char*        filePathForAlternateSpriteSheet, const unsigned int spritesOnWidth, 
 		          const unsigned int spritesOnHeight,                 const unsigned int spritesOnWidthAlternate, const unsigned int spritesOnHeightAlternate);
@@ -57,7 +57,7 @@ protected:
 	unsigned int					 mSingleSpriteWidthAlternate;
 	unsigned int					 mSingleSpriteHeightAlternate;
 
-	const char**                     mCollisionMap;
+	char**                           mCollisionMap;
 
 	FACING_DIRECTION                 mCurrentFacingDirection;
 	FACING_DIRECTION                 mRequestedFacingDirection;

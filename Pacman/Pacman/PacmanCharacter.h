@@ -14,7 +14,7 @@ class PacmanCharacter final : public BaseCharacter
 {
 public:
 	PacmanCharacter() = delete;
-	PacmanCharacter(const char** const collisionMap, 
+	PacmanCharacter(char**       const collisionMap, 
 		            const unsigned int spritesOnWidthMain, 
 		            const unsigned int spritesOnHeightMain, 
 					const unsigned int spritesOnWidthAlternate,

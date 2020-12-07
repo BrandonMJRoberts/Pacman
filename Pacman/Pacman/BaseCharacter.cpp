@@ -7,7 +7,7 @@
 
 // -------------------------------------------------------------------------------- //
 
-BaseCharacter::BaseCharacter(const char** const collisionMap, 
+BaseCharacter::BaseCharacter(char**             collisionMap, 
 	                         const S2D::Vector2 startPosition, 
 	                         const bool         isAIControlled, 
 	                         const char*        filePathForMainSpriteSheet, 
@@ -19,7 +19,6 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 																			mSpritesOnWidthMain(spritesOnWidthMain),
 																			mSpritesOnHeightAlternate(spritesOnHeightAlternate),
 																			mSpritesOnWidthAlternate(spritesOnWidthAlternate),
-																			mCollisionMap(collisionMap), 
 																			mTimePerChangeOfDirection(PLAYER_CHANGE_DIRECTION_DELAY)
 {
 	// Load in the sprite sheets
@@ -67,6 +66,7 @@ BaseCharacter::BaseCharacter(const char** const collisionMap,
 	mFramesPerAnimation              = 0;
 	mMoveToPos                       = mCentrePosition;
 
+	mCollisionMap                    = collisionMap;
 	mIsAlive                         = true;
 }
 
