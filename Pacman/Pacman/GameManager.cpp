@@ -17,7 +17,7 @@ GameManager* GameManager::mInstance = nullptr;
 
 GameManager::GameManager()
 {
-	SetVariablesToStartingValues();
+	SetVariablesToStartingValues(false);
 }
 
 // ---------------------------------------------------------------- //
@@ -43,40 +43,64 @@ GameManager* GameManager::Instance()
 
 // ---------------------------------------------------------------- //
 
-void GameManager::SetVariablesToStartingValues()
+void GameManager::SetVariablesToStartingValues(bool resettingLevel)
 {
-	mPlayerName                    = "UNNAMED";
-	mCurrentLevelID                = 0;
-	mPlayerNameColourIndex         = 1;
+	if (resettingLevel)
+	{
+		// Setting values for the re-setting of an already running level
+		mPlayerIsPoweredUp             = false;
+		mCurrentScore                  = 0;
 
-	mDotsCollectedThisGame         = 0;
-	mGhostsEatenThisGame           = 0;
+		mTimeRemainingInPoweredUpState = 0.0f;
 
-	mRemainingDots                 = 0;
-	mAmountOfPacmanDeathsThisGame  = 0;
+		mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
 
-	mExtraLifeCount                = STARTING_LIFE_COUNT;
-	mPlayerIsPoweredUp             = false;
-	mCurrentScore                  = 0;
-	mCurrentHighScore              = LoadInCurrentHighScore();
+		mPlayerIsAlive                 = true;
+		mGameIsPaused                  = false;
 
-	mTimeRemainingInPoweredUpState = 0.0f;
+		mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
 
-	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
+		mGhostsEatenStreak             = 0;
 
-	mPlayerIsAlive                 = true;
-	mGameIsPaused                  = false;
+		mTimeRemainingInPreGameState   = 0.0f;
+		mInPreGameState                = false;
+	}
+	else
+	{
+		// Setting the values for the start of the program itself
+		mPlayerName                    = "UNNAMED";
+		mCurrentLevelID                = 0;
+		mPlayerNameColourIndex         = 1;
 
-	mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
+		mDotsCollectedThisGame         = 0;
+		mGhostsEatenThisGame           = 0;
 
-	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
+		mRemainingDots                 = 0;
+		mAmountOfPacmanDeathsThisGame  = 0;
 
-	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
+		mExtraLifeCount                = STARTING_LIFE_COUNT;
+		mPlayerIsPoweredUp             = false;
+		mCurrentScore                  = 0;
+		mCurrentHighScore              = LoadInCurrentHighScore();
 
-	mGhostsEatenStreak             = 0;
+		mTimeRemainingInPoweredUpState = 0.0f;
 
-	mTimeRemainingInPreGameState   = TIME_IN_PRE_GAME;
-	mInPreGameState                = true;
+		mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
+
+		mPlayerIsAlive                 = true;
+		mGameIsPaused                  = false;
+
+		mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
+
+		mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
+
+		mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
+
+		mGhostsEatenStreak			   = 0;
+
+		mTimeRemainingInPreGameState   = TIME_IN_PRE_GAME;
+		mInPreGameState				   = true;
+	}
 }
 
 // ---------------------------------------------------------------- //
@@ -90,7 +114,7 @@ void GameManager::SetDotCounts()
 
 void GameManager::RestartLevel()
 {
-	SetVariablesToStartingValues();
+	SetVariablesToStartingValues(true);
 }
 
 // ---------------------------------------------------------------- //

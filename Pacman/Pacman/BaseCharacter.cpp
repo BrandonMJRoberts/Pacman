@@ -155,20 +155,11 @@ void BaseCharacter::Render(const unsigned int frameCount)
 
 void BaseCharacter::Update(const float deltaTime)
 {
-	//if (mTimePerChangeDirectionRemaining > 0.0f)
-	//	mTimePerChangeDirectionRemaining -= deltaTime;
-
 	// Now check if the player has hit the edge of the playable area so loop
 	EdgeCheck();
-
-	// Now move the player in the correct direction
-	//MoveInCurrentDirection(deltaTime);
-
-	//CheckForDirectionChange();
 }
 
 // -------------------------------------------------------------------------------- //
-
 
 void BaseCharacter::HandleInput()
 {

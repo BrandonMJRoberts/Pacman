@@ -70,9 +70,9 @@ public:
 	void                  IncrementPlayerCharacter();
 
 	// Extra lives
-	unsigned int          GetExtraLivesCount()                          const { return mExtraLifeCount; }
+	int                   GetExtraLivesCount()                          const { return mExtraLifeCount; }
 	void                  AddExtraLife()                                      { mExtraLifeCount++; }
-	void                  RemoveLife()                                        { if (mExtraLifeCount > 0) mExtraLifeCount--; }
+	void                  RemoveLife()                                        { mExtraLifeCount--; }
 	void                  SetCurrentExtraLifeCount(unsigned int newVal)       { mExtraLifeCount = newVal; }
 	 
 	// Collectables
@@ -105,7 +105,7 @@ private:
 	GameManager();
 	void                SetDotCounts();
 	unsigned int        LoadInCurrentHighScore();
-	void                SetVariablesToStartingValues();
+	void                SetVariablesToStartingValues(bool resettingLevel);
 
 	// static instance
 	static GameManager* mInstance;
@@ -116,7 +116,7 @@ private:
 	unsigned int		mCurrentLevelID;
 	unsigned int        mCurrentScore;
 	unsigned int        mCurrentHighScore;
-	unsigned int        mExtraLifeCount;
+	int                 mExtraLifeCount;
 	unsigned int	    mRemainingDots;
 
 	unsigned int        mDotsCollectedThisGame;

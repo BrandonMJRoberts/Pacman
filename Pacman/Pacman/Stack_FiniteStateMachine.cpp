@@ -97,9 +97,32 @@ Stack_FiniteStateMachine_Pacman::~Stack_FiniteStateMachine_Pacman()
 
 // --------------------------------------------------------------------------------//
 
-void Stack_FiniteStateMachine_Pacman::PushToStack(BaseState_Pacman* newState)
+void Stack_FiniteStateMachine_Pacman::PushToStack(PACMAN_STATE_TYPES newState)
 {
+	switch (newState)
+	{
+	case PACMAN_STATE_TYPES::CHASE:
 
+	break;
+
+	case PACMAN_STATE_TYPES::FLEE:
+
+	break;
+
+	case PACMAN_STATE_TYPES::COLLECT_DOTS:
+
+	break;
+
+	case PACMAN_STATE_TYPES::COLLECT_FRUIT:
+
+	break;
+
+	case PACMAN_STATE_TYPES::COLLECT_POWERUP:
+
+	break;
+
+	default: break;
+	}
 }
 
 // --------------------------------------------------------------------------------//

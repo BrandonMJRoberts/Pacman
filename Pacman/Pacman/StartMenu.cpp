@@ -123,6 +123,8 @@ SCREENS StartMenu::Update(const float deltaTime)
 				// Play the audio for the game start
 				AudioManager::GetInstance()->PlayGameStartSFX();
 
+				GameManager::Instance()->SetCurrentExtraLifeCount(STARTING_LIFE_COUNT); // Reset the starting life count
+
 				return SCREENS::IN_GAME;
 			break;
 

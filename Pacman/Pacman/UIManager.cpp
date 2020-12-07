@@ -160,7 +160,7 @@ void UIManager::RenderExtraLives()
 	{
 		if (mExtraLifeSourceRenderRect.X == 0)
 		{
-			float xOffset = 0.0f, extraLifeSingleSpriteWidth = mExtraLivesSpriteSheet->GetWidth() / mAmountOfSpritesOnExtraLifeSpriteSheet;
+			float xOffset = 0.0f, extraLifeSingleSpriteWidth = mExtraLivesSpriteSheet->GetWidth() / float(mAmountOfSpritesOnExtraLifeSpriteSheet);
 
 			switch (GameManager::Instance()->GetPlayerCharacterType())
 			{
@@ -186,11 +186,11 @@ void UIManager::RenderExtraLives()
 			}
 
 			// Setup the extra life render rect
-			mExtraLifeSourceRenderRect = S2D::Rect(xOffset, 0, extraLifeSingleSpriteWidth, mExtraLivesSpriteSheet->GetHeight());
+			mExtraLifeSourceRenderRect = S2D::Rect(xOffset, 0, (int)extraLifeSingleSpriteWidth, mExtraLivesSpriteSheet->GetHeight());
 		}
 
 		// Now render the extra lives icons
-		for (unsigned int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
+		for (int lifeID = 0; lifeID < GameManager::Instance()->GetExtraLivesCount(); lifeID++)
 		{
 			S2D::SpriteBatch::Draw( mExtraLivesSpriteSheet,
 				                  &(mExtraLivesStartTopRightPos - S2D::Vector2(34.0f * lifeID, 0.0f)),

@@ -464,14 +464,71 @@ void Ghost::ToggleDoorToHome()
 	// First convert the collision map into a non-const array and then change the door to be open/closed
 	if (mDoorIsOpen)
 	{
-		mCollisionMap[14][12] = '1';
+		mCollisionMap[12][13] = '1';
 	}
 	else
 	{
-		mCollisionMap[14][12] = '0';
+		mCollisionMap[12][13] = '0';
 	}
 
 	mDoorIsOpen = !mDoorIsOpen;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::ResetGhostFromDeath()
+{
+	// Reset the position
+	mCentrePosition = mStartPosition;
+
+	// Reset the facing direction
+	mCurrentFacingDirection = FACING_DIRECTION::NONE;
+
+	// Set the starting, ending and current frames
+	switch (mThisGhostType)
+	{
+	case GHOST_TYPE::RED:
+		mStartFrame = 0;
+		mEndFrame   = 1;
+	break;
+
+	case GHOST_TYPE::ORANGE:
+		mStartFrame = 24;
+		mEndFrame   = 25;
+	break;
+
+	case GHOST_TYPE::PINK:
+		mStartFrame = 8;
+		mEndFrame   = 9;
+	break;
+
+	case GHOST_TYPE::BLUE:
+		mStartFrame = 16;
+		mEndFrame   = 17;
+	break;
+
+	default: break;
+	}
+
+	mColourBaseEndFrame   = mEndFrame;
+	mColourBaseStartFrame = mStartFrame;
+	mCurrentFrame         = mStartFrame;
+	
+	// Reset the movement speed
+	mMovementSpeed = GHOST_MOVEMENT_SPEED;
+
+	mIsAlive       = true;
+	mIsHome        = false;
+
+	// If it is AI controlled then reset the state machine
+	if (!mIsPlayerControlled && mStateMachine)
+	{
+		while (mStateMachine->PeekStack())
+			mStateMachine->PopStack();
+
+		mStateMachine->PushToStack(GHOST_STATE_TYPE::CHASE);
+		mMoveToPos = mStartPosition; // Reset the move to position so that the ghost actually can move to a position witin range
+	}
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //

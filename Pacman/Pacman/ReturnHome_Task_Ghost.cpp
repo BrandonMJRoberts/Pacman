@@ -66,9 +66,11 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 			}
 		}
 
-		// We can go to the exit home state from here
-		if (ghost->GetIsHome())
+		if (int(ghost->GetCentrePosition().X) == mHomeCentrePos.X &&
+			int(ghost->GetCentrePosition().Y) == mHomeCentrePos.Y)
 		{
+			ghost->SetIsHome(true);
+
 			ghost->ToggleDoorToHome();
 
 			// Remove this task and then tell the ghost to leave the home

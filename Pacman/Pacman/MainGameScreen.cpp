@@ -123,7 +123,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		CheckForCharacterCollisions();
 
 		// Now check if the game is over due to death counter
-		if (GameManager::Instance()->GetExtraLivesCount() <= 0)
+		if (GameManager::Instance()->GetExtraLivesCount() < 0)
 			return SCREENS::MAIN_MENU;
 
 		// Update the game manager
@@ -272,32 +272,31 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 					if (GM->GetIsPlayerPoweredUp())
 					{
-						if (mGhosts[i])
+						if (mGhosts[i]->IsAlive() && GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
 						{
-							if (mGhosts[i]->IsAlive() && GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
-							{
-								// Remove the life if we are playing as a ghost
-								GameManager::Instance()->RemoveLife();
-							}
-							else
-							{
-								// Increase the amounts of ghost eaten this game
-								GM->IncrementGhostsEatenCount();
-							}
-
-							// Set this ghost as being dead and eaten
-							mGhosts[i]->SetGhostIsEaten(true);
-							mGhosts[i]->SetIsAlive(false);
-
-							// Display the points
-							UIManager::GetInstance()->DisplayPoints(mPacman->GetCentrePosition(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
-
-							// Play the correct audio track
-							AudioManager::GetInstance()->PlayEatingGhostSFX();
-
-							// Also play the sfx for the ghosts going to their home
-							AudioManager::GetInstance()->PlayGhostGoingToHomeSFX();
+							// Remove the life if we are playing as a ghost
+							GameManager::Instance()->RemoveLife();
 						}
+						else
+						{
+							// Increase the amounts of ghost eaten this game
+							GM->IncrementGhostsEatenCount();
+						}
+
+						// Set this ghost as being dead and eaten
+						mGhosts[i]->SetGhostIsEaten(true);
+						mGhosts[i]->SetIsAlive(false);
+
+						// Display the points
+						UIManager::GetInstance()->DisplayPoints(mPacman->GetCentrePosition(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
+
+						// Play the correct audio track
+						AudioManager::GetInstance()->PlayEatingGhostSFX();
+
+						// Also play the sfx for the ghosts going to their home
+						AudioManager::GetInstance()->PlayGhostGoingToHomeSFX();
+
+						return;
 					}
 					else
 					{
@@ -310,15 +309,24 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 								// Increase the amount of pacman kills the player has currently got this game
 								GameManager::Instance()->IncreasePacmanDeathCounter();
-
 							}
 
+							// Kill pacman
 							mPacman->SetIsAlive(false);
+
+							// We also need to make sure that the ghosts are reset when pacman dies
+							for (unsigned int i = 0; i < mGhosts.size(); i++)
+							{
+								if(mGhosts[i])
+									mGhosts[i]->ResetGhostFromDeath();
+							}
 
 							if (GameManager::Instance()->GetExtraLivesCount() > 1)
 								AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
 							else
 								AudioManager::GetInstance()->PlayPacmanDeathSFX_2();
+
+							return;
 						}
 					}
 				}

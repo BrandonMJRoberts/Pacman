@@ -42,6 +42,8 @@ public:
 
 	void ToggleDoorToHome();
 
+	void ResetGhostFromDeath();
+
 private:
 	void CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
 

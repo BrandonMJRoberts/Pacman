@@ -20,6 +20,17 @@ enum class GHOST_STATE_TYPE
 
 // ------------------------------------------------------------------------------------------------------ //
 
+enum class PACMAN_STATE_TYPES
+{
+	CHASE = 0,
+	FLEE,
+	COLLECT_DOTS,
+	COLLECT_POWERUP,
+	COLLECT_FRUIT
+};
+
+// ------------------------------------------------------------------------------------------------------ //
+
 // Ghost's state machine
 class Stack_FiniteStateMachine_Ghost final
 {
@@ -50,7 +61,7 @@ public:
 
 	BaseState_Pacman*		 PeekStack();
 	void                     PopStack();
-	void                     PushToStack(BaseState_Pacman* newState);
+	void                     PushToStack(PACMAN_STATE_TYPES newState);
 
 private:
 	std::vector<BaseState_Pacman*> mCurrentStack;

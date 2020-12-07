@@ -37,7 +37,11 @@ private:
 	void             UpdateAsPlayerControlled(const float deltaTime);
 	void             UpdateAsAI();
 
+	void             ResetPacmanFromDeath();
+
 	Stack_FiniteStateMachine_Pacman* mStateMachine;
+
+	bool                             mDeathAnimationIsComplete;
 };
 
 #endif

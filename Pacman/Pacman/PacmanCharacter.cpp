@@ -4,6 +4,7 @@
 #include "GameManager.h"
 
 #include "Stack_FiniteStateMachine.h"
+#include "AudioManager.h"
 
 #include <iostream>
 
@@ -39,7 +40,8 @@ PacmanCharacter::PacmanCharacter(char** const       collisionMap,
 
 	mMovementSpeed      = PACMAN_MOVEMENT_SPEED;
 
-	mFramesPerAnimation = 6;
+	mFramesPerAnimation       = 6;
+	mDeathAnimationIsComplete = false;
 }
 
 // ------------------------------------------------------------- //
@@ -131,6 +133,17 @@ void PacmanCharacter::Update(const float deltaTime)
 		else
 			UpdateAsAI();
 	}
+	else
+	{
+		if (mDeathAnimationIsComplete)
+		{
+			GameManager::Instance()->RestartLevel();
+			AudioManager::GetInstance()->StopAllAudio();
+
+			// Make sure everything is reset
+			ResetPacmanFromDeath();
+		}
+	}
 }
 
 // ------------------------------------------------------------- //
@@ -213,8 +226,13 @@ void PacmanCharacter::Render(const unsigned int frameCount)
 		mCurrentFrame++;
 
 		// This is the pacman specific code - this is done to reduce the required size of the sprite sheet to save memory
-		if (mCurrentFrame == mEndFrame && mCurrentFrame != 8)
-			mCurrentFrame = 8;
+		if (mCurrentFrame == mEndFrame)
+		{
+			if (mIsAlive && mCurrentFrame != 8)
+				mCurrentFrame = 8;
+			else if (!mIsAlive)
+				mDeathAnimationIsComplete = true;
+		}
 		else if (mCurrentFrame > mEndFrame)
 			mCurrentFrame = mStartFrame;
 	}
@@ -239,22 +257,53 @@ void PacmanCharacter::Render(const unsigned int frameCount)
 
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mMainSpriteSheet,
-			&(GameManager::Instance()->GetGridOffset() + mRenderPosition),
-			&mSourceRect); // Draws Pacman
+			                 &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                 &mSourceRect); // Draws Pacman
 	}
 	else
 	{
 		// First calculate the source rect
-		mSourceRect.X = float((mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
+		mSourceRect.X = float(   (mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
 		mSourceRect.Y = float(int(mCurrentFrame / mSpritesOnWidthAlternate) * mSingleSpriteHeightAlternate);
 
 		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthAlternate * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightAlternate * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;
 
 		// Now render the character in the correct position, 0.0 being the top left of the screen
 		S2D::SpriteBatch::Draw(mAlternateSpritesSheet,
-			&(GameManager::Instance()->GetGridOffset() + mRenderPosition),
-			&mSourceRect); // Draws Pacman
+			                  &(GameManager::Instance()->GetGridOffset() + mRenderPosition),
+			                  &mSourceRect); // Draws Pacman
 	}
+}
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::ResetPacmanFromDeath()
+{
+	mIsAlive      = true;
+
+	mCurrentFrame = 8;
+	mEndFrame     = 8;
+	mStartFrame   = 8;
+
+	mCentrePosition = mStartPosition;
+	mTargetPositon  = mStartPosition;
+
+	mDeathAnimationIsComplete = false;
+
+	mCurrentFacingDirection = FACING_DIRECTION::NONE;
+
+	if (mStateMachine && !mIsPlayerControlled)
+	{
+		while (mStateMachine->PeekStack())
+		{
+			// Clear the state machine of anything that is on it
+			mStateMachine->PopStack();
+		}
+	}
+
+	// Now add the default behavior if is AI controlled
+	if (!mIsPlayerControlled && mStateMachine)
+		mStateMachine->PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
 }
 
 // ------------------------------------------------------------- //
