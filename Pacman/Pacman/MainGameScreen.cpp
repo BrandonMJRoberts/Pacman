@@ -83,48 +83,52 @@ void MainGameScreen::Render(const unsigned int frameCount)
 
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
-	// Update the dots in the level
-	if (mPacman)
+	if (!GameManager::Instance()->GetIsInPreGameState())
 	{
-		mPacman->Update(deltaTime);
-		mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
+		// Update the dots in the level
+		if (mPacman)
+		{
+			mPacman->Update(deltaTime);
+			mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
+		}
+
+		// First check if the level is over
+		if (GameManager::Instance()->GetRemainingDots() == 0)
+		{
+			// Increase the level in the game manager
+			GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
+
+			// Reset the player
+			mPacman->ResetCharacter();
+
+			// Make sure we change the background colour to being the next level's
+			mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
+
+			delete mCollectable;
+			mCollectable = nullptr;
+		}
+
+		// Update all ghosts
+		for (unsigned int i = 0; i < mGhosts.size(); i++)
+		{
+			if (mGhosts[i])
+				mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
+		}
+
+		HandleCollectable(deltaTime);
+
+		// Now check if pacman has collided with any of the ghosts
+		CheckForCharacterCollisions();
+
+		// Now check if the game is over due to death counter
+		if (GameManager::Instance()->GetExtraLivesCount() <= 0)
+			return SCREENS::MAIN_MENU;
+
+		// Update the game manager
+		UIManager::GetInstance()->Update(deltaTime);
 	}
 
-	// First check if the level is over
-	if (GameManager::Instance()->GetRemainingDots() == 0)
-	{
-		// Increase the level in the game manager
-		GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
-
-		// Reset the player
-		mPacman->ResetCharacter();
-
-		// Make sure we change the background colour to being the next level's
-		mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
-
-		delete mCollectable;
-		mCollectable = nullptr;
-	}
-
-	// Update all ghosts
-	for (unsigned int i = 0; i < mGhosts.size(); i++)
-	{
-		if (mGhosts[i])
-			mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
-	}
-
-	HandleCollectable(deltaTime);
-
-	// Now check if pacman has collided with any of the ghosts
-	CheckForCharacterCollisions();
-
-	// Now check if the game is over due to death counter
-	if (GameManager::Instance()->GetExtraLivesCount() <= 0)
-		return SCREENS::MAIN_MENU;
-
-	// Update the game manager
 	GameManager::Instance()->Update(deltaTime);
-	UIManager::GetInstance()->Update(deltaTime);
 
 	// Input
 	return InGameInputCheck();

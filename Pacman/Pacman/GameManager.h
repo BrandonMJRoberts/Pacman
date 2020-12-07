@@ -18,65 +18,65 @@ public:
 	void                  Update(const float deltaTime);
 
 	// Dot count
-	unsigned int          GetRemainingDots()			                      { return mRemainingDots; }
+	unsigned int          GetRemainingDots()			                const { return mRemainingDots; }
 	void                  SetCurrentDotCount(const unsigned int count)        { mRemainingDots = count; }
 	void                  DecreaseRemainingDots(const unsigned int amount)    { mRemainingDots -= amount; }
 
 	// Dots collected and ghosts eaten
-	unsigned int         GetCurrentAmountOfDotsEaten()                        { return mDotsCollectedThisGame; }
+	unsigned int         GetCurrentAmountOfDotsEaten()                  const { return mDotsCollectedThisGame; }
 	void                 IncrementDotsEatenCount()                            { mDotsCollectedThisGame++; }
 	void                 ResetDotsEatenCount()                                { mDotsCollectedThisGame = 0; }
 
-	unsigned int         GetAmountOfGhostsEatenthisGame()                     { return mGhostsEatenThisGame; }
+	unsigned int         GetAmountOfGhostsEatenthisGame()               const { return mGhostsEatenThisGame; }
 	void                 IncrementGhostsEatenCount();
 
-	unsigned int         GetAmountOfGhostsEatenStreak()                       { return mGhostsEatenStreak; }
+	unsigned int         GetAmountOfGhostsEatenStreak()                 const { return mGhostsEatenStreak; }
 	void                 ResetGhostsEatenCount()                              { mGhostsEatenThisGame = 0; }
 
 	// Levels
 	void                  SetCurrentLevel(unsigned int newID)                 { mCurrentLevelID = newID; }
-	unsigned int          GetCurrentLevel()                                   { return mCurrentLevelID; }
+	unsigned int          GetCurrentLevel()                             const { return mCurrentLevelID; }
 
 	// Scores
 	void                  AddToScore(unsigned int addition)                   { mCurrentScore += addition;  mPointsRemainingTillNextLife -= addition; }
-	unsigned int          GetCurrentScore()			                          { return mCurrentScore; }
+	unsigned int          GetCurrentScore()			                  const   { return mCurrentScore; }
 	void                  SetCurrentScore(unsigned int newVal)                { mCurrentScore = newVal; }
 	void                  ResetScoreForExtraLife()                            { mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE; }
 
 	// Highscores
 	unsigned int          SetCurrentHighScore(unsigned int score)             { mCurrentHighScore = score; }
-	unsigned int          GetCurrentHighScore()                               { return mCurrentHighScore; }
+	unsigned int          GetCurrentHighScore()                         const { return mCurrentHighScore; }
 
 	// Powered up
 	void                  SetPlayerPoweredUp(bool playerState);
-	bool                  GetIsPlayerPoweredUp()                              { return mPlayerIsPoweredUp; }
+	bool                  GetIsPlayerPoweredUp()                        const { return mPlayerIsPoweredUp; }
 
 	// Grid offset
-	S2D::Vector2          GetGridOffset()                                     { return mGridOffsetFromTopLeft; }
+	S2D::Vector2          GetGridOffset()                              const { return mGridOffsetFromTopLeft; }
 
 	// Alive state
-	bool                  GetPlayerIsAlive()					              { return mPlayerIsAlive; }
+	bool                  GetPlayerIsAlive()					        const { return mPlayerIsAlive; }
 	void                  SetPlayerIsAlive(bool newVal)                       { mPlayerIsAlive = newVal; }
 
 	// Pause
-	bool                  GetGameIsPaused()                                   { return mGameIsPaused; }
+	bool                  GetGameIsPaused()                             const { return mGameIsPaused; }
 	void                  SetGameIsPaused(bool newVal)                        { mGameIsPaused = newVal; }
-	bool                  GetIsAlreadySettingGamePaused()                     {  return mSettingGamePausedState; }
+	bool                  GetIsAlreadySettingGamePaused()               const {  return mSettingGamePausedState; }
 	void                  SetIsPausedButtonPressed(bool newVal)               { mSettingGamePausedState = newVal; }
 
 	// Player character type
-	PLAYER_CHARACTER_TYPE GetPlayerCharacterType()                            { return mPlayerCharacterType; }
+	PLAYER_CHARACTER_TYPE GetPlayerCharacterType()                      const { return mPlayerCharacterType; }
 	void                  SetPlayerCharacter(PLAYER_CHARACTER_TYPE newType)   { mPlayerCharacterType = newType; }
 	void                  IncrementPlayerCharacter();
 
 	// Extra lives
-	unsigned int          GetExtraLivesCount()                                { return mExtraLifeCount; }
+	unsigned int          GetExtraLivesCount()                          const { return mExtraLifeCount; }
 	void                  AddExtraLife()                                      { mExtraLifeCount++; }
 	void                  RemoveLife()                                        { if (mExtraLifeCount > 0) mExtraLifeCount--; }
 	void                  SetCurrentExtraLifeCount(unsigned int newVal)       { mExtraLifeCount = newVal; }
 	 
 	// Collectables
-	PICKUP_TYPES          GetThisLevelCollectableType()                       { return mThisLevelCollectableSpawnType; }
+	PICKUP_TYPES          GetThisLevelCollectableType()                 const { return mThisLevelCollectableSpawnType; }
 	void                  SetLevelPickupType(PICKUP_TYPES newType)            { mThisLevelCollectableSpawnType = newType; }
 
 	// Loading/restarting levels
@@ -84,11 +84,11 @@ public:
 	void                  LoadLevel(const unsigned int newLevelID);
 
 	// Player name
-	string                GetPlayerName()                                     { return mPlayerName; }
+	string                GetPlayerName()                               const { return mPlayerName; }
 	void                  SetPlayerName(string newName)                       { mPlayerName = newName; }
 
 	// Player name colour index
-	unsigned int          GetPlayerNameColourIndex()                          { return mPlayerNameColourIndex; }
+	unsigned int          GetPlayerNameColourIndex()                    const { return mPlayerNameColourIndex; }
 	void                  SetPlayerColourIndex(unsigned int newVal)           { mPlayerNameColourIndex = newVal % 7; }
 	void                  IncrementPlayerColourIndex()                        { mPlayerNameColourIndex = (mPlayerNameColourIndex + 1) % 7; }
 
@@ -96,7 +96,10 @@ public:
 	void                  SaveOutScoreToLeaderboard();
 
 	void                  IncreasePacmanDeathCounter()                        { ++mAmountOfPacmanDeathsThisGame; }
-	unsigned int          GetAmountOfPacmanDeathsThisGame()                   { return mAmountOfPacmanDeathsThisGame; }
+	unsigned int          GetAmountOfPacmanDeathsThisGame()             const { return mAmountOfPacmanDeathsThisGame; }
+
+	bool GetIsInPreGameState()                                          const { return mInPreGameState; }
+
 private:
 	GameManager();
 	void                SetDotCounts();
@@ -124,6 +127,8 @@ private:
 	int                 mPointsRemainingTillNextLife;
 	float               mTimeRemainingInPoweredUpState;
 
+	float               mTimeRemainingInPreGameState;
+
 	// Player name data
 	string              mPlayerName;
 	unsigned int        mPlayerNameColourIndex;
@@ -141,6 +146,8 @@ private:
 	// Game state
 	bool                mGameIsPaused;
 	bool                mSettingGamePausedState;
+
+	bool                mInPreGameState;
 };
 
 #endif // !_GAME_MANAGER_H_

@@ -71,9 +71,12 @@ void GameManager::SetVariablesToStartingValues()
 
 	mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
 
-	mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE;
+	mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
 
-	mGhostsEatenStreak = 0;
+	mGhostsEatenStreak             = 0;
+
+	mTimeRemainingInPreGameState   = TIME_IN_PRE_GAME;
+	mInPreGameState                = true;
 }
 
 // ---------------------------------------------------------------- //
@@ -108,31 +111,37 @@ void GameManager::SetPlayerPoweredUp(bool playerState)
 
 void GameManager::Update(const float deltaTime)
 {
-	// First handle the powerup timer
-	if (mTimeRemainingInPoweredUpState > 0)
+	if (mInPreGameState)
 	{
-		mTimeRemainingInPoweredUpState -= deltaTime;
+		if (mTimeRemainingInPreGameState > 0)
+			mTimeRemainingInPreGameState -= deltaTime;
+		else
+			mInPreGameState = false;
 	}
-
-	if (mTimeRemainingInPoweredUpState <= 0 && mPlayerIsPoweredUp)
+	else
 	{
-		SetPlayerPoweredUp(false);
-	}
+		// First handle the powerup timer
+		if (mTimeRemainingInPoweredUpState > 0)
+			mTimeRemainingInPoweredUpState -= deltaTime;
 
-	// Check if the current score has beaten the current highscore
-	if (mCurrentScore > mCurrentHighScore)
-		mCurrentHighScore = mCurrentScore;
+		if (mTimeRemainingInPoweredUpState <= 0 && mPlayerIsPoweredUp)
+			SetPlayerPoweredUp(false);
 
-	// You get an extra life after collecting 10,000 points
-	if (mPointsRemainingTillNextLife <= 0)
-	{
-		if (mExtraLifeCount < 5)
+		// Check if the current score has beaten the current highscore
+		if (mCurrentScore > mCurrentHighScore)
+			mCurrentHighScore = mCurrentScore;
+
+		// You get an extra life after collecting 10,000 points
+		if (mPointsRemainingTillNextLife <= 0)
 		{
-			AddExtraLife();
-			AudioManager::GetInstance()->PlayExtraLifeSFX();
-		}
+			if (mExtraLifeCount < 5)
+			{
+				AddExtraLife();
+				AudioManager::GetInstance()->PlayExtraLifeSFX();
+			}
 
-		mPointsRemainingTillNextLife += POINTS_PER_EXTRA_LIFE;
+			mPointsRemainingTillNextLife += POINTS_PER_EXTRA_LIFE;
+		}
 	}
 }
 
