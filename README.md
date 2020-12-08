@@ -3,13 +3,13 @@
 ### The main features of this project are:
 - Fully AI controlled ghosts of all four colours with the origional game's seek positions
 - Being able to play as Pacman or a Ghost for an unique experience
-- If you choose to play as a Ghost then PacMan becomes full AI controlled for a different game
+- If you choose to play as a Ghost then Pacman becomes full AI controlled for a different game mode
 - A top 10 highscore table
   - You can set your name from the main menu
-    - Max 7 characters
-    - You can select one of 7 colours by pressing enter on the name enter option
+   - Max 7 characters
+   - You can select one of 7 colours by pressing enter on the name enter option
 - Fully working animations for Pacman and the Ghosts
-  - In life and after death
+  - In life and during death
 - Looping around the screen when you exit from the left or right
   - This works for both Pacman and the Ghosts
 - Fully working collision with the maze and other characters
