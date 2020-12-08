@@ -6,7 +6,7 @@
 - If you choose to play as a Ghost then Pacman becomes full AI controlled for a different game mode
 - A top 10 highscore table
   - You can set your name from the main menu
-   - Max 7 characters
+   - Max 7 characters for a name
    - You can select one of 7 colours by pressing enter on the name enter option
 - Fully working animations for Pacman and the Ghosts
   - In life and during death
