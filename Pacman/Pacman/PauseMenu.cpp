@@ -27,7 +27,7 @@ PauseMenu::PauseMenu() : BaseMenu()
 		return;
 	}
 
-	mPauseMenuTextPosition                  = S2D::Vector2(HALF_SCREEN_WIDTH + (4 * SPRITE_RESOLUTION), 100);                                                          // PAUSE MENU
+	mPauseMenuTextPosition                  = S2D::Vector2(HALF_SCREEN_WIDTH   + (4 * SPRITE_RESOLUTION), 100);                                                          // PAUSE MENU
 	mCurrentScoreTextPosition               = S2D::Vector2(QUATER_SCREEN_WIDTH / 4, mPauseMenuTextPosition.Y           + (2 * TWICE_SPRITE_RESOLUTION)); // CURRENT SCORE: SCORE
 	mHighScoreTextPosition                  = S2D::Vector2(QUATER_SCREEN_WIDTH / 4, mCurrentScoreTextPosition.Y        + TWICE_SPRITE_RESOLUTION); // HIGH SCORE: SCORE
 	mRemainingLivesCountTextPosition        = S2D::Vector2(QUATER_SCREEN_WIDTH / 4, mHighScoreTextPosition.Y           + TWICE_SPRITE_RESOLUTION); // EXTRA LIVES: count

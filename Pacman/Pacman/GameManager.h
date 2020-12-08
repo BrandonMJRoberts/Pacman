@@ -41,7 +41,7 @@ public:
 	void                  AddToScore(unsigned int addition)                   { mCurrentScore += addition;  mPointsRemainingTillNextLife -= addition; }
 	unsigned int          GetCurrentScore()			                  const   { return mCurrentScore; }
 	void                  SetCurrentScore(unsigned int newVal)                { mCurrentScore = newVal; }
-	void                  ResetScoreForExtraLife()                            { mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE; }
+	void                  ResetScoreForExtraLife();
 
 	// Highscores
 	unsigned int          SetCurrentHighScore(unsigned int score)             { mCurrentHighScore = score; }
@@ -99,7 +99,11 @@ public:
 	unsigned int          GetAmountOfPacmanDeathsThisGame()             const { return mAmountOfPacmanDeathsThisGame; }
 
 	bool                  GetIsInPreGameState()                         const { return mInPreGameState; }
-	void                  ResetPreGameTimer() { mTimeRemainingInPreGameState = TIME_IN_PRE_GAME; mInPreGameState = true; }
+	void                  ResetPreGameTimer()                                 { mTimeRemainingInPreGameState = TIME_IN_PRE_GAME; mInPreGameState = true; }
+
+	unsigned int          GetAmountOfGhostsReleased()                   const { return mAmountOfGhostsReleased; }
+	void                  ResetAmountOfGhostsReleased()                       { mAmountOfGhostsReleased = 1; }
+	void                  IncreaseAmountOfGhostsReleased()                    { mAmountOfGhostsReleased++; }
 
 private:
 	GameManager();
@@ -118,6 +122,8 @@ private:
 	unsigned int        mCurrentHighScore;
 	int                 mExtraLifeCount;
 	unsigned int	    mRemainingDots;
+
+	unsigned int        mAmountOfGhostsReleased;
 
 	unsigned int        mDotsCollectedThisGame;
 	unsigned int        mGhostsEatenThisGame;

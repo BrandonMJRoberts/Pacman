@@ -45,27 +45,16 @@ GameManager* GameManager::Instance()
 
 void GameManager::SetVariablesToStartingValues(bool resettingLevel)
 {
-	if (resettingLevel)
-	{
-		// Setting values for the re-setting of an already running level
-		mPlayerIsPoweredUp             = false;
-		mCurrentScore                  = 0;
+	mPlayerIsPoweredUp             = false;
+	mTimeRemainingInPoweredUpState = 0.0f;
+	mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
+	mPlayerIsAlive                 = true;
+	mGameIsPaused                  = false;
+	mGhostsEatenStreak             = 0;
+	mInPreGameState                = false;
+	mTimeRemainingInPreGameState   = 0.0f;
 
-		mTimeRemainingInPoweredUpState = 0.0f;
-
-		mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
-
-		mPlayerIsAlive                 = true;
-		mGameIsPaused                  = false;
-
-		mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
-
-		mGhostsEatenStreak             = 0;
-
-		mTimeRemainingInPreGameState   = 0.0f;
-		mInPreGameState                = false;
-	}
-	else
+	if (!resettingLevel)
 	{
 		// Setting the values for the start of the program itself
 		mPlayerName                    = "UNNAMED";
@@ -79,27 +68,23 @@ void GameManager::SetVariablesToStartingValues(bool resettingLevel)
 		mAmountOfPacmanDeathsThisGame  = 0;
 
 		mExtraLifeCount                = STARTING_LIFE_COUNT;
-		mPlayerIsPoweredUp             = false;
-		mCurrentScore                  = 0;
 		mCurrentHighScore              = LoadInCurrentHighScore();
+		mCurrentScore                  = 0;
 
-		mTimeRemainingInPoweredUpState = 0.0f;
-
-		mGridOffsetFromTopLeft         = S2D::Vector2(0.0f, 100.0f);
-
-		mPlayerIsAlive                 = true;
 		mGameIsPaused                  = false;
 
 		mPlayerCharacterType           = PLAYER_CHARACTER_TYPE::PACMAN;
 
 		mThisLevelCollectableSpawnType = PICKUP_TYPES::CHERRY;
 
-		mPointsRemainingTillNextLife   = POINTS_PER_EXTRA_LIFE;
-
-		mGhostsEatenStreak			   = 0;
+		if(mPlayerCharacterType == PLAYER_CHARACTER_TYPE::PACMAN)
+			mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE_PACMAN;
+		else
+			mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE_GHOST;
 
 		mTimeRemainingInPreGameState   = TIME_IN_PRE_GAME;
 		mInPreGameState				   = true;
+		mAmountOfGhostsReleased        = 1;
 	}
 }
 
@@ -164,7 +149,7 @@ void GameManager::Update(const float deltaTime)
 				AudioManager::GetInstance()->PlayExtraLifeSFX();
 			}
 
-			mPointsRemainingTillNextLife += POINTS_PER_EXTRA_LIFE;
+			ResetScoreForExtraLife();
 		}
 	}
 }
@@ -303,17 +288,19 @@ unsigned int GameManager::LoadInCurrentHighScore()
 	}
 
 	// We just need to load in the first line of the file and get the score from it
-	char* cLine               = new char[100];
+	char*                     cLine = new char[100];
 	unsigned int              returnVal;
 	std::string               sLine, temp;
 	std::stringstream         ssLine;
 
 	readFile.getline(cLine, 100);
 
-	sLine = cLine;
+	sLine  = cLine;
 	ssLine = std::stringstream(sLine);
 
 	ssLine >> temp >> returnVal;
+
+	readFile.close();
 
 	// Clean up the memory allocated
 	delete[] cLine;
@@ -351,3 +338,15 @@ void GameManager::IncrementGhostsEatenCount()
 	break;
 	}
 }
+
+// --------------------------------------------------------------------------------- //
+
+void GameManager::ResetScoreForExtraLife()
+{
+	if (mPlayerCharacterType == PLAYER_CHARACTER_TYPE::PACMAN)
+		mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE_PACMAN;
+	else
+		mPointsRemainingTillNextLife = POINTS_PER_EXTRA_LIFE_GHOST;
+}
+
+// --------------------------------------------------------------------------------- //

@@ -3,6 +3,7 @@
 #include "Commons.h"
 
 #include "GameManager.h"
+#include "AudioManager.h"
 
 #include <iostream>
 
@@ -17,12 +18,13 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	         const unsigned int spritesOnWidthMain, 
 	         const unsigned int spritesOnHeightMain, 
 			 const unsigned int spritesOnWidthAlternate,
-			 const unsigned int spritesOnHeightAlternate) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate)
+			 const unsigned int spritesOnHeightAlternate, 
+	         const bool         startHome) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate)
 {
 	mThisGhostType            = ghostType;
 
 	mIsAlive                  = true;
-	mIsHome                   = false;
+	mIsHome                   = startHome;
 	mGhostIsFleeing           = false;
 	mGhostIsEaten             = false;
 
@@ -90,8 +92,17 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 	// First check if the ghost is player controlled
 	if (mIsPlayerControlled)
 	{
+		if (mTimePerChangeDirectionRemaining > 0.0f)
+			mTimePerChangeDirectionRemaining -= deltaTime;
+
+		MoveInCurrentDirection(deltaTime);
+
+		CheckForDirectionChange();
+
 		// Handle the player's input to determine which direction the ghost should go
 		HandleInput();
+
+		CheckForDirectionChange();
 	}
 	else
 	{
@@ -426,7 +437,10 @@ void Ghost::SetGhostIsEaten(bool newVal)
 	mGhostIsEaten = newVal;
 
 	if (!newVal)
+	{
+		AudioManager::GetInstance()->PauseGhostGoingToHomeSFX();
 		return;
+	}
 	else
 	{
 		switch (mCurrentFacingDirection)
@@ -454,6 +468,9 @@ void Ghost::SetGhostIsEaten(bool newVal)
 
 		mEndFrame     = mStartFrame;
 		mCurrentFrame = mStartFrame;
+
+		// Also play the sfx for the ghosts going to their home
+		AudioManager::GetInstance()->PlayGhostGoingToHomeSFX();
 	}
 }
 
@@ -517,8 +534,11 @@ void Ghost::ResetGhostFromDeath()
 	// Reset the movement speed
 	mMovementSpeed = GHOST_MOVEMENT_SPEED;
 
-	mIsAlive       = true;
-	mIsHome        = false;
+	mIsAlive	    = true;
+	mIsHome         = false;
+	mGhostIsFleeing = false;
+	mGhostIsEaten   = false;
+	mDoorIsOpen     = false;
 
 	// If it is AI controlled then reset the state machine
 	if (!mIsPlayerControlled && mStateMachine)

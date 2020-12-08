@@ -18,6 +18,7 @@ MainGameScreen::MainGameScreen() : BaseMenu()
 	LoadInDataForLevel();
 
 	GameManager::Instance()->ResetPreGameTimer();
+	GameManager::Instance()->ResetScoreForExtraLife(); // Make sure that the amount of points required for the next life are correctly set
 
 	UIManager::GetInstance()->AddCollectedPickup(GameManager::Instance()->GetThisLevelCollectableType());
 	UIManager::GetInstance()->ResetExtraLifeSprite();
@@ -50,7 +51,6 @@ MainGameScreen::~MainGameScreen()
 		mGhosts[i] = nullptr;
 	}
 	mGhosts.clear();
-
 }
 
 // ------------------------------------------------------------------------------ //
@@ -157,20 +157,60 @@ void MainGameScreen::LoadInDataForLevel()
 			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 4, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
 	}
 
+	// Create the ghosts 
 	if (mGhosts.size() == 0)
 	{
-		for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
+		S2D::Vector2 outSideHomeSpawn = S2D::Vector2(14.0f, 11.5f);
+
+		// First make sure that the player always spawns as the first ghost in the maze
+		if (GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
 		{
-			if (GameManager::Instance()->GetPlayerCharacterType() == (PLAYER_CHARACTER_TYPE)(i + 1))
-				mGhosts.push_back(new Ghost(S2D::Vector2(1.5f, 1.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)i, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));
-			else
-				mGhosts.push_back(new Ghost(S2D::Vector2(1.5f, 1.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)i, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2));
+			switch (GameManager::Instance()->GetPlayerCharacterType())
+			{
+			case PLAYER_CHARACTER_TYPE::RED_GHOST:
+				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::RED, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+			break;
+
+			case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
+				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::BLUE, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+			break;
+
+			case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
+				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::ORANGE, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+			break;
+
+			case PLAYER_CHARACTER_TYPE::PINK_GHOST:
+				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::PINK, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+			break;
+
+			default: break;
+			}
+
+			// Now create the remaining ghosts inside of the home
+			unsigned int GhostSpawnID = 0;
+			for (unsigned int i = 0; i < NUMBER_OF_GHOSTS_IN_LEVEL; i++)
+			{
+				if ((PLAYER_CHARACTER_TYPE)(i + 1) == GameManager::Instance()->GetPlayerCharacterType())
+					continue;
+				else
+				{
+					mGhosts.push_back(new Ghost(S2D::Vector2(12.0f + (GhostSpawnID * 2.0f), 14.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)(i), true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
+					GhostSpawnID++;
+				}
+			}
+		}
+		else
+		{
+			// Just create the ghosts normally - with the red ghost on the outside first
+			mGhosts.push_back(new Ghost(outSideHomeSpawn,           mBackground->GetCollisionMap(), GHOST_TYPE::RED,    true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+			mGhosts.push_back(new Ghost(S2D::Vector2(12.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::BLUE,   true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
+			mGhosts.push_back(new Ghost(S2D::Vector2(14.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::ORANGE, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
+			mGhosts.push_back(new Ghost(S2D::Vector2(16.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::PINK,   true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
 		}
 	}
 
 	mTimeTillNextCollectableSpawn = 10.0f;
-
-	mCollectable = nullptr;
+	mCollectable                  = nullptr;
 }
 
 // ------------------------------------------------------------------------------ //
@@ -253,28 +293,35 @@ void MainGameScreen::HandleCollectable(const float deltaTime)
 
 void MainGameScreen::CheckForCharacterCollisions()
 {
+	// Only do this if pacman has been created
 	if (mPacman)
 	{
 		S2D::Vector2 ghostCentre, pacmanCentre = mPacman->GetCentrePosition();
-		float accuracy = 0.5f;
+		float        accuracy = 0.5f;
 
 		// Loop through all of the ghosts and check for collisions
 		for (unsigned int i = 0; i < mGhosts.size(); i++)
 		{
+			// If the ghost exists and the ghost is not currently eaten
 			if (mGhosts[i] && !mGhosts[i]->GetIfGhostIsEaten())
 			{
+				// Get the ghost position
 				ghostCentre = mGhosts[i]->GetCentrePosition();
 
+				// Check for a collision between this ghost and pacman
 				if ((ghostCentre.X == pacmanCentre.X && ghostCentre.Y + accuracy > pacmanCentre.Y - accuracy && ghostCentre.Y - accuracy < pacmanCentre.Y + accuracy) ||
 					(ghostCentre.Y == pacmanCentre.Y && ghostCentre.X + accuracy > pacmanCentre.X - accuracy && ghostCentre.X - accuracy < pacmanCentre.X + accuracy))
 				{
+					// Gamemanager instance getting once and storing it, so we dont have to do it multiple times
 					GameManager* GM = GameManager::Instance();
 
+					// If the player is powered up
 					if (GM->GetIsPlayerPoweredUp())
 					{
+						// If there is a collision between this ghost and pacman, and the player is not playing as pacman, and this ghost is alive
 						if (mGhosts[i]->IsAlive() && GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
 						{
-							// Remove the life if we are playing as a ghost
+							// Then remove a life if we are playing as a ghost
 							GameManager::Instance()->RemoveLife();
 						}
 						else
@@ -293,16 +340,13 @@ void MainGameScreen::CheckForCharacterCollisions()
 						// Play the correct audio track
 						AudioManager::GetInstance()->PlayEatingGhostSFX();
 
-						// Also play the sfx for the ghosts going to their home
-						AudioManager::GetInstance()->PlayGhostGoingToHomeSFX();
-
 						return;
 					}
 					else
 					{
-						if (mPacman)
+						if (mPacman->IsAlive())
 						{
-							if (mPacman->IsAlive() && GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+							if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
 							{
 								// Remove a life
 								GameManager::Instance()->RemoveLife();
@@ -310,24 +354,27 @@ void MainGameScreen::CheckForCharacterCollisions()
 								// Increase the amount of pacman kills the player has currently got this game
 								GameManager::Instance()->IncreasePacmanDeathCounter();
 							}
-
-							// Kill pacman
-							mPacman->SetIsAlive(false);
-
-							// We also need to make sure that the ghosts are reset when pacman dies
-							for (unsigned int i = 0; i < mGhosts.size(); i++)
-							{
-								if(mGhosts[i])
-									mGhosts[i]->ResetGhostFromDeath();
-							}
-
-							if (GameManager::Instance()->GetExtraLivesCount() > 1)
-								AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
 							else
-								AudioManager::GetInstance()->PlayPacmanDeathSFX_2();
-
-							return;
+							{
+								// Make sure we add the needed points to the current score
+								GameManager::Instance()->AddToScore(POINTS_PER_PACMAN_KILL / GameManager::Instance()->GetAmountOfGhostsReleased());
+							}
 						}
+
+						// Kill pacman
+						mPacman->SetIsAlive(false);
+
+						// We also need to make sure that the ghosts are reset when pacman dies
+						for (unsigned int i = 0; i < mGhosts.size(); i++)
+						{
+							if(mGhosts[i])
+								mGhosts[i]->ResetGhostFromDeath();
+						}
+
+						// Play the pacman death SFX 
+						AudioManager::GetInstance()->PlayPacmanDeathSFX_1();
+
+						return;
 					}
 				}
 			}

@@ -33,6 +33,8 @@ public:
 	void PauseGhostFleeingSFX_4() { if (mGhostFleeingSFX_4) S2D::Audio::Pause(mGhostFleeingSFX_4); }
 	void PauseGhostFleeingSFX_5() { if (mGhostFleeingSFX_5) S2D::Audio::Pause(mGhostFleeingSFX_5); }
 
+	void PauseGhostGoingToHomeSFX() { if (mGhostGoingToHomeSFX) S2D::Audio::Pause(mGhostGoingToHomeSFX); }
+
 	void PlayGameStartSFX();
 
 	void StopAllAudio();

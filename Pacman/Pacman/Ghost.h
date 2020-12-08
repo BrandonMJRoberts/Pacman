@@ -14,16 +14,17 @@ class Ghost final : public BaseCharacter
 {
 public:
 	Ghost() = delete; // Make it so you cannot create a default ghost type
-	Ghost(const S2D::Vector2 startPos, 
-		  char** const       collisionMap, 
-		  const GHOST_TYPE   ghostType, 
-		  const bool		 isAIControlled, 
-		  const char*        filePathForColoured, 
-		  const char*        filePathForFlee, 
-		  const unsigned int spritesOnWidthMain, 
-		  const unsigned int spritesOnHeightMain, 
-		  const unsigned int spritesOnWidthAlternate, 
-		  const unsigned int spritesOnHeightAlternate);
+	Ghost(const S2D::Vector2 startPos,
+		  char** const       collisionMap,
+		  const GHOST_TYPE   ghostType,
+		  const bool		 isAIControlled,
+		  const char*        filePathForColoured,
+		  const char*        filePathForFlee,
+		  const unsigned int spritesOnWidthMain,
+		  const unsigned int spritesOnHeightMain,
+		  const unsigned int spritesOnWidthAlternate,
+		  const unsigned int spritesOnHeightAlternate,
+		  const bool         startsAtHome);
 	~Ghost() override;
 
 	void Render(const unsigned int frameCount) override;
