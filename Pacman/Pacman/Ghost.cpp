@@ -136,7 +136,7 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 void Ghost::CheckForDirectionChange()
 {
 	// Now check to see if the player can change direction 
-	if (mRequestedFacingDirection == FACING_DIRECTION::NONE)
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
 	{
 		// Quick out if the player has not entered anything
 		return;
@@ -532,7 +532,7 @@ void Ghost::ResetGhostFromDeath()
 	mCurrentFrame         = mStartFrame;
 	
 	// Reset the movement speed
-	mMovementSpeed = GHOST_MOVEMENT_SPEED;
+	mMovementSpeed  = GHOST_MOVEMENT_SPEED;
 
 	mIsAlive	    = true;
 	mIsHome         = false;
