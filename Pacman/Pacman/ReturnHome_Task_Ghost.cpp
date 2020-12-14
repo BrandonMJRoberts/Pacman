@@ -50,8 +50,10 @@ void ReturnHomeState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vecto
 
 void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 {
+	// First check if the ghost exists
 	if (ghost)
 	{
+		// If the ghost is going to the entrance of the home
 		if (mGoingToEntrance)
 		{
 			S2D::Vector2 centrePos = ghost->GetCentrePosition();
@@ -60,23 +62,30 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 			if (int(centrePos.X) == mHomeEntrancePos.X &&
 				int(centrePos.Y) == mHomeEntrancePos.Y)
 			{
+				// Toggle the door to the home
 				ghost->ToggleDoorToHome();
 
+				// Set we are not going to the entrance anymore
 				mGoingToEntrance = false;
 			}
 		}
-
-		if (int(ghost->GetCentrePosition().X) == mHomeCentrePos.X &&
-			int(ghost->GetCentrePosition().Y) == mHomeCentrePos.Y)
+		else // If not going to the entrance means that they are going to their home position
 		{
-			ghost->SetIsHome(true);
+			// Check if they are home
+			if (int(ghost->GetCentrePosition().X) == mHomeCentrePos.X &&
+				int(ghost->GetCentrePosition().Y) == mHomeCentrePos.Y)
+			{
+				// Set they are home
+				ghost->SetIsHome(true);
 
-			ghost->ToggleDoorToHome();
+				// Close the door on them
+				ghost->ToggleDoorToHome();
 
-			// Remove this task and then tell the ghost to leave the home
-			ghost->GetStateMachine()->PopStack();
-			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
-			return;
+				// Remove this task and then tell the ghost to leave the home
+				ghost->GetStateMachine()->PopStack();
+				ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
+				return;
+			}
 		}
 	}
 	else

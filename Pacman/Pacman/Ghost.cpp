@@ -23,7 +23,7 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 {
 	mThisGhostType            = ghostType;
 
-	mIsAlive                  = true;
+	mIsAlive                  = true; // Default alive
 	mIsHome                   = startHome;
 	mGhostIsFleeing           = false;
 	mGhostIsEaten             = false;
@@ -66,6 +66,15 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 
 	mFramesPerAnimation       = 10;
 	mDoorIsOpen               = false;
+
+	// If the ghosts starts in their home then they cannot leave by default, but if they dont start at their home then they can leave by default
+	if (startHome)
+	{
+		mCanLeaveHome = false;
+		mStateMachine->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
+	}
+	else
+		mCanLeaveHome = true;
 } 
 
 // -------------------------------------------------------------------- //
@@ -89,12 +98,12 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 	// First call the base class update
 	BaseCharacter::Update(deltaTime);
 
+	if (mTimePerChangeDirectionRemaining > 0.0f)
+		mTimePerChangeDirectionRemaining -= deltaTime;
+
 	// First check if the ghost is player controlled
 	if (mIsPlayerControlled)
 	{
-		if (mTimePerChangeDirectionRemaining > 0.0f)
-			mTimePerChangeDirectionRemaining -= deltaTime;
-
 		MoveInCurrentDirection(deltaTime);
 
 		CheckForDirectionChange();
@@ -126,8 +135,10 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 	    if(S2D::Vector2::Distance(mCentrePosition, mMoveToPos) < accuracy)
 		{
 			CalculateAIMovementDirection(); // Now calclate where we need to actually move to - the centre of which segment
-			CheckForDirectionChange();      // Check if the ghost should change facing direction
 		}
+
+		// Check if the ghost should change facing direction
+		CheckForDirectionChange();
 	}
 }
 
@@ -144,7 +155,10 @@ void Ghost::CheckForDirectionChange()
 	else
 	{
 		// If we have changed direction then reset the countdown for the next change of direction
-		mTimePerChangeDirectionRemaining = GHOST_CHANGE_DIRECTION_DELAY;
+		if (mIsPlayerControlled)
+			mTimePerChangeDirectionRemaining = GHOST_CHANGE_DIRECTION_DELAY;
+		else
+			mTimePerChangeDirectionRemaining = 0.0f;
 
 		if (mIsAlive && !mGhostIsEaten && !mGhostIsFleeing)
 		{

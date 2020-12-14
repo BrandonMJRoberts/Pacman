@@ -111,7 +111,15 @@ void GameManager::SetPlayerPoweredUp(bool playerState)
 		mTimeRemainingInPoweredUpState = TIME_IN_POWER_PELLET;
 	}
 	else
+	{
 		mTimeRemainingInPoweredUpState = 0.0f;
+
+		AudioManager::GetInstance()->PauseGhostFleeingSFX_1();
+		AudioManager::GetInstance()->PauseGhostFleeingSFX_2();
+		AudioManager::GetInstance()->PauseGhostFleeingSFX_3();
+		AudioManager::GetInstance()->PauseGhostFleeingSFX_4();
+		AudioManager::GetInstance()->PauseGhostFleeingSFX_5();
+	}
 
 	mPlayerIsPoweredUp = playerState; 
 }

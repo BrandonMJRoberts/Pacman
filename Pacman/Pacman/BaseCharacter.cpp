@@ -339,6 +339,8 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 	break;
 
 	case FACING_DIRECTION::NONE:
+		gridPos        = mCentrePosition;
+		movementAmount = S2D::Vector2(0.0f, 0.0f);
 	break;
 
 	default:

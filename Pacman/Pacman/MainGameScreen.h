@@ -39,6 +39,9 @@ private:
 	std::vector<Ghost*> mGhosts; 
 	PacmanCharacter*    mPacman;
 
+	float               mTimeRemainingForGhostRelease;
+	unsigned int        mAmountOfGhostsReleased;
+
 	float               mTimeTillNextCollectableSpawn;
 };
 

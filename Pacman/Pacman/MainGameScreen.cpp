@@ -17,6 +17,10 @@ MainGameScreen::MainGameScreen() : BaseMenu()
 {
 	LoadInDataForLevel();
 
+	// Default to one ghost being released and the time per ghost release
+	mAmountOfGhostsReleased       = 1;
+	mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+
 	GameManager::Instance()->ResetPreGameTimer();
 	GameManager::Instance()->ResetScoreForExtraLife(); // Make sure that the amount of points required for the next life are correctly set
 
@@ -91,7 +95,9 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		if (mPacman)
 		{
 			mPacman->Update(deltaTime);
-			mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
+
+			if(mDotHandler)
+				mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
 		}
 
 		// First check if the level is over
@@ -115,6 +121,29 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		{
 			if (mGhosts[i])
 				mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
+		}
+
+		// Remove the time passed for a ghost release
+		mTimeRemainingForGhostRelease -= deltaTime;
+
+		// Check if enough time has passed for another ghost to be released
+		if (mAmountOfGhostsReleased < NUMBER_OF_GHOSTS_IN_LEVEL && mTimeRemainingForGhostRelease < 0.0f)
+		{
+			// Then release a ghost
+
+			// Loop through all the ghosts and release the next one that has not been released
+			for (unsigned int i = 0; i < mGhosts.size(); i++)
+			{
+				if (!mGhosts[i]->GetCanLeaveHome())
+				{
+					mGhosts[i]->SetCanLeaveHome(true);
+					mAmountOfGhostsReleased++;
+					break;
+				}
+			}
+
+			// Reset the time remaining
+			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 		}
 
 		HandleCollectable(deltaTime);
