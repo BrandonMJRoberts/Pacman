@@ -394,3 +394,13 @@ void AudioManager::StopAllAudio()
 }
 
 // -------------------------------------------------------------------------- //
+
+bool AudioManager::GetPacmanDeathSFXFinishedPlaying()
+{
+	if (mDeathSFX_1 && mDeathSFX_2 && mDeathSFX_1->GetState() == S2D::SoundEffectState::STOPPED && mDeathSFX_2->GetState() == S2D::SoundEffectState::STOPPED)
+		return true;
+
+	return false;
+}
+
+// -------------------------------------------------------------------------- //

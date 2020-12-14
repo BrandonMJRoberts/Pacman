@@ -21,7 +21,7 @@ public:
 	void AddCollectedPickup(PICKUP_TYPES typeToAdd);
 	void DisplayPoints(S2D::Vector2 position, bool fromGhost, unsigned int magnitude);
 
-	void RemoveALlCollectedPickups();
+	void RemoveAllCollectedPickups();
 
 	void ResetExtraLifeSprite();
 
@@ -50,8 +50,8 @@ private:
 
 	// In Maze Points
 	S2D::Texture2D*		   mPointsSpriteSheet;
-	S2D::Rect*             mPointsSourceRect;
-	S2D::Rect*             mPointsDestRect;
+	S2D::Rect              mPointsSourceRect;
+	S2D::Rect              mPointsDestRect;
 
 	const unsigned int     mAmountOfSpritesOnPointsSpriteSheetHeight;
 	const unsigned int     mAmountOfSpritesOnPointsSpriteSheetWidth;

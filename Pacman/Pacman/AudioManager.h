@@ -17,6 +17,8 @@ public:
 	void PlayPacmanDeathSFX_1();
 	void PlayPacmanDeathSFX_2();
 
+	bool GetPacmanDeathSFXFinishedPlaying();
+
 	void PlayEatingGhostSFX();
 
 	void PlayGhostGoingToHomeSFX();

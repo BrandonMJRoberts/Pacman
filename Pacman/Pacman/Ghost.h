@@ -46,13 +46,14 @@ public:
 
 	void ToggleDoorToHome();
 
-	void ResetGhostFromDeath();
+	void SetGhostsShouldReset();
 
 private:
 	void CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
 
 	void							 CalculateAIMovementDirection();
 	void                             SetToMoveInDirection(FACING_DIRECTION direction);
+	void							 ResetGhostFromDeath();
 
 	Stack_FiniteStateMachine_Ghost*  mStateMachine; // Each ghost has a state machine if it is AI controlled
 
@@ -66,6 +67,8 @@ private:
 	bool                             mDoorIsOpen;
 
 	bool							 mCanLeaveHome;
+	bool                             mResetting;
+	bool                             mStartAtHome;
 
 };
 

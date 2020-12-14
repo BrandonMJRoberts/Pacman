@@ -71,9 +71,11 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 		}
 		else // If not going to the entrance means that they are going to their home position
 		{
+			S2D::Vector2 centrePos = ghost->GetCentrePosition();
+
 			// Check if they are home
-			if (int(ghost->GetCentrePosition().X) == mHomeCentrePos.X &&
-				int(ghost->GetCentrePosition().Y) == mHomeCentrePos.Y)
+			if (int(centrePos.X) == mHomeCentrePos.X &&
+				int(centrePos.Y) == mHomeCentrePos.Y)
 			{
 				// Set they are home
 				ghost->SetIsHome(true);

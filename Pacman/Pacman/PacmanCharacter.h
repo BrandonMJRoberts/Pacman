@@ -40,8 +40,6 @@ private:
 	void             ResetPacmanFromDeath();
 
 	Stack_FiniteStateMachine_Pacman* mStateMachine;
-
-	bool                             mDeathAnimationIsComplete;
 };
 
 #endif

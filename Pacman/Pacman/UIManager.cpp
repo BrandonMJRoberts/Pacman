@@ -38,7 +38,7 @@ UIManager::UIManager() : mAmountOfSpritesOnPointsSpriteSheetHeight(3), mAmountOf
 
 	mPointsSingleSpriteWidth       = mPointsSpriteSheet->GetWidth() / mAmountOfSpritesOnPointsSpriteSheetWidth;
 	mPointsSingleSpriteHeight      = mPointsSpriteSheet->GetHeight() / mAmountOfSpritesOnPointsSpriteSheetHeight;
-	mPointsSourceRect              = new S2D::Rect(0, 0, mPointsSingleSpriteWidth, mPointsSingleSpriteHeight);
+	mPointsSourceRect              = S2D::Rect(0, 0, mPointsSingleSpriteWidth, mPointsSingleSpriteHeight);
 
 	mTextRenderer                  = new TextRenderer("Textures/UI/Font.png", 15, 21);
 
@@ -59,12 +59,6 @@ UIManager::~UIManager()
 	delete mTextRenderer;
 		mTextRenderer = nullptr;
 
-	delete mPointsSourceRect;
-		mPointsSourceRect = nullptr;
-
-	delete mPointsDestRect;
-		mPointsDestRect = nullptr;
-
 	for(unsigned int i = 0; i < mCollectedPickups.size(); i++)
 	{
 		delete mCollectedPickups[i];
@@ -84,7 +78,7 @@ void UIManager::Update(const float deltaTime)
 	{
 		mTimeRemainingForPointsDisplay -= deltaTime;
 
-		if (mTimeRemainingForPointsDisplay <= 0.0f)
+		if (mTimeRemainingForPointsDisplay < 0.0f)
 			mDisplayingPointsToScreen = false;
 	}
 }
@@ -213,25 +207,19 @@ void UIManager::DisplayPoints(S2D::Vector2 centrePosition, bool fromGhost, unsig
 	mDisplayingPointsToScreen      = true;
 	mTimeRemainingForPointsDisplay = TIME_POINTS_SHOW_FOR;
 
-	delete mPointsDestRect;
-	mPointsDestRect = nullptr;
-
-	delete mPointsSourceRect;
-	mPointsSourceRect = nullptr;
-
 	// Setup where the points are going to be rendered in the maze
-	mPointsDestRect                = new S2D::Rect(centrePosition.X - (mPointsSingleSpriteWidth / 2),
-												   centrePosition.Y - (mPointsSingleSpriteHeight / 2),
+	mPointsDestRect                    = S2D::Rect(centrePosition.X - (mPointsSingleSpriteWidth / 2.0f),
+												   centrePosition.Y - (mPointsSingleSpriteHeight / 2.0f),
 		                                           mPointsSingleSpriteWidth, 
 		                                           mPointsSingleSpriteHeight);
 
 	if(fromGhost)
-		mPointsSourceRect              = new S2D::Rect(float(magnitude * mPointsSingleSpriteWidth), 
+		mPointsSourceRect              = S2D::Rect(float(magnitude * mPointsSingleSpriteWidth), 
 			                                           0.0f, 
 			                                           mPointsSingleSpriteWidth, 
 			                                           mPointsSingleSpriteHeight);
 	else
-		mPointsSourceRect              = new S2D::Rect(     float((magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth)       * mPointsSingleSpriteWidth),
+		mPointsSourceRect              = S2D::Rect(     float(   (magnitude % mAmountOfSpritesOnPointsSpriteSheetWidth)      * mPointsSingleSpriteWidth),
 			                                            float(int(magnitude / mAmountOfSpritesOnPointsSpriteSheetWidth) + 1) * mPointsSingleSpriteHeight,
 			                                            mPointsSingleSpriteWidth, 
 			                                            mPointsSingleSpriteHeight);
@@ -241,13 +229,13 @@ void UIManager::DisplayPoints(S2D::Vector2 centrePosition, bool fromGhost, unsig
 
 void UIManager::RenderPoints()
 {
-	if(mPointsDestRect && mPointsSourceRect && mPointsSpriteSheet)
-		S2D::SpriteBatch::Draw(mPointsSpriteSheet, mPointsDestRect, mPointsSourceRect);
+	if(mPointsSpriteSheet)
+		S2D::SpriteBatch::Draw(mPointsSpriteSheet, &mPointsDestRect, &mPointsSourceRect);
 }
 
 // ---------------------------------------------------------------- //
 
-void UIManager::RemoveALlCollectedPickups()
+void UIManager::RemoveAllCollectedPickups()
 {
 	for (unsigned int i = 0; i < mCollectedPickups.size(); i++)
 	{

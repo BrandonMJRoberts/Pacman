@@ -68,13 +68,18 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	mDoorIsOpen               = false;
 
 	// If the ghosts starts in their home then they cannot leave by default, but if they dont start at their home then they can leave by default
+	mStartAtHome = startHome;
 	if (startHome)
 	{
 		mCanLeaveHome = false;
-		mStateMachine->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
+
+		if(mStateMachine)
+			mStateMachine->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
 	}
 	else
 		mCanLeaveHome = true;
+
+	mResetting             = false;
 } 
 
 // -------------------------------------------------------------------- //
@@ -95,50 +100,64 @@ Ghost::~Ghost()
 
 void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FACING_DIRECTION pacmanFacingDirection)
 {
-	// First call the base class update
-	BaseCharacter::Update(deltaTime);
-
-	if (mTimePerChangeDirectionRemaining > 0.0f)
-		mTimePerChangeDirectionRemaining -= deltaTime;
-
-	// First check if the ghost is player controlled
-	if (mIsPlayerControlled)
+	if (!mResetting)
 	{
-		MoveInCurrentDirection(deltaTime);
+		// First call the base class update
+		BaseCharacter::Update(deltaTime);
 
-		CheckForDirectionChange();
+		if (mTimePerChangeDirectionRemaining > 0.0f)
+			mTimePerChangeDirectionRemaining -= deltaTime;
 
-		// Handle the player's input to determine which direction the ghost should go
-		HandleInput();
+		// First check if the ghost is player controlled
+		if (mIsPlayerControlled)
+		{
+			MoveInCurrentDirection(deltaTime);
 
-		CheckForDirectionChange();
+			CheckForDirectionChange();
+
+			// Handle the player's input to determine which direction the ghost should go
+			HandleInput();
+
+			CheckForDirectionChange();
+		}
+		else
+		{
+			double accuracy = 0.3f;
+
+			// First move in the current direction
+			MoveInCurrentDirection(deltaTime);
+
+			// Get the target position - normally where pacman is or where to flee to
+			BaseState_Ghost* currentState = mStateMachine->PeekStack();
+			if (currentState)
+			{
+				// Update the current state and get the target position for this ghost
+				currentState->OnUpdate(mTargetPositon, pacmanPos, pacmanFacingDirection);
+
+				// Check if we should transition out of the current state
+				currentState->CheckTransitions(this);
+			}
+
+			// If we are at the next position to be moved to then calculate another one
+			if (S2D::Vector2::Distance(mCentrePosition, mMoveToPos) < accuracy)
+			{
+				CalculateAIMovementDirection(); // Now calclate where we need to actually move to - the centre of which segment
+			}
+
+			// Check if the ghost should change facing direction
+			CheckForDirectionChange();
+		}
 	}
 	else
-	{
-		double accuracy = 0.3f;
+	{ 
+		// Take time off the delay
 
-		// First move in the current direction
-		MoveInCurrentDirection(deltaTime);
-
-		// Get the target position - normally where pacman is or where to flee to
-		BaseState_Ghost* currentState = mStateMachine->PeekStack();
-		if (currentState)
+		if (AudioManager::GetInstance()->GetPacmanDeathSFXFinishedPlaying())
 		{
-			// Update the current state and get the target position for this ghost
-			currentState->OnUpdate(mTargetPositon, pacmanPos, pacmanFacingDirection);
-		
-			// Check if we should transition out of the current state
-			currentState->CheckTransitions(this);
-		}
+			mResetting = false;
 
-		// If we are at the next position to be moved to then calculate another one
-	    if(S2D::Vector2::Distance(mCentrePosition, mMoveToPos) < accuracy)
-		{
-			CalculateAIMovementDirection(); // Now calclate where we need to actually move to - the centre of which segment
+			ResetGhostFromDeath();
 		}
-
-		// Check if the ghost should change facing direction
-		CheckForDirectionChange();
 	}
 }
 
@@ -159,6 +178,9 @@ void Ghost::CheckForDirectionChange()
 			mTimePerChangeDirectionRemaining = GHOST_CHANGE_DIRECTION_DELAY;
 		else
 			mTimePerChangeDirectionRemaining = 0.0f;
+
+		if (mIsHome && !mCanLeaveHome)
+			return;
 
 		if (mIsAlive && !mGhostIsEaten && !mGhostIsFleeing)
 		{
@@ -496,12 +518,15 @@ void Ghost::ToggleDoorToHome()
 	if (mDoorIsOpen)
 	{
 		mCollisionMap[12][13] = '1';
+		mCollisionMap[12][14] = '1';
 	}
 	else
 	{
 		mCollisionMap[12][13] = '0';
+		mCollisionMap[12][14] = '0';
 	}
 
+	// Toggle the door state
 	mDoorIsOpen = !mDoorIsOpen;
 }
 
@@ -510,7 +535,7 @@ void Ghost::ToggleDoorToHome()
 void Ghost::ResetGhostFromDeath()
 {
 	// Reset the position
-	mCentrePosition = mStartPosition;
+	mCentrePosition         = mStartPosition;
 
 	// Reset the facing direction
 	mCurrentFacingDirection = FACING_DIRECTION::NONE;
@@ -549,10 +574,11 @@ void Ghost::ResetGhostFromDeath()
 	mMovementSpeed  = GHOST_MOVEMENT_SPEED;
 
 	mIsAlive	    = true;
-	mIsHome         = false;
+	mIsHome         = mStartAtHome;
 	mGhostIsFleeing = false;
 	mGhostIsEaten   = false;
 	mDoorIsOpen     = false;
+
 
 	// If it is AI controlled then reset the state machine
 	if (!mIsPlayerControlled && mStateMachine)
@@ -561,8 +587,21 @@ void Ghost::ResetGhostFromDeath()
 			mStateMachine->PopStack();
 
 		mStateMachine->PushToStack(GHOST_STATE_TYPE::CHASE);
-		mMoveToPos = mStartPosition; // Reset the move to position so that the ghost actually can move to a position witin range
+
+		if (mStartAtHome)
+			mStateMachine->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
+		else
+			mMoveToPos = mStartPosition; // Reset the move to position so that the ghost actually can move to a position witin range
 	}
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::SetGhostsShouldReset()
+{
+	mResetting                = true;
+	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
+	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //

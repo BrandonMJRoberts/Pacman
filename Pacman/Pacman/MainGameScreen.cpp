@@ -44,7 +44,7 @@ MainGameScreen::~MainGameScreen()
 	delete mDotHandler;
 	mDotHandler = nullptr;
 
-	UIManager::GetInstance()->RemoveALlCollectedPickups();
+	UIManager::GetInstance()->RemoveAllCollectedPickups();
 	
 	delete mPacman;
 	mPacman = nullptr;
@@ -65,14 +65,14 @@ void MainGameScreen::Render(const unsigned int frameCount)
 	if (mBackground)
 		mBackground->Render();
 
-	UIManager::GetInstance()->Render();
-
 	// Render the dots onto the screen
 	if (mDotHandler)
 		mDotHandler->Render(frameCount);
 
 	if (mCollectable)
 		mCollectable->Render();
+
+	UIManager::GetInstance()->Render();
 
 	if(mPacman)
 		mPacman->Render(frameCount);
@@ -181,9 +181,9 @@ void MainGameScreen::LoadInDataForLevel()
 	if (!mPacman)
 	{
 		if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 4, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 5, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
 		else
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 4, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
+			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 5, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
 	}
 
 	// Create the ghosts 
@@ -364,7 +364,7 @@ void MainGameScreen::CheckForCharacterCollisions()
 						mGhosts[i]->SetIsAlive(false);
 
 						// Display the points
-						UIManager::GetInstance()->DisplayPoints(mPacman->GetCentrePosition(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
+						UIManager::GetInstance()->DisplayPoints((mPacman->GetCentrePosition() * SPRITE_RESOLUTION) + GameManager::Instance()->GetGridOffset(), true, GM->GetAmountOfGhostsEatenStreak() - 1);
 
 						// Play the correct audio track
 						AudioManager::GetInstance()->PlayEatingGhostSFX();
@@ -397,7 +397,7 @@ void MainGameScreen::CheckForCharacterCollisions()
 						for (unsigned int i = 0; i < mGhosts.size(); i++)
 						{
 							if(mGhosts[i])
-								mGhosts[i]->ResetGhostFromDeath();
+								mGhosts[i]->SetGhostsShouldReset();
 						}
 
 						// Play the pacman death SFX 

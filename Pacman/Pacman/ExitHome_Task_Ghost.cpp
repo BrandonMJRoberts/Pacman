@@ -6,7 +6,7 @@
 
 // ---------------------------------------------------------------- //
 
-ExitHomeState_Ghost::ExitHomeState_Ghost() : BaseState_Ghost()
+ExitHomeState_Ghost::ExitHomeState_Ghost() : BaseState_Ghost(), mHomeEntrancePos(S2D::Vector2(14, 11))
 {
 	//OnEnter();
 }
@@ -56,14 +56,29 @@ void ExitHomeState_Ghost::CheckTransitions(Ghost* ghost)
 		}
 
 		// Default their target position to being the ghosts current position, to prevent movement
-		ghost->SetTargetPosition(ghost->GetCentrePosition());
+	//	ghost->SetTargetPosition(ghost->GetCentrePosition());
 	
 		// If the ghost can leave then they should exit as soon as they can
 		if (ghost->GetCanLeaveHome())
 		{
-			// Then remove this task from the list
-			ghost->GetStateMachine()->PopStack();
-			ghost->SetIsAlive(true);
+			// If not exited then set the target position to be the entrance of the home
+			ghost->SetTargetPosition(mHomeEntrancePos);
+
+			// If the ghost has left the home then we need to close the door behind the ghost
+			if ((int)(ghost->GetCentrePosition().X) == mHomeEntrancePos.X &&
+				(int)(ghost->GetCentrePosition().Y) == mHomeEntrancePos.Y)
+			{
+				// open the door
+				ghost->ToggleDoorToHome();
+
+				// Then remove this task from the list
+				ghost->GetStateMachine()->PopStack();
+
+				return;
+			}
+
+			ghost->SetIsAlive(true);                  // Make sure the ghost is alive
+			ghost->SetGhostIsFleeing(false);          // Make sure the ghost is no longer fleeing pacman
 			return;
 		}
 	}

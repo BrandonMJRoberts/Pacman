@@ -41,7 +41,6 @@ PacmanCharacter::PacmanCharacter(char** const       collisionMap,
 	mMovementSpeed      = PACMAN_MOVEMENT_SPEED;
 
 	mFramesPerAnimation       = 6;
-	mDeathAnimationIsComplete = false;
 }
 
 // ------------------------------------------------------------- //
@@ -135,7 +134,7 @@ void PacmanCharacter::Update(const float deltaTime)
 	}
 	else
 	{
-		if (mDeathAnimationIsComplete)
+		if (AudioManager::GetInstance()->GetPacmanDeathSFXFinishedPlaying())
 		{
 			GameManager::Instance()->RestartLevel();
 			AudioManager::GetInstance()->StopAllAudio();
@@ -189,7 +188,7 @@ void PacmanCharacter::SetIsAlive(bool newVal)
 		if (mIsAlive)
 		{
 			mStartFrame   = 0;
-			mEndFrame     = 11;
+			mEndFrame     = (mSpritesOnWidthAlternate * mSpritesOnHeightAlternate) - 1;
 			mCurrentFrame = 0;
 
 			mCurrentFacingDirection = FACING_DIRECTION::NONE;
@@ -222,19 +221,31 @@ void PacmanCharacter::Render(const unsigned int frameCount)
 	{
 		mFrameProgression -= mFramesPerAnimation;
 
-		// Increment the current frame
-		mCurrentFrame++;
-
-		// This is the pacman specific code - this is done to reduce the required size of the sprite sheet to save memory
-		if (mCurrentFrame == mEndFrame)
+		// Animations need to be dealt with differently if pacman has died
+		if (mIsAlive)
 		{
-			if (mIsAlive && mCurrentFrame != 8)
-				mCurrentFrame = 8;
-			else if (!mIsAlive)
-				mDeathAnimationIsComplete = true;
+			// Increment the current frame
+			mCurrentFrame++;
+
+			// This is the pacman specific code - this is done to reduce the required size of the sprite sheet to save memory
+			if (mCurrentFrame == mEndFrame)
+			{
+				if (mCurrentFrame != 8)
+					mCurrentFrame = 8;
+			}
+			else if (mCurrentFrame > mEndFrame)
+			{
+				// Only loop if pacman is alive, as the death animation doesnt work if it loops				
+				mCurrentFrame = mStartFrame;
+			}
 		}
-		else if (mCurrentFrame > mEndFrame)
-			mCurrentFrame = mStartFrame;
+		else
+		{
+			if (mCurrentFrame != mEndFrame)
+			{
+				mCurrentFrame++;
+			}
+		}
 	}
 
 	// First perform the checks to avoid crashing here
@@ -287,8 +298,6 @@ void PacmanCharacter::ResetPacmanFromDeath()
 
 	mCentrePosition = mStartPosition;
 	mTargetPositon  = mStartPosition;
-
-	mDeathAnimationIsComplete = false;
 
 	mCurrentFacingDirection = FACING_DIRECTION::NONE;
 

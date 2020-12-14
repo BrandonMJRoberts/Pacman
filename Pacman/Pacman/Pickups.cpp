@@ -145,7 +145,7 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const f
 
 		if (mCollected)
 		{
-			S2D::Vector2 renderPos = S2D::Vector2(mCentrePosition + GameManager::Instance()->GetGridOffset()) * SPRITE_RESOLUTION;
+			S2D::Vector2 renderPos = (mCentrePosition * SPRITE_RESOLUTION) + GameManager::Instance()->GetGridOffset();
 			unsigned int magnitude = 0;
 
 			// Increase the score

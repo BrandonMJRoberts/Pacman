@@ -23,7 +23,7 @@
 #define GHOST_MOVEMENT_SPEED     8.5f
 #define GHOST_EYE_MOVEMENT_SPEED 13.0f
 
-#define TIME_IN_PRE_GAME         5.0f
+#define TIME_IN_PRE_GAME            5.0f
 
 #define TIME_PER_GHOST_RELEASE  15.0f
 

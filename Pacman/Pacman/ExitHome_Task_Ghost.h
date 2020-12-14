@@ -17,6 +17,8 @@ public:
 private:
 	void OnEnter() override;
 	void OnExit() override;
+
+	const S2D::Vector2 mHomeEntrancePos;
 };
 
 #endif
