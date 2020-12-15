@@ -170,6 +170,12 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 			mAmountOfGhostsReleased       = 1;
 			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 
+			// Save the current score to the highscore table
+			GameManager::Instance()->SaveOutScoreToLeaderboard();
+
+			// Reset the current score to zero
+			GameManager::Instance()->SetCurrentScore(0);
+
 			return SCREENS::MAIN_MENU;
 		}
 
