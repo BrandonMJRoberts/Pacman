@@ -121,6 +121,8 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 			mAmountOfGhostsReleased       = 1;
 
+			AudioManager::GetInstance()->StopAllAudio();
+
 			delete mCollectable;
 			mCollectable = nullptr;
 		}
