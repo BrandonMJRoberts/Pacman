@@ -105,6 +105,8 @@ public:
 	void                  ResetAmountOfGhostsReleased()                       { mAmountOfGhostsReleased = 1; }
 	void                  IncreaseAmountOfGhostsReleased()                    { mAmountOfGhostsReleased++; }
 
+	void                  ResetGhostsEatenStreak()                            { mGhostsEatenStreak = 0; }
+
 private:
 	GameManager();
 	void                SetDotCounts();

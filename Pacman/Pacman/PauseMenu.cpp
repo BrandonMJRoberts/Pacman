@@ -4,6 +4,7 @@
 #include "Constants.h"
 
 #include "TextRenderer.h"
+#include "AudioManager.h"
 
 #include <iostream>
 
@@ -79,11 +80,15 @@ SCREENS PauseMenu::Update(const float deltaTime)
 {
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
+	AudioManager::GetInstance()->Update();
+
 	// Do checks to see if the player has re-entered the game
 	if (keyboardState->IsKeyDown(S2D::Input::Keys::P) && !GameManager::Instance()->GetIsAlreadySettingGamePaused())
 	{
 		GameManager::Instance()->SetGameIsPaused(false);
 		GameManager::Instance()->SetIsPausedButtonPressed(true);
+
+		AudioManager::GetInstance()->ResumeAllAudio();
 
 		return SCREENS::PRIOR;
 	}

@@ -98,6 +98,8 @@ SCREENS StartMenu::Update(const float deltaTime)
 	// Check for any relevent button inputs
 	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
 
+	AudioManager::GetInstance()->Update();
+
 	// Traversing the menu's
 	HandleDownPress(*keyboardState);
 	HandleUpPress(*keyboardState);

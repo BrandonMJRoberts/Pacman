@@ -10,6 +10,8 @@ public:
 
 	static AudioManager* GetInstance();
 
+	void Update();
+
 	void PlayDotCollectionSFX();
 	void PlayEatingFruitSFX();
 	void PlayExtraLifeSFX();
@@ -29,22 +31,28 @@ public:
 	void PlayGhostFleeingSFX_4();
 	void PlayGhostFleeingSFX_5();
 
-	void PauseGhostFleeingSFX_1() { if (mGhostFleeingSFX_1) S2D::Audio::Pause(mGhostFleeingSFX_1); }
-	void PauseGhostFleeingSFX_2() { if (mGhostFleeingSFX_2) S2D::Audio::Pause(mGhostFleeingSFX_2); }
-	void PauseGhostFleeingSFX_3() { if (mGhostFleeingSFX_3) S2D::Audio::Pause(mGhostFleeingSFX_3); }
-	void PauseGhostFleeingSFX_4() { if (mGhostFleeingSFX_4) S2D::Audio::Pause(mGhostFleeingSFX_4); }
-	void PauseGhostFleeingSFX_5() { if (mGhostFleeingSFX_5) S2D::Audio::Pause(mGhostFleeingSFX_5); }
+	void PauseGhostFleeingSFX_1();
+	void PauseGhostFleeingSFX_2();
+	void PauseGhostFleeingSFX_3();
+	void PauseGhostFleeingSFX_4();
+	void PauseGhostFleeingSFX_5();
 
 	void PauseGhostGoingToHomeSFX() { if (mGhostGoingToHomeSFX) S2D::Audio::Pause(mGhostGoingToHomeSFX); }
 
 	void PlayGameStartSFX();
 
 	void StopAllAudio();
+	void PauseAllAudio();
+	void ResumeAllAudio();
 
 private:
 	AudioManager();
 
+	void RemoveSoundFromCurrentlyPlayingList(S2D::SoundEffect* sfx);
+
 	static AudioManager* mInstance;
+
+	std::vector<S2D::SoundEffect*> mCurrentlyPlayingSounds;
 
 	S2D::SoundEffect*    mDotCollectionSFX;
 	S2D::SoundEffect*    mEatingFruitSFX;

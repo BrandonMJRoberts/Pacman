@@ -89,6 +89,8 @@ void MainGameScreen::Render(const unsigned int frameCount)
 
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
+	AudioManager::GetInstance()->Update();
+
 	if (!GameManager::Instance()->GetIsInPreGameState())
 	{
 		// Update the dots in the level
@@ -155,6 +157,9 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		if (GameManager::Instance()->GetExtraLivesCount() < 0)
 		{
 			UIManager::GetInstance()->ResetForStartOfGame();
+
+			mAmountOfGhostsReleased       = 1;
+			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 
 			return SCREENS::MAIN_MENU;
 		}
@@ -265,6 +270,8 @@ SCREENS MainGameScreen::InGameInputCheck()
 		GameManager::Instance()->SetGameIsPaused(true);
 		GameManager::Instance()->SetIsPausedButtonPressed(true);
 
+		AudioManager::GetInstance()->PauseAllAudio();
+
 		return SCREENS::PAUSE_MENU;
 	}
 	else if (S2D::Input::Keyboard::GetState()->IsKeyUp(S2D::Input::Keys::P))
@@ -285,6 +292,11 @@ SCREENS MainGameScreen::InGameInputCheck()
 		gm->SetCurrentScore(0);                            // Reset the player's current score
 		gm->ResetDotsEatenCount();                         // Reset the dots eaten count
 		gm->ResetGhostsEatenCount();					   // Reset the ghosts eaten count
+		gm->ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
+		gm->ResetAmountOfGhostsReleased();
+		 
+		mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+		mAmountOfGhostsReleased       = 1;
 
 		AudioManager::GetInstance()->StopAllAudio();
 
@@ -379,18 +391,27 @@ void MainGameScreen::CheckForCharacterCollisions()
 					{
 						if (mPacman->IsAlive())
 						{
-							if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+							GameManager* gm = GameManager::Instance();
+
+							if (gm->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
 							{
 								// Remove a life
-								GameManager::Instance()->RemoveLife();
+								gm->RemoveLife();
 
 								// Increase the amount of pacman kills the player has currently got this game
-								GameManager::Instance()->IncreasePacmanDeathCounter();
+								gm->IncreasePacmanDeathCounter();
+
+								// Reset the needed game mamager variables
+								gm->ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
+								gm->ResetAmountOfGhostsReleased();
+
+								mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+								mAmountOfGhostsReleased       = 1;
 							}
 							else
 							{
 								// Make sure we add the needed points to the current score
-								GameManager::Instance()->AddToScore(POINTS_PER_PACMAN_KILL / GameManager::Instance()->GetAmountOfGhostsReleased());
+								gm->AddToScore(POINTS_PER_PACMAN_KILL / GameManager::Instance()->GetAmountOfGhostsReleased());
 							}
 						}
 
