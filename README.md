@@ -1,4 +1,4 @@
-## This repo is for my project to make Pacman
+## Repo for my Pacman Project 
 
 ### The main features of this project are:
 - Fully AI controlled ghosts of all four colours with the origional game's seek positions
