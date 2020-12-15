@@ -114,6 +114,13 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 			// Make sure we change the background colour to being the next level's
 			mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
 
+			// Make sure the ghosts reset as well as the rest of the level
+			for (unsigned int i = 0; i < mGhosts.size(); i++)
+				mGhosts[i]->SetGhostsShouldReset();
+
+			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+			mAmountOfGhostsReleased       = 1;
+
 			delete mCollectable;
 			mCollectable = nullptr;
 		}
