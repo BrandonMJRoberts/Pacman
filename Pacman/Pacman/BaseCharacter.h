@@ -32,9 +32,11 @@ public:
 protected:
 	void                             HandleInput();
 	bool                             EdgeCheck();
-	bool                             CanMoveInDirection(FACING_DIRECTION direction);
+
+	bool		                     CanMoveInDirection(FACING_DIRECTION direction);
 	void                             MoveInCurrentDirection(const float deltaTime);
-	bool							 CanTurnToDirection(const FACING_DIRECTION newDir);
+
+	virtual bool					 CanTurnToDirection(const FACING_DIRECTION newDir);
 	virtual	void                     CheckForDirectionChange(); // This function is for setting start and end frames for specific directional sprites
 
 	S2D::Vector2                     mCentrePosition;        // Current position

@@ -25,6 +25,8 @@ public:
 
 	void ResetExtraLifeSprite();
 
+	void ResetForStartOfGame();
+
 private:
 	UIManager();
 

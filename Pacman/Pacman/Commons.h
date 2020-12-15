@@ -72,3 +72,22 @@ enum class GHOST_TYPE : char
 };
 
 // ------------------------------------------------------------------ //
+
+enum class GHOST_STATE_TYPE
+{
+	CHASE = 0,
+	FLEE,
+	RETURN_HOME,
+	EXIT_HOME
+};
+
+// ------------------------------------------------------------------ //
+
+enum class PACMAN_STATE_TYPES
+{
+	CHASE = 0,
+	FLEE,
+	COLLECT_DOTS,
+	COLLECT_POWERUP,
+	COLLECT_FRUIT
+};

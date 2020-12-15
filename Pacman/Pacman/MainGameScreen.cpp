@@ -153,7 +153,11 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 		// Now check if the game is over due to death counter
 		if (GameManager::Instance()->GetExtraLivesCount() < 0)
+		{
+			UIManager::GetInstance()->ResetForStartOfGame();
+
 			return SCREENS::MAIN_MENU;
+		}
 
 		// Update the game manager
 		UIManager::GetInstance()->Update(deltaTime);

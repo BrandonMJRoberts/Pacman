@@ -8,6 +8,7 @@
 FleeState_Ghost::FleeState_Ghost(GHOST_TYPE colourOfGhost) : BaseState_Ghost()
 {
 	mGhostColour = colourOfGhost;
+
 	//OnEnter();
 }
 
@@ -22,7 +23,7 @@ FleeState_Ghost::~FleeState_Ghost()
 
 void FleeState_Ghost::OnEnter()
 {
-
+	mType = GHOST_STATE_TYPE::FLEE;
 }
 
 // ---------------------------------------------------------------- //
@@ -74,10 +75,12 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		}
 
 		// Pacman must have eaten this ghost then
-		if (!ghost->IsAlive())
+		if (GameManager::Instance()->GetIsPlayerPoweredUp() && !ghost->IsAlive())
 		{
-			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::RETURN_HOME);
-			ghost->SetGhostIsFleeing(false);
+			// Tell the ghost to return to its home
+			ghost->GetStateMachine()->PopStack(); // Remove the flee task 
+			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::RETURN_HOME); // Add the return home task
+			ghost->SetGhostIsFleeing(false); // Set that the ghost is not fleeing anymore
 			return;
 		}
 

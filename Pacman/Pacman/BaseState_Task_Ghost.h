@@ -12,12 +12,16 @@ public:
 	BaseState_Ghost();
 	virtual ~BaseState_Ghost();
 
-	virtual void OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection);
-	virtual void CheckTransitions(Ghost* ghost);
+	virtual void      OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pacmanPos, FACING_DIRECTION pacmanFacingDirection);
+	virtual void      CheckTransitions(Ghost* ghost);
+
+	GHOST_STATE_TYPE  GetType() const { return mType; }
 
 protected:
-	virtual void OnEnter();
-	virtual void OnExit();
+	virtual void     OnEnter();
+	virtual void     OnExit();
+
+	GHOST_STATE_TYPE mType;
 
 };
 

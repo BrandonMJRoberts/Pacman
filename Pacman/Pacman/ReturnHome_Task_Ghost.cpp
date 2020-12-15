@@ -4,11 +4,9 @@
 
 // ---------------------------------------------------------------- //
 
-ReturnHomeState_Ghost::ReturnHomeState_Ghost() : BaseState_Ghost(), mHomeEntrancePos(S2D::Vector2(14, 11)), mHomeCentrePos(S2D::Vector2(14, 12))
+ReturnHomeState_Ghost::ReturnHomeState_Ghost() : BaseState_Ghost(), mHomeEntrancePosRight(S2D::Vector2(14, 11)), mHomeEntrancePosLeft(S2D::Vector2(13, 11)), mHomeCentrePos(S2D::Vector2(14, 12))
 {
-	//OnEnter();
-
-	mGoingToEntrance = true;
+	OnEnter();
 }
 
 // ---------------------------------------------------------------- //
@@ -22,7 +20,10 @@ ReturnHomeState_Ghost::~ReturnHomeState_Ghost()
 
 void ReturnHomeState_Ghost::OnEnter()
 {
+	mGoingToEntrance = true;
+	mGoingIntoHome   = false;
 
+	mType = GHOST_STATE_TYPE::RETURN_HOME;
 }
 
 // ---------------------------------------------------------------- //
@@ -38,7 +39,7 @@ void ReturnHomeState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vecto
 	// Making the ghost go to the door to the centre
 	if (mGoingToEntrance)
 	{
-		targetPositionRef = mHomeEntrancePos;
+		targetPositionRef = mHomeEntrancePosLeft;
 	}
 	else // Making the ghost actually go into their home
 	{
@@ -59,17 +60,19 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 			S2D::Vector2 centrePos = ghost->GetCentrePosition();
 
 			// If the ghost is in the correct position then tell them enter the home 
-			if (int(centrePos.X) == mHomeEntrancePos.X &&
-				int(centrePos.Y) == mHomeEntrancePos.Y)
+			if ((int(centrePos.X) == mHomeEntrancePosLeft.X &&
+				 int(centrePos.Y) == mHomeEntrancePosLeft.Y) || 
+				(int(centrePos.X) == mHomeEntrancePosRight.X &&
+			     int(centrePos.Y) == mHomeEntrancePosRight.Y))
 			{
-				// Toggle the door to the home
-				ghost->ToggleDoorToHome();
-
 				// Set we are not going to the entrance anymore
 				mGoingToEntrance = false;
+				mGoingIntoHome   = true;
 			}
 		}
-		else // If not going to the entrance means that they are going to their home position
+
+		// If not going to the entrance means that they are going to their home position
+		if (mGoingIntoHome)
 		{
 			S2D::Vector2 centrePos = ghost->GetCentrePosition();
 
@@ -79,9 +82,6 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 			{
 				// Set they are home
 				ghost->SetIsHome(true);
-
-				// Close the door on them
-				ghost->ToggleDoorToHome();
 
 				// Remove this task and then tell the ghost to leave the home
 				ghost->GetStateMachine()->PopStack();

@@ -44,12 +44,12 @@ public:
 	void SetGhostIsEaten(bool newVal);
 	bool GetIfGhostIsEaten()                    const { return mGhostIsEaten; }
 
-	void ToggleDoorToHome();
-
 	void SetGhostsShouldReset();
 
 private:
-	void CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
+	bool                             CanTurnToDirection(const FACING_DIRECTION direction) override;
+
+	void                             CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
 
 	void							 CalculateAIMovementDirection();
 	void                             SetToMoveInDirection(FACING_DIRECTION direction);
@@ -64,7 +64,6 @@ private:
 	bool                             mIsHome;
 	bool                             mGhostIsFleeing;
 	bool                             mGhostIsEaten;
-	bool                             mDoorIsOpen;
 
 	bool							 mCanLeaveHome;
 	bool                             mResetting;

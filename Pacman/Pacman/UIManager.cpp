@@ -247,3 +247,11 @@ void UIManager::RemoveAllCollectedPickups()
 }
 
 // ---------------------------------------------------------------- //
+
+void UIManager::ResetForStartOfGame()
+{
+	mDisplayingPointsToScreen      = false;
+	mTimeRemainingForPointsDisplay = 0.0f;
+}
+
+// ---------------------------------------------------------------- //

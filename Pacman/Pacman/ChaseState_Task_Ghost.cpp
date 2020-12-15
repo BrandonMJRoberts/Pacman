@@ -9,6 +9,7 @@
 ChaseState_Ghost::ChaseState_Ghost(GHOST_TYPE ghostColour) : BaseState_Ghost()
 {
 	mColourOfGhost = ghostColour;
+
 	OnEnter();
 }
 
@@ -23,7 +24,7 @@ ChaseState_Ghost::~ChaseState_Ghost()
 
 void ChaseState_Ghost::OnEnter()
 {
-
+	mType = GHOST_STATE_TYPE::CHASE;
 }
 
 // ---------------------------------------------------------------- //
@@ -75,7 +76,7 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 	return;
 
 	case GHOST_TYPE::ORANGE:
-		// Random
+		// Random position
 		//S2D::Vector2 randomPos = S2D::Vector2(-1, -1);
 
 		// While we havent picked a valid random position then pick another one

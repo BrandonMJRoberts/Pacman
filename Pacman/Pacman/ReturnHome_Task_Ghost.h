@@ -18,10 +18,13 @@ private:
 	void OnEnter() override;
 	void OnExit() override;
 
-	const S2D::Vector2 mHomeEntrancePos;
+	const S2D::Vector2 mHomeEntrancePosRight;
+	const S2D::Vector2 mHomeEntrancePosLeft;
+
 	const S2D::Vector2 mHomeCentrePos;
 
 	bool mGoingToEntrance;
+	bool mGoingIntoHome;
 };  
 
 #endif

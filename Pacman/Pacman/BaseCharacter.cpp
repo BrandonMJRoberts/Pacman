@@ -348,7 +348,9 @@ void BaseCharacter::MoveInCurrentDirection(const float deltaTime)
 	return;
 	}
 
-	// Now check if we can actually go to the new position
+	// Now check if we can actually go to the new position - factoring in what the current state the ghost is in
+
+	// If the next position is not blocked AND it is one of these specific situations
 	if (mCollisionMap[(unsigned int)gridPos.Y][(unsigned int)gridPos.X] != '1')
 	{
 		mCentrePosition.X += movementAmount.X;
@@ -394,7 +396,7 @@ bool BaseCharacter::CanTurnToDirection(const FACING_DIRECTION newDir)
 	break;
 	}
 
-	// Need to go right to get to the position
+	// Check if the position is open
 	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0')
 	{
 		return true;

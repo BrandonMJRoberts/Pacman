@@ -26,7 +26,6 @@ void BaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pac
 
 void BaseState_Ghost::OnEnter()
 {
-
 }
 
 // ---------------------------------------------------- //

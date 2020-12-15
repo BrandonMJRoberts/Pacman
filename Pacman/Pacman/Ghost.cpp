@@ -65,7 +65,6 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	mMovementSpeed			  = GHOST_MOVEMENT_SPEED;
 
 	mFramesPerAnimation       = 10;
-	mDoorIsOpen               = false;
 
 	// If the ghosts starts in their home then they cannot leave by default, but if they dont start at their home then they can leave by default
 	mStartAtHome = startHome;
@@ -512,26 +511,6 @@ void Ghost::SetGhostIsEaten(bool newVal)
 
 // ------------------------------------------------------------------------------------------------------------------------- //
 
-void Ghost::ToggleDoorToHome()
-{
-	// First convert the collision map into a non-const array and then change the door to be open/closed
-	if (mDoorIsOpen)
-	{
-		mCollisionMap[12][13] = '1';
-		mCollisionMap[12][14] = '1';
-	}
-	else
-	{
-		mCollisionMap[12][13] = '0';
-		mCollisionMap[12][14] = '0';
-	}
-
-	// Toggle the door state
-	mDoorIsOpen = !mDoorIsOpen;
-}
-
-// ------------------------------------------------------------------------------------------------------------------------- //
-
 void Ghost::ResetGhostFromDeath()
 {
 	// Reset the position
@@ -577,8 +556,7 @@ void Ghost::ResetGhostFromDeath()
 	mIsHome         = mStartAtHome;
 	mGhostIsFleeing = false;
 	mGhostIsEaten   = false;
-	mDoorIsOpen     = false;
-
+	mCanLeaveHome   = !mStartAtHome;
 
 	// If it is AI controlled then reset the state machine
 	if (!mIsPlayerControlled && mStateMachine)
@@ -588,10 +566,10 @@ void Ghost::ResetGhostFromDeath()
 
 		mStateMachine->PushToStack(GHOST_STATE_TYPE::CHASE);
 
+		mMoveToPos = mCentrePosition;
+
 		if (mStartAtHome)
 			mStateMachine->PushToStack(GHOST_STATE_TYPE::EXIT_HOME);
-		else
-			mMoveToPos = mStartPosition; // Reset the move to position so that the ghost actually can move to a position witin range
 	}
 }
 
@@ -602,6 +580,45 @@ void Ghost::SetGhostsShouldReset()
 	mResetting                = true;
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
+{
+	S2D::Vector2 offset = S2D::Vector2(0.0f, 0.0f);
+
+	switch (newDir)
+	{
+	case FACING_DIRECTION::UP:
+		offset.X = 0.5f;
+		offset.Y = -0.5f;
+	break;
+
+	case FACING_DIRECTION::DOWN:
+		offset.X = 0.5f;
+		offset.Y = 1.5f;
+	break;
+
+	case FACING_DIRECTION::LEFT:
+		offset.X = -0.5f;
+		offset.Y = 0.5f;
+	break;
+
+	case FACING_DIRECTION::RIGHT:
+		offset.X = 1.5f;
+		offset.Y = 0.5f;
+	break;
+	}
+
+	// Check if the position is open, or if we are in certain states then we can move through collision marked with a '2'
+	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0' || 
+		(mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '2' && (mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::EXIT_HOME || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::RETURN_HOME)))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //
