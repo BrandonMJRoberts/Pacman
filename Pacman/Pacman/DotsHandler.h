@@ -45,8 +45,8 @@ private:
 	S2D::Texture2D*   mSmallDotSpriteSheet;
 	S2D::Texture2D*   mLargeDotSpriteSheet;
 
-	S2D::Rect*        mSourceRectSmallDot;
-	S2D::Rect*        mSourceRectLargeDot;
+	S2D::Rect         mSourceRectSmallDot;
+	S2D::Rect         mSourceRectLargeDot;
 };
 
 #endif

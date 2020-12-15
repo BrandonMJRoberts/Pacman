@@ -117,7 +117,11 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const f
 
 				return false;
 			}
+			else
+				mCollidedWith = false;
 		}
+		else
+			mCollidedWith = false;
 	}
 	else
 	{

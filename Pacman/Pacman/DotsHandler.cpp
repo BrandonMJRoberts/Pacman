@@ -28,8 +28,8 @@ DotsHandler::DotsHandler()
 		return;
 	}
 
-	mSourceRectLargeDot = new S2D::Rect(0, 0, SPRITE_RESOLUTION, SPRITE_RESOLUTION);
-	mSourceRectSmallDot = new S2D::Rect(0, 0, SPRITE_RESOLUTION, SPRITE_RESOLUTION);
+	mSourceRectLargeDot = S2D::Rect(0, 0, mLargeDotSpriteSheet->GetWidth() / 2.0f, SPRITE_RESOLUTION);
+	mSourceRectSmallDot = S2D::Rect(0, 0, SPRITE_RESOLUTION, SPRITE_RESOLUTION);
 }
 
 // ----------------------------------------------------------------- //
@@ -49,12 +49,6 @@ DotsHandler::~DotsHandler()
 
 	delete mSmallDotSpriteSheet;
 		mSmallDotSpriteSheet = nullptr;
-
-	delete mSourceRectLargeDot;
-		mSourceRectLargeDot = nullptr;
-
-	delete mSourceRectSmallDot;
-		mSourceRectSmallDot = nullptr;
 }
 
 // ----------------------------------------------------------------- //
@@ -65,9 +59,16 @@ void DotsHandler::Render(unsigned int currentFrameCount)
 	for (unsigned int i = 0; i < mDots.size(); i++)
 	{
 		if (mDots[i]->mDotType == DOT_TYPE::SMALL)
-			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), mSourceRectSmallDot);
+			S2D::SpriteBatch::Draw(mSmallDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), &mSourceRectSmallDot);
 		else
-			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), mSourceRectLargeDot);
+		{
+			if (currentFrameCount > (FRAME_RATE / 2.0f))
+				mSourceRectLargeDot.X = mLargeDotSpriteSheet->GetWidth() / 2.0f;
+			else
+				mSourceRectLargeDot.X = 0.0f;
+
+			S2D::SpriteBatch::Draw(mLargeDotSpriteSheet, &(GameManager::Instance()->GetGridOffset() + (mDots[i]->mPosition * SPRITE_RESOLUTION)), &mSourceRectLargeDot);
+		}
 	}
 }
 
