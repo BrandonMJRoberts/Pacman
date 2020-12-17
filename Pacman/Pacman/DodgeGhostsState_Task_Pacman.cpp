@@ -165,7 +165,8 @@ void DodgeGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vec
 
 	for (unsigned int i = 0; i < ghostPositions.size(); i++)
 	{
-		if ((ghostPositions[i] - pacman.GetCentrePosition()).Length() < DISTANCE_FROM_GHOST_BEFORE_FLEE)
+		// The + 2 is so we dont keep swapping in and out of flee state
+		if ((ghostPositions[i] - pacman.GetCentrePosition()).Length() < (DISTANCE_FROM_GHOST_BEFORE_FLEE + 2))
 		{
 			// It is not safe to exit the flee state
 			return;

@@ -19,7 +19,7 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	         const unsigned int spritesOnHeightMain, 
 			 const unsigned int spritesOnWidthAlternate,
 			 const unsigned int spritesOnHeightAlternate, 
-	         const bool         startHome) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate)
+	         const bool         startHome) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate), mHomePosition(S2D::Vector2(14, 12))
 {
 	mThisGhostType            = ghostType;
 
@@ -35,6 +35,7 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	switch (mThisGhostType)
 	{
 	case GHOST_TYPE::RED:
+	default:
 		mStartFrame   = 0;
 		mEndFrame     = 1;
 	break;
@@ -52,9 +53,6 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	case GHOST_TYPE::BLUE:
 		mStartFrame   = 16;
 		mEndFrame     = 17;
-	break;
-
-	default:
 	break;
 	}
 
@@ -111,10 +109,24 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 		if (mIsPlayerControlled)
 		{
 			// As the transition into fleeing is an AI controlled thing we need to do it if the ghost is player controlled
-			if (GameManager::Instance()->GetIsPlayerPoweredUp() && !mGhostIsFleeing)
-				SetGhostIsFleeing(true);
-			else if (!GameManager::Instance()->GetIsPlayerPoweredUp() && mGhostIsFleeing)
-				SetGhostIsFleeing(false);
+			if (!mGhostIsEaten)
+			{
+				if (!mGhostIsFleeing && GameManager::Instance()->GetIsPlayerPoweredUp())
+					SetGhostIsFleeing(true);
+				else if (mGhostIsFleeing && !GameManager::Instance()->GetIsPlayerPoweredUp())
+					SetGhostIsFleeing(false);
+			}
+			else // Now check if the player is eaten and has returned to the home to become a full ghost again
+			{
+				// If returned home
+				if ((int)mCentrePosition.X == (int)mHomePosition.X &&
+					(int)mCentrePosition.Y == (int)mHomePosition.Y)
+				{
+					mIsAlive = true;
+					mGhostIsEaten = false;
+					mGhostIsFleeing = false;
+				}
+			}
 
 			MoveInCurrentDirection(deltaTime);
 
@@ -210,11 +222,6 @@ void Ghost::CheckForDirectionChange()
 			break;
 
 			case FACING_DIRECTION::RIGHT:
-				mStartFrame   = mColourBaseStartFrame;
-				mEndFrame     = mColourBaseEndFrame;
-				mCurrentFrame = mColourBaseStartFrame;
-			break;
-
 			default:
 				mStartFrame   = mColourBaseStartFrame;
 				mEndFrame     = mColourBaseEndFrame;
@@ -245,11 +252,6 @@ void Ghost::CheckForDirectionChange()
 			break;
 
 			case FACING_DIRECTION::RIGHT:
-				mStartFrame   = 4;
-				mEndFrame     = 4;
-				mCurrentFrame = 4;
-			break;
-
 			default:
 				mStartFrame   = 4;
 				mEndFrame     = 4;
@@ -342,13 +344,43 @@ void Ghost::SetGhostIsFleeing(bool newVal)
 {
 	mGhostIsFleeing = newVal;
 
-	if (!newVal)
-		return;
-	else
+	if (newVal)
 	{
 		mStartFrame   = 0;
 		mEndFrame     = 1;
 		mCurrentFrame = 1;
+	}
+	else
+	{
+		switch (mRequestedFacingDirection)
+		{
+		case FACING_DIRECTION::DOWN:
+			mStartFrame   = mColourBaseStartFrame + 6;
+			mEndFrame     = mColourBaseEndFrame + 6;
+			mCurrentFrame = mColourBaseStartFrame + 6;
+		break;
+
+		case FACING_DIRECTION::UP:
+			mStartFrame   = mColourBaseStartFrame + 4;
+			mEndFrame     = mColourBaseEndFrame + 4;
+			mCurrentFrame = mColourBaseStartFrame + 4;
+		break;
+
+		case FACING_DIRECTION::LEFT:
+			mStartFrame   = mColourBaseStartFrame + 2;
+			mEndFrame     = mColourBaseEndFrame + 2;
+			mCurrentFrame = mColourBaseStartFrame + 2;
+		break;
+
+		case FACING_DIRECTION::RIGHT:
+			mStartFrame   = mColourBaseStartFrame;
+			mEndFrame     = mColourBaseEndFrame;
+			mCurrentFrame = mColourBaseStartFrame;
+		break;
+
+		default:
+		break;
+		}
 	}
 }
 
@@ -465,6 +497,9 @@ void Ghost::ResetGhostFromDeath()
 void Ghost::SetGhostsShouldReset()
 {
 	mResetting                = true;
+	mGhostIsFleeing           = false;
+	mGhostIsEaten             = false;
+
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 }
@@ -498,14 +533,22 @@ bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
 	break;
 	}
 
-	// Check if the position is open, or if we are in certain states then we can move through collision marked with a '2'
+	// Check if the position is open, or if we are in certain states then we can move through collision marked with a '2', or if we are player controlled
 	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0' || 
-		(mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '2' && (mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::EXIT_HOME || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::RETURN_HOME)))
+		(mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '2' && (mIsPlayerControlled || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::EXIT_HOME || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::RETURN_HOME)))
 	{
 		return true;
 	}
 
 	return false;
+}
+
+// ------------------------------------------------------------------------------------------------------------------------- //
+
+void Ghost::IncreaseGhostMovementSpeedToNextLevel()
+{
+	if (GameManager::Instance()->GetCurrentLevel() < AMOUNT_OF_LEVELS_GHOSTS_INCREASE_SPEED)
+		mMovementSpeed += GHOST_SPEED_INCREASE_PER_LEVEL;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //

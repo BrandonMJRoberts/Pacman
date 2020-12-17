@@ -45,6 +45,7 @@ public:
 	bool GetIfGhostIsEaten()                    const { return mGhostIsEaten; }
 
 	void SetGhostsShouldReset();
+	void IncreaseGhostMovementSpeedToNextLevel();
 
 private:
 	bool                             CanTurnToDirection(const FACING_DIRECTION direction) override;
@@ -52,6 +53,8 @@ private:
 	void                             CheckForDirectionChange() override; // This function is for setting start and end frames for specific directional sprites
 
 	void							 ResetGhostFromDeath();
+
+	const S2D::Vector2               mHomePosition;
 
 	Stack_FiniteStateMachine_Ghost*  mStateMachine; // Each ghost has a state machine if it is AI controlled
 

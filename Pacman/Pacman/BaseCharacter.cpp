@@ -229,13 +229,16 @@ void BaseCharacter::HandleInput()
 
 void BaseCharacter::ResetCharacter()
 {
-	mCentrePosition           = mStartPosition;
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
 	mStartFrame   = 0;
 	mEndFrame     = 0;
 	mCurrentFrame = 0;
+
+	mCentrePosition = mStartPosition;
+	mMoveToPos     = mCentrePosition;
+	mTargetPositon = mCentrePosition;
 }
 
 // -------------------------------------------------------------------------------- //
@@ -477,10 +480,10 @@ void BaseCharacter::CalculateAIMovementDirection()
 	S2D::Vector2 movementDifferential = mTargetPositon - mCentrePosition;
 
 	// First calculate which movements are valid and then choose which one is the best for the current situation
-	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP) && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
-	bool canMoveDown  = CanTurnToDirection(FACING_DIRECTION::DOWN) && mCurrentFacingDirection != FACING_DIRECTION::UP;
+	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP)    && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
+	bool canMoveDown  = CanTurnToDirection(FACING_DIRECTION::DOWN)  && mCurrentFacingDirection != FACING_DIRECTION::UP;
 	bool canMoveRight = CanTurnToDirection(FACING_DIRECTION::RIGHT) && mCurrentFacingDirection != FACING_DIRECTION::LEFT;
-	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
+	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT)  && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
 
 	// So that you only consider the alternate axis if beyond a certain amount
 	float accuracy = 0.5f;
@@ -541,14 +544,14 @@ void BaseCharacter::CalculateAIMovementDirection()
 	else
 	{
 		// If there are no good options then just choose another direction to go
-		if (canMoveDown)
-			SetToMoveInDirection(FACING_DIRECTION::DOWN);
-		else if (canMoveUp)
-			SetToMoveInDirection(FACING_DIRECTION::UP);
-		else if (canMoveLeft)
+		if(canMoveLeft)
 			SetToMoveInDirection(FACING_DIRECTION::LEFT);
+		else if (canMoveDown)
+			SetToMoveInDirection(FACING_DIRECTION::DOWN);
 		else if (canMoveRight)
 			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
+		else if (canMoveUp)
+			SetToMoveInDirection(FACING_DIRECTION::UP);
 
 		return;
 	}

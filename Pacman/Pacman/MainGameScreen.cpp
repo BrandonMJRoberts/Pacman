@@ -100,7 +100,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 			std::vector<S2D::Vector2> ghostPositions;
 			for (unsigned int i = 0; i < mGhosts.size(); i++)
 			{
-				if (mGhosts[i])
+				if (mGhosts[i] && mGhosts[i]->GetCanLeaveHome())
 					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
 			}
 
@@ -164,6 +164,8 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 			// Reset the current score to zero
 			GameManager::Instance()->SetCurrentScore(0);
+
+			AudioManager::GetInstance()->StopAllAudio();
 
 			return SCREENS::MAIN_MENU;
 		}
@@ -415,7 +417,7 @@ void MainGameScreen::CheckForCharacterCollisions()
 							else
 							{
 								// Make sure we add the needed points to the current score
-								gm->AddToScore(POINTS_PER_PACMAN_KILL / GameManager::Instance()->GetAmountOfGhostsReleased());
+								gm->AddToScore(MAX_POINTS_PER_PACMAN_KILL / GameManager::Instance()->GetAmountOfGhostsReleased());
 							}
 						}
 
@@ -455,7 +457,10 @@ void MainGameScreen::LoadNextLevel()
 
 	// Make sure the ghosts reset as well as the rest of the level
 	for (unsigned int i = 0; i < mGhosts.size(); i++)
+	{
 		mGhosts[i]->SetGhostsShouldReset();
+		mGhosts[i]->IncreaseGhostMovementSpeedToNextLevel();
+	}
 
 	mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 	mAmountOfGhostsReleased = 1;

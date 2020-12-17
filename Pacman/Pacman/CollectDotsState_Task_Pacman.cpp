@@ -25,6 +25,18 @@ void CollectDotsGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::
 {
 	// We are not in a panic state, so lets just collect some dots
 	targetPositionRef = dotManager.GetRandomDotPosition();
+
+	// Now make sure that the position is in the centre of a segment, as if it is on the edge then pacman can miss it
+	if ((int)targetPositionRef.X - targetPositionRef.X == 0.0f)
+	{
+		targetPositionRef.X = (int)targetPositionRef.X + 0.5f;
+	}
+
+	if ((int)targetPositionRef.Y - targetPositionRef.Y == 0.0f)
+	{
+		targetPositionRef.Y = (int)targetPositionRef.Y + 0.5f;
+	}
+
 }
 
 // ---------------------------------------------------- //

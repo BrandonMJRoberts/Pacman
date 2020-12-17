@@ -185,10 +185,8 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pa
 					}
 				}
 
-				Dot* placeholder        = mDots[mDots.size() - 1];
-				mDots[mDots.size() - 1] = mDots[i];
-				mDots[i]                = placeholder;
-				mDots.pop_back();
+				delete mDots[i];
+				mDots.erase(mDots.begin() + i);
 
 				GameManager::Instance()->DecreaseRemainingDots(1);
 				GameManager::Instance()->IncrementDotsEatenCount();
@@ -209,9 +207,9 @@ S2D::Vector2 DotsHandler::GetRandomDotPosition()
 {
 	if (mDots.size() > 0)
 	{
-		if (mRandomDotIndex == -1)
+		while (mRandomDotIndex == -1 || mRandomDotIndex >= (int)mDots.size())
 		{
-			mRandomDotIndex = rand() % mDots.size();
+			mRandomDotIndex = (unsigned int)((unsigned int)rand() % mDots.size());
 		}
 
 		return mDots[mRandomDotIndex]->mPosition;

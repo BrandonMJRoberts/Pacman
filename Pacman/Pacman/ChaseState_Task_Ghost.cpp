@@ -76,20 +76,9 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 	return;
 
 	case GHOST_TYPE::ORANGE:
-		// Random position
-		//S2D::Vector2 randomPos = S2D::Vector2(-1, -1);
+		// In actual pacman the orange ghost moves randomly until it goes within a range of pacman, but for simplicity ive left it to just chase pacman directly
 
-		// While we havent picked a valid random position then pick another one
-		//while (!CheckIsValidMove(randomPos))
-		//{
-		//	randomPos.X = rand()%;
-		//	randomPos.Y = rand()%;
-		//}
-
-		//targetPositionRef = randomPos;
-		//return;
-
-		targetPositionRef = S2D::Vector2((int)pacmanPos.X + positionalOffset.X, (int)pacmanPos.Y + positionalOffset.Y);
+		targetPositionRef = S2D::Vector2((int)pacmanPos.X, (int)pacmanPos.Y);
 	return;
 
 	case GHOST_TYPE::BLUE:

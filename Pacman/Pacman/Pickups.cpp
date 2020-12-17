@@ -156,49 +156,64 @@ bool PickUps::CheckForCollision(const S2D::Vector2 pacmanCentrePosition, const f
 			switch (mThisPickupType)
 			{
 			case PICKUP_TYPES::CHERRY:
-				GameManager::Instance()->AddToScore(100);
+				if(GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(100);
+
 				magnitude = 0;
 			break;
 
 			case PICKUP_TYPES::APPLE:
-				GameManager::Instance()->AddToScore(700);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(700);
+
 				magnitude = 3;
 			break;
 
 			case PICKUP_TYPES::BELL:
-				GameManager::Instance()->AddToScore(3000);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(3000);
+
 				magnitude = 6;
 			break;
 
 			case PICKUP_TYPES::CUP:
-				GameManager::Instance()->AddToScore(2000);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(2000);
+
 				magnitude = 5;
 			break;
 
 			case PICKUP_TYPES::KEY:
-				GameManager::Instance()->AddToScore(5000);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(5000);
+
 				magnitude = 7;
 			break;
 
 			case PICKUP_TYPES::LIME:
-				GameManager::Instance()->AddToScore(1000);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(1000);
+
 				magnitude = 4;
 			break;
 
 			case PICKUP_TYPES::PEACH:
-				GameManager::Instance()->AddToScore(500);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(500);	
+
 				magnitude = 2;
 			break;
 
 			case PICKUP_TYPES::STRAWBERRY:
-				GameManager::Instance()->AddToScore(300);
+				if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+					GameManager::Instance()->AddToScore(300);
+
 				magnitude = 1;
 			break;
 			}
 
 			UIManager::GetInstance()->DisplayPoints(renderPos, false, magnitude);
 			AudioManager::GetInstance()->PlayEatingFruitSFX();
-
 
 			// We have been passed over so return this to the higher function call
 			return true;
