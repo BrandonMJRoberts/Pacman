@@ -5,6 +5,7 @@
 
 #include "Stack_FiniteStateMachine.h"
 #include "AudioManager.h"
+#include "DotsHandler.h"
 
 #include <iostream>
 
@@ -28,11 +29,8 @@ PacmanCharacter::PacmanCharacter(char** const       collisionMap,
 																					spritesOnWidthAlternate,
 																					spritesOnHeightAlternate)
 {
-	// Setup the state machine that is needed for the AI controls
-	if (!mIsPlayerControlled)
-		mStateMachine = new Stack_FiniteStateMachine_Pacman();
-	else
-		mStateMachine = nullptr;
+	// Setup the state machine that is needed for the AI controls - just disable it if the player is controlling pacman - to avoid any nullptr references
+	mStateMachine = new Stack_FiniteStateMachine_Pacman(isAIControlled);
 
 	mCurrentFrame       = 8;
 	mStartFrame         = 8;
@@ -41,6 +39,14 @@ PacmanCharacter::PacmanCharacter(char** const       collisionMap,
 	mMovementSpeed      = PACMAN_MOVEMENT_SPEED;
 
 	mFramesPerAnimation       = 6;
+
+	if (isAIControlled)
+	{
+		mMoveToPos = mCentrePosition;	
+
+		mCurrentFacingDirection   = FACING_DIRECTION::NONE;
+		mRequestedFacingDirection = FACING_DIRECTION::NONE;
+	}
 }
 
 // ------------------------------------------------------------- //
@@ -61,7 +67,7 @@ PacmanCharacter::~PacmanCharacter()
 void PacmanCharacter::CheckForDirectionChange()
 {
 	// Now check to see if the player can change direction 
-	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mRequestedFacingDirection == mCurrentFacingDirection || mTimePerChangeDirectionRemaining > 0.0f)
 	{
 		// Quick out if the player has not entered anything
 		return;
@@ -69,7 +75,10 @@ void PacmanCharacter::CheckForDirectionChange()
 	else
 	{
 		// If we have changed direction then reset the countdown for the next change of direction
-		mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
+		if (mIsPlayerControlled)
+			mTimePerChangeDirectionRemaining = PLAYER_CHANGE_DIRECTION_DELAY;
+		else
+			mTimePerChangeDirectionRemaining = 0.0f;
 
 		switch (mRequestedFacingDirection)
 		{
@@ -111,26 +120,54 @@ void PacmanCharacter::CheckForDirectionChange()
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::Update(const float deltaTime)
+void PacmanCharacter::Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager)
 {
 	if (mIsAlive)
 	{
-		// First call the base update function to do the generic update calls
 		BaseCharacter::Update(deltaTime);
 
 		if (mTimePerChangeDirectionRemaining > 0.0f)
 			mTimePerChangeDirectionRemaining -= deltaTime;
 
-		// Now move the player in the correct direction
-		MoveInCurrentDirection(deltaTime);
-
-		CheckForDirectionChange();
-
-		// Now do this class specific update functionality
+		// First check if pacman is player controlled
 		if (mIsPlayerControlled)
-			UpdateAsPlayerControlled(deltaTime);
+		{
+			MoveInCurrentDirection(deltaTime);
+
+			CheckForDirectionChange();
+
+			// Handle the player's input
+			HandleInput();
+
+			CheckForDirectionChange();
+		}
 		else
-			UpdateAsAI();
+		{
+			double accuracy = 0.3f;
+
+			// First move in the current direction
+			MoveInCurrentDirection(deltaTime);
+
+			// Get the target position
+			BaseState_Pacman* currentState = mStateMachine->PeekStack();
+			if (currentState)
+			{
+				// Update the current state and get the target position for pacman
+				currentState->OnUpdate(mCentrePosition, mTargetPositon, ghostPositions, dotManager);
+
+				// Check if we should transition out of the current state
+				currentState->CheckTransitions(*this, ghostPositions);
+			}
+
+			// If we are at the next position to be moved to then calculate another one
+			if (S2D::Vector2::Distance(mCentrePosition, mMoveToPos) < accuracy)
+			{
+				CalculateAIMovementDirection(); // Now calclate where we need to actually move to - the centre of which segment
+			}
+
+			// Check if the ghost should change facing direction
+			CheckForDirectionChange();
+		}
 	}
 	else
 	{
@@ -142,31 +179,6 @@ void PacmanCharacter::Update(const float deltaTime)
 			// Make sure everything is reset
 			ResetPacmanFromDeath();
 		}
-	}
-}
-
-// ------------------------------------------------------------- //
-
-void PacmanCharacter::UpdateAsPlayerControlled(const float deltaTime)
-{
-	// First check for input
-	HandleInput();
-
-	// Now we have the requested direction to face we need to check if it is a valid change, so:
-	// Now check if the player should change facing direction
-	CheckForDirectionChange();
-}
-
-// ------------------------------------------------------------- //
-
-void PacmanCharacter::UpdateAsAI()
-{
-	if (mStateMachine->PeekStack())
-	{
-		mStateMachine->PeekStack()->OnUpdate();
-		
-		// Now perform the transition checks as to which state we should swap to
-		mStateMachine->PeekStack()->CheckTransitions();
 	}
 }
 
@@ -297,22 +309,24 @@ void PacmanCharacter::ResetPacmanFromDeath()
 	mStartFrame   = 8;
 
 	mCentrePosition = mStartPosition;
-	mTargetPositon  = mStartPosition;
+	mMoveToPos      = mCentrePosition;
+	//mTargetPositon  = mStartPosition;
 
-	mCurrentFacingDirection = FACING_DIRECTION::NONE;
+	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
+	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
-	if (mStateMachine && !mIsPlayerControlled)
+	// Reset the state machine if there is one
+	if (mStateMachine)
 	{
 		while (mStateMachine->PeekStack())
 		{
 			// Clear the state machine of anything that is on it
 			mStateMachine->PopStack();
 		}
-	}
 
-	// Now add the default behavior if is AI controlled
-	if (!mIsPlayerControlled && mStateMachine)
-		mStateMachine->PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
+		if(!mIsPlayerControlled)
+			mStateMachine->PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
+	}
 }
 
 // ------------------------------------------------------------- //

@@ -35,12 +35,17 @@ public:
 	void Update(const S2D::Vector2 pacmanPosition, const float pacmanDimensions);
 	void Render(const unsigned int currentFrameCount);
 
+	std::vector<S2D::Vector2> GetLargeDotPositions() { return mLargeDotsPositions; }
+	S2D::Vector2              GetRandomDotPosition();
+
 private:
 	void LoadInDotData();
 
 	unsigned int      mTotalDots;
+	int               mRandomDotIndex;
 
 	std::vector<Dot*> mDots;
+	std::vector<S2D::Vector2> mLargeDotsPositions;
 
 	S2D::Texture2D*   mSmallDotSpriteSheet;
 	S2D::Texture2D*   mLargeDotSpriteSheet;

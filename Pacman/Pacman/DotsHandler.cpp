@@ -28,8 +28,10 @@ DotsHandler::DotsHandler()
 		return;
 	}
 
-	mSourceRectLargeDot = S2D::Rect(0, 0, mLargeDotSpriteSheet->GetWidth() / 2.0f, SPRITE_RESOLUTION);
+	mSourceRectLargeDot = S2D::Rect(0, 0, mLargeDotSpriteSheet->GetWidth() / 2, SPRITE_RESOLUTION);
 	mSourceRectSmallDot = S2D::Rect(0, 0, SPRITE_RESOLUTION, SPRITE_RESOLUTION);
+
+	mRandomDotIndex     = -1;
 }
 
 // ----------------------------------------------------------------- //
@@ -49,6 +51,8 @@ DotsHandler::~DotsHandler()
 
 	delete mSmallDotSpriteSheet;
 		mSmallDotSpriteSheet = nullptr;
+
+	mLargeDotsPositions.clear();
 }
 
 // ----------------------------------------------------------------- //
@@ -118,6 +122,7 @@ void DotsHandler::LoadInDotData()
 		else if (typeOfDot == 2)
 		{
 			mDots.push_back(new Dot(S2D::Vector2((float)xPos, (float)yPos), DOT_TYPE::LARGE));
+			mLargeDotsPositions.push_back(S2D::Vector2((float)xPos, (float)yPos));
 			continue;
 		}
 		else
@@ -148,17 +153,36 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pa
 		{
 			if (mDots[i]->mPosition.Y + 0.5f > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->mPosition.Y + 0.5f < pacmanCentrePosition.Y + pacmanDimensions)
 			{
+				if (i == mRandomDotIndex)
+					mRandomDotIndex = -1;
+
 				// Add score to the player's score based on the type of dot it is
 				if (mDots[i]->mDotType == DOT_TYPE::SMALL)
 				{
-					GameManager::Instance()->AddToScore(10);
+					if(GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+						GameManager::Instance()->AddToScore(10);
 				}
 				else
 				{
-					GameManager::Instance()->AddToScore(50);
+					if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
+						GameManager::Instance()->AddToScore(50);
+
 					GameManager::Instance()->SetPlayerPoweredUp(true);
 
 					AudioManager::GetInstance()->PlayGhostFleeingSFX_1();
+
+					// Now make sure we remove the large dot position from the list of positions
+					for (unsigned int i = 0; i < mLargeDotsPositions.size(); i++)
+					{
+						if (mDots[i]->mPosition.X + 0.5f > pacmanCentrePosition.X - pacmanDimensions && mDots[i]->mPosition.X + 0.5f < pacmanCentrePosition.X + pacmanDimensions)
+						{
+							if (mDots[i]->mPosition.Y + 0.5f > pacmanCentrePosition.Y - pacmanDimensions && mDots[i]->mPosition.Y + 0.5f < pacmanCentrePosition.Y + pacmanDimensions)
+							{
+								mLargeDotsPositions.erase(mLargeDotsPositions.begin() + i);
+								break;
+							}
+						}
+					}
 				}
 
 				Dot* placeholder        = mDots[mDots.size() - 1];
@@ -177,6 +201,23 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pa
 	}
 
 	return;
+}
+
+// ----------------------------------------------------------------- //
+
+S2D::Vector2 DotsHandler::GetRandomDotPosition()
+{
+	if (mDots.size() > 0)
+	{
+		if (mRandomDotIndex == -1)
+		{
+			mRandomDotIndex = rand() % mDots.size();
+		}
+
+		return mDots[mRandomDotIndex]->mPosition;
+	}
+	else
+		return S2D::Vector2();
 }
 
 // ----------------------------------------------------------------- //

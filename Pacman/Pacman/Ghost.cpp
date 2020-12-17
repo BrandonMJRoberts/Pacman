@@ -110,6 +110,12 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 		// First check if the ghost is player controlled
 		if (mIsPlayerControlled)
 		{
+			// As the transition into fleeing is an AI controlled thing we need to do it if the ghost is player controlled
+			if (GameManager::Instance()->GetIsPlayerPoweredUp() && !mGhostIsFleeing)
+				SetGhostIsFleeing(true);
+			else if (!GameManager::Instance()->GetIsPlayerPoweredUp() && mGhostIsFleeing)
+				SetGhostIsFleeing(false);
+
 			MoveInCurrentDirection(deltaTime);
 
 			CheckForDirectionChange();
@@ -165,7 +171,7 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 void Ghost::CheckForDirectionChange()
 {
 	// Now check to see if the player can change direction 
-	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mTimePerChangeDirectionRemaining > 0.0f)
+	if (mRequestedFacingDirection == FACING_DIRECTION::NONE || mRequestedFacingDirection == mCurrentFacingDirection || mTimePerChangeDirectionRemaining > 0.0f)
 	{
 		// Quick out if the player has not entered anything
 		return;
@@ -263,125 +269,6 @@ void Ghost::CheckForDirectionChange()
 	}
 }
 
-// -------------------------------------------------------------------- //
-
-void Ghost::SetToMoveInDirection(FACING_DIRECTION direction)
-{
-	switch (direction)
-	{
-	case FACING_DIRECTION::RIGHT:
-		// Set the move to pos to be the centre of the next segment to move to
-		mMoveToPos                = S2D::Vector2((int)mCentrePosition.X + 1.5f, (int)mCentrePosition.Y + 0.5f);
-		mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
-	break;
-
-	case FACING_DIRECTION::LEFT:
-		// Set the move to pos to be the centre of the next segment to move to
-		mMoveToPos                = S2D::Vector2((int)mCentrePosition.X - 0.5f, (int)mCentrePosition.Y + 0.5f);
-		mRequestedFacingDirection = FACING_DIRECTION::LEFT;
-	break;
-
-	case FACING_DIRECTION::UP:
-		// Set the move to pos to be the centre of the next segment to move to
-		mMoveToPos                = S2D::Vector2((int)mCentrePosition.X + 0.5f, (int)mCentrePosition.Y - 0.5f);
-		mRequestedFacingDirection = FACING_DIRECTION::UP;
-	break;
-
-	case FACING_DIRECTION::DOWN:
-		// Set the move to pos to be the centre of the next segment to move to
-		mMoveToPos                = S2D::Vector2((int)mCentrePosition.X + 0.5f, (int)mCentrePosition.Y + 1.5f);
-		mRequestedFacingDirection = FACING_DIRECTION::DOWN;
-	break;
-	}
-}
-
-// -------------------------------------------------------------------- //
-
-void Ghost::CalculateAIMovementDirection()
-{
-	// Now calculate where we need to go to get to the taget position
-	S2D::Vector2 movementDifferential = mTargetPositon - mCentrePosition;
-
-	// First calculate which movements are valid and then choose which one is the best for the current situation
-	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP)    && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
-	bool canMoveDown  = CanTurnToDirection(FACING_DIRECTION::DOWN)  && mCurrentFacingDirection != FACING_DIRECTION::UP;
-	bool canMoveRight = CanTurnToDirection(FACING_DIRECTION::RIGHT) && mCurrentFacingDirection != FACING_DIRECTION::LEFT;
-	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT)  && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
-
-	// So that you only consider the alternate axis if beyond a certain amount
-	float accuracy = 0.5f;
-
-	bool validVertical = false, validHorizontal = false;
-
-	if ((movementDifferential.X > accuracy && canMoveRight) || 
-		(movementDifferential.X < -accuracy && canMoveLeft))
-		validHorizontal = true;
-
-	if ((movementDifferential.Y > accuracy && canMoveDown) || 
-		(movementDifferential.Y < -accuracy && canMoveUp))
-		validVertical = true;
-
-	// If both axis are valid then choose the one with the greatest distance to go
-	if (validVertical && validHorizontal)
-	{
-		// Choose the direction with the greatest distance remaining
-		if (abs(movementDifferential.X) > abs(movementDifferential.Y))
-		{
-			// If you want to go right and you can, then go right
-			if (canMoveRight && movementDifferential.X > accuracy)
-				SetToMoveInDirection(FACING_DIRECTION::RIGHT);
-
-			if (canMoveLeft && movementDifferential.X < -accuracy)
-				SetToMoveInDirection(FACING_DIRECTION::LEFT);
-
-			return;
-		}
-		else
-		{
-			if (canMoveDown && movementDifferential.Y > accuracy)
-				SetToMoveInDirection(FACING_DIRECTION::DOWN);
-
-			if (canMoveUp && movementDifferential.Y < -accuracy)
-				SetToMoveInDirection(FACING_DIRECTION::UP);
-
-			return;
-		}
-	}
-	else if (validVertical || validHorizontal)
-	{
-		// If only one option is avaliable then go in that direction
-		if (canMoveRight && movementDifferential.X > accuracy)
-			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
-
-		if (canMoveLeft && movementDifferential.X < -accuracy)
-			SetToMoveInDirection(FACING_DIRECTION::LEFT);
-
-		if (canMoveDown && movementDifferential.Y > accuracy)
-			SetToMoveInDirection(FACING_DIRECTION::DOWN);
-
-		if (canMoveUp && movementDifferential.Y < -accuracy)
-			SetToMoveInDirection(FACING_DIRECTION::UP);
-
-		return;
-	}
-	else
-	{
-		// If there are no good options then just choose another direction to go
-		if (canMoveDown)
-			SetToMoveInDirection(FACING_DIRECTION::DOWN);
-		else if (canMoveUp)
-			SetToMoveInDirection(FACING_DIRECTION::UP);
-		else if (canMoveLeft)
-			SetToMoveInDirection(FACING_DIRECTION::LEFT);
-		else if (canMoveRight)
-			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
-
-		return;
-	}
-
-	return;
-}
-
 // ------------------------------------------------------------------------------------------------------------------------- //
 
 void Ghost::Render(const unsigned int frameCount)
@@ -437,7 +324,7 @@ void Ghost::Render(const unsigned int frameCount)
 	else if (!mIsAlive || mGhostIsFleeing || mGhostIsEaten)
 	{
 		// First calculate the source rect
-		mSourceRect.X   = float((mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
+		mSourceRect.X   = float(   (mCurrentFrame % mSpritesOnWidthAlternate) * mSingleSpriteWidthAlternate);
 		mSourceRect.Y   = float(int(mCurrentFrame / mSpritesOnWidthAlternate) * mSingleSpriteHeightAlternate);
 
 		mRenderPosition = S2D::Vector2(mCentrePosition.X - ((mSingleSpriteWidthAlternate * 0.5f) / SPRITE_RESOLUTION), mCentrePosition.Y - ((mSingleSpriteHeightAlternate * 0.5f) / SPRITE_RESOLUTION)) * SPRITE_RESOLUTION;

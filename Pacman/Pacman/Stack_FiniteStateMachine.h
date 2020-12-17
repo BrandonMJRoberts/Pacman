@@ -35,7 +35,7 @@ private:
 class Stack_FiniteStateMachine_Pacman final
 {
 public:
-	Stack_FiniteStateMachine_Pacman();
+	Stack_FiniteStateMachine_Pacman(bool enabled);
 	~Stack_FiniteStateMachine_Pacman();
 
 	BaseState_Pacman*		 PeekStack();

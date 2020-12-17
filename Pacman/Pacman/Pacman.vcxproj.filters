@@ -144,6 +144,12 @@
     <ClCompile Include="BaseCharacter.cpp">
       <Filter>Source Files\Game Components\Characters</Filter>
     </ClCompile>
+    <ClCompile Include="CollectDotsState_Task_Pacman.cpp">
+      <Filter>Source Files\AI\Pacman Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="DodgeGhostsState_Task_Pacman.cpp">
+      <Filter>Source Files\AI\Pacman Tasks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pacman.h">
@@ -226,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="BaseCharacter.h">
       <Filter>Header Files\Game Components\Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectDotsState_Task_Pacman.h">
+      <Filter>Header Files\Game Components\AI\PacmanTasks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

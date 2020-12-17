@@ -80,9 +80,20 @@ BaseState_Ghost* Stack_FiniteStateMachine_Ghost::PeekStack()
 // -----------------------------  PACMAN  -----------------------------------------//
 // --------------------------------------------------------------------------------//
 
-Stack_FiniteStateMachine_Pacman::Stack_FiniteStateMachine_Pacman()
-{
+#include "BaseState_Task_Pacman.h"
+#include "ChaseGhostsState_Task_Pacman.h"
+#include "CollectDotsState_Task_Pacman.h"
+#include "DodgeGhostsState_Task_Pacman.h"
 
+// --------------------------------------------------------------------------------//
+
+Stack_FiniteStateMachine_Pacman::Stack_FiniteStateMachine_Pacman(bool enabled)
+{
+	if (enabled)
+	{
+		// Default to a collect dots state
+		PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
+	}
 }
 
 // --------------------------------------------------------------------------------//
@@ -102,23 +113,15 @@ void Stack_FiniteStateMachine_Pacman::PushToStack(PACMAN_STATE_TYPES newState)
 	switch (newState)
 	{
 	case PACMAN_STATE_TYPES::CHASE:
-
+		mCurrentStack.push_back(new ChaseGhostsState_Pacman());
 	break;
 
 	case PACMAN_STATE_TYPES::FLEE:
-
+		mCurrentStack.push_back(new DodgeGhostsState_Pacman());
 	break;
 
 	case PACMAN_STATE_TYPES::COLLECT_DOTS:
-
-	break;
-
-	case PACMAN_STATE_TYPES::COLLECT_FRUIT:
-
-	break;
-
-	case PACMAN_STATE_TYPES::COLLECT_POWERUP:
-
+		mCurrentStack.push_back(new CollectDotsGhostsState_Pacman());
 	break;
 
 	default: break;
@@ -145,3 +148,5 @@ BaseState_Pacman* Stack_FiniteStateMachine_Pacman::PeekStack()
 	else
 		return nullptr;
 }
+
+// --------------------------------------------------------------------------------//

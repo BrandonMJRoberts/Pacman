@@ -87,7 +87,7 @@ enum class PACMAN_STATE_TYPES
 {
 	CHASE = 0,
 	FLEE,
-	COLLECT_DOTS,
-	COLLECT_POWERUP,
-	COLLECT_FRUIT
+	COLLECT_DOTS
 };
+
+// ------------------------------------------------------------------ //

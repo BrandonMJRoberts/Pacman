@@ -96,7 +96,15 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		// Update the dots in the level
 		if (mPacman)
 		{
-			mPacman->Update(deltaTime);
+			// Get all of the ghosts positions to pass to pacmans
+			std::vector<S2D::Vector2> ghostPositions;
+			for (unsigned int i = 0; i < mGhosts.size(); i++)
+			{
+				if (mGhosts[i])
+					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
+			}
+
+			mPacman->Update(deltaTime, ghostPositions, *mDotHandler);
 
 			if(mDotHandler)
 				mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
@@ -105,26 +113,7 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		// First check if the level is over
 		if (GameManager::Instance()->GetRemainingDots() == 0)
 		{
-			// Increase the level in the game manager
-			GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
-
-			// Reset the player
-			mPacman->ResetCharacter();
-
-			// Make sure we change the background colour to being the next level's
-			mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
-
-			// Make sure the ghosts reset as well as the rest of the level
-			for (unsigned int i = 0; i < mGhosts.size(); i++)
-				mGhosts[i]->SetGhostsShouldReset();
-
-			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
-			mAmountOfGhostsReleased       = 1;
-
-			AudioManager::GetInstance()->StopAllAudio();
-
-			delete mCollectable;
-			mCollectable = nullptr;
+			LoadNextLevel();
 		}
 
 		// Update all ghosts
@@ -449,6 +438,32 @@ void MainGameScreen::CheckForCharacterCollisions()
 			}
 		}
 	}
+}
+
+// ------------------------------------------------------------------------------ //
+
+void MainGameScreen::LoadNextLevel()
+{
+	// Increase the level in the game manager
+	GameManager::Instance()->LoadLevel(GameManager::Instance()->GetCurrentLevel() + 1);
+
+	// Reset the player
+	mPacman->ResetCharacter();
+
+	// Make sure we change the background colour to being the next level's
+	mBackground->ChangeColourIndex(GameManager::Instance()->GetCurrentLevel());
+
+	// Make sure the ghosts reset as well as the rest of the level
+	for (unsigned int i = 0; i < mGhosts.size(); i++)
+		mGhosts[i]->SetGhostsShouldReset();
+
+	mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+	mAmountOfGhostsReleased = 1;
+
+	AudioManager::GetInstance()->StopAllAudio();
+
+	delete mCollectable;
+	mCollectable = nullptr;
 }
 
 // ------------------------------------------------------------------------------ //

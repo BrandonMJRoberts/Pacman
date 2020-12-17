@@ -9,6 +9,7 @@
 #include "BaseCharacter.h"
 
 class Stack_FiniteStateMachine_Pacman;
+class DotsHandler;
 
 class PacmanCharacter final : public BaseCharacter
 {
@@ -25,17 +26,18 @@ public:
 		            bool               isAIControlled);
 	~PacmanCharacter() override;
 
-	void             Update(const float deltaTime) override;
+	//void             Update(const float deltaTime) override;
+	void             Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager);
 	void             SetIsAlive(bool newVal) override;
 
 	void             Render(const unsigned int frameCount) override;
+
+	Stack_FiniteStateMachine_Pacman& GetStateMachine() { return *mStateMachine; }
+
 private:
 
 	void             ReSetupPacmanSourceRect(float x, float y, unsigned int width, unsigned int height);
 	void             CheckForDirectionChange() override;
-
-	void             UpdateAsPlayerControlled(const float deltaTime);
-	void             UpdateAsAI();
 
 	void             ResetPacmanFromDeath();
 

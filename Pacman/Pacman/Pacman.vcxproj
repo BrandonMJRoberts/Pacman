@@ -91,6 +91,8 @@
     <ClCompile Include="BaseState_Task_Pacman.cpp" />
     <ClCompile Include="ChaseGhostsState_Task_Pacman.cpp" />
     <ClCompile Include="ChaseState_Task_Ghost.cpp" />
+    <ClCompile Include="CollectDotsState_Task_Pacman.cpp" />
+    <ClCompile Include="DodgeGhostsState_Task_Pacman.cpp" />
     <ClCompile Include="ExitHome_Task_Ghost.cpp" />
     <ClCompile Include="FleeState_Task_Ghost.cpp" />
     <ClCompile Include="Ghost.cpp" />
@@ -118,6 +120,7 @@
     <ClInclude Include="BaseState_Task_Pacman.h" />
     <ClInclude Include="ChaseGhostsState_Task_Pacman.h" />
     <ClInclude Include="ChaseState_Task_Ghost.h" />
+    <ClInclude Include="CollectDotsState_Task_Pacman.h" />
     <ClInclude Include="DodgeGhostsState_Task_Pacman.h" />
     <ClInclude Include="ExitHome_Task_Ghost.h" />
     <ClInclude Include="FleeState_Task_Ghost.h" />
