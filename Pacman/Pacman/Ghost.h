@@ -94,6 +94,8 @@ private:
 	void                             CalculateAIMovementDirection() override;
 
 	const S2D::Vector2               mHomePosition;
+	const S2D::Vector2               mHomeEntranceRightPosition;
+	const S2D::Vector2               mHomeEntranceLeftPosition;
 
 	Stack_FiniteStateMachine_Ghost*  mStateMachine; // Each ghost has a state machine if it is AI controlled
 

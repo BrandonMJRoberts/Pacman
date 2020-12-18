@@ -92,8 +92,9 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		if (mPacmanPreviousPowerupState != playerIsPoweredUp)
 		{
 			ghost->SetGhostIsFleeing(playerIsPoweredUp);
-			mPacmanPreviousPowerupState = playerIsPoweredUp;
 		}
+
+		mPacmanPreviousPowerupState = playerIsPoweredUp;
 	}
 	else
 		return;

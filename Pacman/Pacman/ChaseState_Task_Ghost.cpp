@@ -125,14 +125,18 @@ void ChaseState_Ghost::CheckTransitions(Ghost* ghost)
 		bool currentPoweredUpState = GameManager::Instance()->GetIsPlayerPoweredUp();
 
 		// From here we can transition into FLEE, but only if this is a fresh power-up collected
-		if (currentPoweredUpState && currentPoweredUpState != mPreviousPoweredUpState)
+		if (currentPoweredUpState && (currentPoweredUpState != mPreviousPoweredUpState))
 		{
 			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::FLEE);	
 			ghost->SetTargetPosition(ghost->GetCentrePosition());
-		}
 
-		// Make sure to save the new state
-		mPreviousPoweredUpState = currentPoweredUpState;
+			mPreviousPoweredUpState = false;
+		}
+		else
+		{
+			// Make sure to save the new state
+			mPreviousPoweredUpState = currentPoweredUpState;
+		}
 	}
 	else
 		return;

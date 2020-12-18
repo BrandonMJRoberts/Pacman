@@ -12,7 +12,7 @@
 #define SPRITE_RESOLUTION            16
 #define TWICE_SPRITE_RESOLUTION (SPRITE_RESOLUTION * 2)
 
-#define TIME_IN_POWER_PELLET          5.0f
+#define TIME_IN_POWER_PELLET          4.2f
 #define TIME_POINTS_SHOW_FOR          4.0f
 #define TIME_IN_PRE_GAME              5.0f
 #define TIME_PER_GHOST_RELEASE       15.0f

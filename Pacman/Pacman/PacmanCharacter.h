@@ -54,7 +54,7 @@ public:
 	~PacmanCharacter() override;
 
 	//void             Update(const float deltaTime) override;
-	void             Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager);
+	void             Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager, std::vector<bool> validGhostsToEat);
 	void             SetIsAlive(bool newVal) override;
 
 	void             Render(const unsigned int frameCount) override;
@@ -67,6 +67,7 @@ private:
 	void             CheckForDirectionChange() override;
 
 	void             ResetPacmanFromDeath();
+	void             ResetPacmanStateMachine();
 
 	Stack_FiniteStateMachine_Pacman* mStateMachine;
 };

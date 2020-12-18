@@ -13,7 +13,7 @@ public:
 	virtual     ~BaseState_Pacman();
 
 	virtual void OnUpdate(S2D::Vector2 currentPosition, S2D::Vector2& targetPositionRef, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager);
-	virtual void CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions);
+	virtual void CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions, std::vector<bool> validGhostsToEat);
 
 protected:
 	virtual void OnEnter();

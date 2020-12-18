@@ -104,21 +104,28 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 		// Get all of the ghosts positions to pass to pacman, and update the ghosts at the same time
 		std::vector<S2D::Vector2> ghostPositions;
+		std::vector<bool>         validGhostsToEat;
 		for (unsigned int i = 0; i < mGhosts.size(); i++)
 		{
 			if (mGhosts[i])
 			{
 				mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
 
-				if(mGhosts[i]->GetCanLeaveHome())
+				// Only consider a ghost if it is on the board and can be interacted with
+				if(mGhosts[i]->GetCanLeaveHome() && !mGhosts[i]->GetIfGhostIsEaten())
 					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
+
+				if (mGhosts[i]->GetCanLeaveHome() && mGhosts[i]->GetGhostIsFleeing() && mGhosts[i]->GetIfGhostIsEaten())
+					validGhostsToEat.push_back(true);
+				else
+					validGhostsToEat.push_back(false);
 			}
 		}
 
 		// Update pacman and the dots in the level
 		if (mPacman && mDotHandler)
 		{
-			mPacman->Update(deltaTime, ghostPositions, *mDotHandler);
+			mPacman->Update(deltaTime, ghostPositions, *mDotHandler, validGhostsToEat);
 			mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
 		}
 
@@ -170,6 +177,8 @@ void MainGameScreen::HandleGhostRelease(const float deltaTime)
 				mAmountOfGhostsReleased++;
 				break;
 			}
+
+			GameManager::Instance()->IncreaseAmountOfGhostsReleased();
 		}
 
 		// Reset the time remaining
@@ -462,6 +471,8 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 						mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 						mAmountOfGhostsReleased       = 1;
+
+						GameManager::Instance()->ResetAmountOfGhostsReleased();
 
 						// We also need to make sure that the ghosts are reset when pacman dies
 						for (unsigned int i = 0; i < mGhosts.size(); i++)

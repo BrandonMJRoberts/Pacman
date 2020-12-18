@@ -41,7 +41,7 @@ void CollectDotsGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::
 
 // ---------------------------------------------------- //
 
-void CollectDotsGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions)
+void CollectDotsGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions, std::vector<bool> validGhostsToEat)
 {
 	// If the ghosts are within a range then flee
 	for (unsigned int i = 0; i < ghostPositions.size(); i++)

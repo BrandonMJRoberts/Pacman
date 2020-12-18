@@ -108,7 +108,7 @@ void PacmanCharacter::CheckForDirectionChange()
 
 // ------------------------------------------------------------- //
 
-void PacmanCharacter::Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager)
+void PacmanCharacter::Update(const float deltaTime, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager, std::vector<bool> validGhostsToEat)
 {
 	if (mIsAlive)
 	{
@@ -144,7 +144,7 @@ void PacmanCharacter::Update(const float deltaTime, std::vector<S2D::Vector2> gh
 				currentState->OnUpdate(mCentrePosition, mTargetPositon, ghostPositions, dotManager);
 
 				// Check if we should transition out of the current state
-				currentState->CheckTransitions(*this, ghostPositions);
+				currentState->CheckTransitions(*this, ghostPositions, validGhostsToEat);
 			}
 
 			// If we are at the next position to be moved to then calculate another one
@@ -194,7 +194,27 @@ void PacmanCharacter::SetIsAlive(bool newVal)
 			mCurrentFacingDirection = FACING_DIRECTION::NONE;
 
 			mIsAlive = newVal;
+
+			ResetPacmanStateMachine();
 		}
+	}
+}
+
+// ------------------------------------------------------------- //
+
+void PacmanCharacter::ResetPacmanStateMachine()
+{
+	// Reset the state machine if there is one
+	if (mStateMachine)
+	{
+		while (mStateMachine->PeekStack())
+		{
+			// Clear the state machine of anything that is on it
+			mStateMachine->PopStack();
+		}
+
+		if (!mIsPlayerControlled)
+			mStateMachine->PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
 	}
 }
 
@@ -303,18 +323,7 @@ void PacmanCharacter::ResetPacmanFromDeath()
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;
 
-	// Reset the state machine if there is one
-	if (mStateMachine)
-	{
-		while (mStateMachine->PeekStack())
-		{
-			// Clear the state machine of anything that is on it
-			mStateMachine->PopStack();
-		}
-
-		if(!mIsPlayerControlled)
-			mStateMachine->PushToStack(PACMAN_STATE_TYPES::COLLECT_DOTS);
-	}
+	ResetPacmanStateMachine();
 }
 
 // ------------------------------------------------------------- //

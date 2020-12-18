@@ -17,7 +17,7 @@ Ghost::Ghost(GhostCreationData creationData, const bool isAIControlled) : BaseCh
 																						creationData.mSpritesOnWidthMain, 
 																						creationData.mSpritesOnHeightMain, 
 																						creationData.mSpritesOnWidthAlternate, 
-																						creationData.mSpritesOnHeightAlternate), mHomePosition(S2D::Vector2(14, 12))
+																						creationData.mSpritesOnHeightAlternate), mHomePosition(S2D::Vector2(14, 12)), mHomeEntranceRightPosition(S2D::Vector2(13.0f, 11.0f)), mHomeEntranceLeftPosition(S2D::Vector2(15.0f, 11.0f))
 {
 	mThisGhostType            = creationData.mGhostType;
 
@@ -128,6 +128,15 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 					SetIsAlive(true);
 					SetGhostIsEaten(false);
 					SetGhostIsFleeing(false);
+				}
+
+				// Check if the player has moved out of their home then stop them from being able to re-enter 
+				if (((int)mCentrePosition.X == (int)mHomeEntranceLeftPosition.X &&
+					 (int)mCentrePosition.Y == (int)mHomeEntranceLeftPosition.Y) ||
+					((int)mCentrePosition.X == (int)mHomeEntranceRightPosition.X &&
+					 (int)mCentrePosition.Y == (int)mHomeEntranceRightPosition.Y))
+				{
+					mIsHome = false;
 				}
 			}
 

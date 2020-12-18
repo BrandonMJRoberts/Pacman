@@ -13,7 +13,7 @@ public:
 	~DodgeGhostsState_Pacman() override;
 
 	void OnUpdate(S2D::Vector2 currentPosition, S2D::Vector2& targetPositionRef, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager) override;
-	void CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions)                                                                    override;
+	void CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPosition, std::vector<bool> validGhostsToEat)                                                                    override;
 
 protected:
 	void OnEnter()             override;

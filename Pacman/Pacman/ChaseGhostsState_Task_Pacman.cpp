@@ -24,30 +24,37 @@ ChaseGhostsState_Pacman::~ChaseGhostsState_Pacman()
 
 void ChaseGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector2& targetPositionRef, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager)
 {
-	unsigned int bestIndex = 0;
-	float smallestDistance = 1000000000;
-
-	// If we are chasing ghosts then calculate which ghost is closest to us and go towards that one
-	for (unsigned int i = 0; i < ghostPositions.size(); i++)
+	if (ghostPositions.size() > 0)
 	{
-		if ((currentPosition - ghostPositions[i]).LengthSquared() < smallestDistance)
+		unsigned int bestIndex = 0;
+		float smallestDistance = 1000000000;
+
+		// If we are chasing ghosts then calculate which ghost is closest to us and go towards that one
+		for (unsigned int i = 0; i < ghostPositions.size(); i++)
 		{
-			smallestDistance = (currentPosition - ghostPositions[i]).LengthSquared();
-			bestIndex = i;
+			// Make sure we only consider edable ghosts
+			if ((mValidGhostsToEat.size() > i && mValidGhostsToEat[i]) && (currentPosition - ghostPositions[i]).LengthSquared() < smallestDistance)
+			{
+				smallestDistance = (currentPosition - ghostPositions[i]).LengthSquared();
+				bestIndex = i;
+			}
 		}
+
+		// Set the closest ghost to be the target
+		targetPositionRef = ghostPositions[bestIndex];
+
+		return;
 	}
-
-	targetPositionRef = ghostPositions[bestIndex];
-
-	return;
 }
 
 // ------------------------------------------------------------ //
 
-void ChaseGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions)
+void ChaseGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions, std::vector<bool> validGhostsToEat)
 {
-	// If the player is no-longer powered up then we shouldnt be chasing ghosts
-	if (!GameManager::Instance()->GetIsPlayerPoweredUp())
+	mValidGhostsToEat = validGhostsToEat;
+
+	// If the player is no-longer powered up then we shouldn't be chasing ghosts, or if there are no edable ghosts in the maze
+	if (validGhostsToEat.size() == 0 || !GameManager::Instance()->GetIsPlayerPoweredUp() || ghostPositions.size() == 0)
 		pacman.GetStateMachine().PopStack();
 }
 

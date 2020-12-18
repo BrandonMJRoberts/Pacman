@@ -27,7 +27,7 @@ void BaseState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector2& targ
 
 // ---------------------------------------------------- //
 
-void BaseState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions)
+void BaseState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions, std::vector<bool> validGhostsToEat)
 {
 
 }

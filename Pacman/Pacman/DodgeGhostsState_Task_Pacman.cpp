@@ -121,31 +121,31 @@ void DodgeGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector
 			directionBias[1]++;
 		}
 
-		if (ghostDifferential.X < 0)
+		if (ghostDifferential.X > 0)
 		{
 			directionBias[2]++;
 		}
 
-		if (ghostDifferential.X > 0)
+		if (ghostDifferential.X < 0)
 		{
 			directionBias[3]++;
 		}
 	}
 
-	// Now move in the direction that has the least ghost traces in it
-	unsigned int currentLowestScore = directionBias[0], currentLowestIndex = 0;
+	// Now move in the direction that is the most desirable
+	unsigned int currentHighestScore = directionBias[0], currentHighestIndex = 0;
 	for (unsigned int i = 1; i < 4; i++)
 	{
-		if (directionBias[i] < currentLowestScore)
-			currentLowestIndex = i;
+		if (directionBias[i] > currentHighestScore)
+			currentHighestIndex = i;
 	}
 
 	// Now set that pacman should move in a certain direction
-	if(currentLowestIndex == 0)
+	if(currentHighestIndex == 0)
 		targetPositionRef = currentPosition + S2D::Vector2(0.0f, -1.0f);
-	else if(currentLowestIndex == 1)
+	else if(currentHighestIndex == 1)
 		targetPositionRef = currentPosition + S2D::Vector2(0.0f, 1.0f);
-	else if(currentLowestIndex == 2)
+	else if(currentHighestIndex == 2)
 		targetPositionRef = currentPosition + S2D::Vector2(-1.0f, 0.0f);
 	else
 		targetPositionRef = currentPosition + S2D::Vector2(1.0f, 0.0f);
@@ -155,7 +155,7 @@ void DodgeGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector
 
 // ---------------------------------------------------- //
 
-void DodgeGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions)
+void DodgeGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vector<S2D::Vector2> ghostPositions, std::vector<bool> validGhostsToEat)
 {
 	if (GameManager::Instance()->GetIsPlayerPoweredUp())
 	{
@@ -168,7 +168,7 @@ void DodgeGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, std::vec
 	for (unsigned int i = 0; i < ghostPositions.size(); i++)
 	{
 		// The + 2 is so we dont keep swapping in and out of flee state
-		if ((ghostPositions[i] - pacman.GetCentrePosition()).Length() < (DISTANCE_FROM_GHOST_BEFORE_FLEE + 2))
+		if (!validGhostsToEat[i] && (ghostPositions[i] - pacman.GetCentrePosition()).Length() < (DISTANCE_FROM_GHOST_BEFORE_FLEE + 2))
 		{
 			// It is not safe to exit the flee state
 			return;
