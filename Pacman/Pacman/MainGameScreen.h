@@ -30,6 +30,10 @@ private:
 
 	void             CheckForCharacterCollisions();
 
+	void             HandleGhostRelease(const float deltaTime);
+
+	void             ResetForEndOfGame();
+
 	SCREENS          InGameInputCheck();
 
 	PickUps*            mCollectable;

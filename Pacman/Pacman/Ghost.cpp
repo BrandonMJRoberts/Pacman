@@ -9,27 +9,25 @@
 
 // -------------------------------------------------------------------- //
 
-Ghost::Ghost(const S2D::Vector2 startPos, 
-	         char** const       collisionMap, 
-	         const GHOST_TYPE   ghostType, 
-	         const bool         isAIControlled, 
-	         const char*        filePathForMainSpriteSheet, 
-	         const char*        filePathForAlternateSpriteSheet, 
-	         const unsigned int spritesOnWidthMain, 
-	         const unsigned int spritesOnHeightMain, 
-			 const unsigned int spritesOnWidthAlternate,
-			 const unsigned int spritesOnHeightAlternate, 
-	         const bool         startHome) : BaseCharacter(collisionMap, startPos, isAIControlled, filePathForMainSpriteSheet, filePathForAlternateSpriteSheet, spritesOnWidthMain, spritesOnHeightMain, spritesOnWidthAlternate, spritesOnHeightAlternate), mHomePosition(S2D::Vector2(14, 12))
+Ghost::Ghost(GhostCreationData creationData, const bool isAIControlled) : BaseCharacter(creationData.mCollisionMap, 
+	                                                                                    creationData.mStartPos, 
+	                                                                                    isAIControlled, 
+	                                                                                    creationData.mFilePathForColoured, 
+																					    creationData.mFilePathForFlee, 
+																						creationData.mSpritesOnWidthMain, 
+																						creationData.mSpritesOnHeightMain, 
+																						creationData.mSpritesOnWidthAlternate, 
+																						creationData.mSpritesOnHeightAlternate), mHomePosition(S2D::Vector2(14, 12))
 {
-	mThisGhostType            = ghostType;
+	mThisGhostType            = creationData.mGhostType;
 
 	mIsAlive                  = true; // Default alive
-	mIsHome                   = startHome;
+	mIsHome                   = creationData.mStartsAtHome;
 	mGhostIsFleeing           = false;
 	mGhostIsEaten             = false;
 
 	// Create the state machine needed
-	mStateMachine             = new Stack_FiniteStateMachine_Ghost(ghostType, isAIControlled);
+	mStateMachine             = new Stack_FiniteStateMachine_Ghost(creationData.mGhostType, isAIControlled);
 
 	// Set the starting, ending and current frames
 	switch (mThisGhostType)
@@ -60,13 +58,14 @@ Ghost::Ghost(const S2D::Vector2 startPos,
 	mColourBaseStartFrame     = mStartFrame;
 	mCurrentFrame             = mStartFrame;
 
-	mMovementSpeed			  = GHOST_MOVEMENT_SPEED;
+	mGhostSetSpeed            = GHOST_BASE_MOVEMENT_SPEED;
+	mMovementSpeed			  = mGhostSetSpeed;
 
-	mFramesPerAnimation       = 10;
+	mFramesPerAnimation       = FRAMES_PER_ANIMATION_GHOST;
 
 	// If the ghosts starts in their home then they cannot leave by default, but if they dont start at their home then they can leave by default
-	mStartAtHome = startHome;
-	if (startHome)
+	mStartAtHome = creationData.mStartsAtHome;
+	if (mStartAtHome)
 	{
 		mCanLeaveHome = false;
 
@@ -111,7 +110,7 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 			// As the transition into fleeing is an AI controlled thing we need to do it if the ghost is player controlled
 			if (!mGhostIsEaten)
 			{
-				if (!mGhostIsFleeing && GameManager::Instance()->GetIsPlayerPoweredUp())
+				if (!mIsHome && !mGhostIsFleeing && GameManager::Instance()->GetIsPlayerPoweredUp())
 					SetGhostIsFleeing(true);
 				else if (mGhostIsFleeing && !GameManager::Instance()->GetIsPlayerPoweredUp())
 					SetGhostIsFleeing(false);
@@ -122,9 +121,12 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 				if ((int)mCentrePosition.X == (int)mHomePosition.X &&
 					(int)mCentrePosition.Y == (int)mHomePosition.Y)
 				{
-					mIsAlive = true;
-					mGhostIsEaten = false;
+					mIsAlive        = true;
+					mIsHome         = true;
+					mGhostIsEaten   = false;
 					mGhostIsFleeing = false;
+
+					mMovementSpeed = mGhostSetSpeed;
 				}
 			}
 
@@ -174,6 +176,160 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 			mResetting = false;
 
 			ResetGhostFromDeath();
+		}
+	}
+}
+
+// -------------------------------------------------------------------- //
+
+// A ghost specific version so that the correct local functions get called instead of the base functions
+void Ghost::CalculateAIMovementDirection()
+{
+	// Now calculate where we need to go to get to the taget position
+	S2D::Vector2 movementDifferential = mTargetPositon - mCentrePosition;
+
+	// First calculate which movements are valid and then choose which one is the best for the current situation
+	bool canMoveUp    = CanTurnToDirection(FACING_DIRECTION::UP)    && mCurrentFacingDirection != FACING_DIRECTION::DOWN;
+	bool canMoveDown  = CanTurnToDirection(FACING_DIRECTION::DOWN)  && mCurrentFacingDirection != FACING_DIRECTION::UP;
+	bool canMoveRight = CanTurnToDirection(FACING_DIRECTION::RIGHT) && mCurrentFacingDirection != FACING_DIRECTION::LEFT;
+	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT)  && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
+
+	// So that you only consider the alternate axis if beyond a certain amount
+	float accuracy = 0.3f;
+
+	bool validVertical = false, validHorizontal = false;
+
+	if ((movementDifferential.X > accuracy && canMoveRight) ||
+		(movementDifferential.X < -accuracy && canMoveLeft))
+		validHorizontal = true;
+
+	if ((movementDifferential.Y > accuracy && canMoveDown) ||
+		(movementDifferential.Y < -accuracy && canMoveUp))
+		validVertical = true;
+
+	// If both axis are valid then choose the one with the greatest distance to go
+	if (validVertical && validHorizontal)
+	{
+		// Choose the direction with the greatest distance remaining
+		if (abs(movementDifferential.X) > abs(movementDifferential.Y))
+		{
+			// If you want to go right and you can, then go right
+			if (canMoveRight && movementDifferential.X > accuracy)
+				SetToMoveInDirection(FACING_DIRECTION::RIGHT);
+
+			if (canMoveLeft && movementDifferential.X < -accuracy)
+				SetToMoveInDirection(FACING_DIRECTION::LEFT);
+
+			return;
+		}
+		else
+		{
+			if (canMoveDown && movementDifferential.Y > accuracy)
+				SetToMoveInDirection(FACING_DIRECTION::DOWN);
+
+			if (canMoveUp && movementDifferential.Y < -accuracy)
+				SetToMoveInDirection(FACING_DIRECTION::UP);
+
+			return;
+		}
+	}
+	else if (validVertical || validHorizontal)
+	{
+		// If only one option is avaliable then go in that direction
+		if (canMoveRight && movementDifferential.X > accuracy)
+			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
+
+		if (canMoveLeft && movementDifferential.X < -accuracy)
+			SetToMoveInDirection(FACING_DIRECTION::LEFT);
+
+		if (canMoveDown && movementDifferential.Y > accuracy)
+			SetToMoveInDirection(FACING_DIRECTION::DOWN);
+
+		if (canMoveUp && movementDifferential.Y < -accuracy)
+			SetToMoveInDirection(FACING_DIRECTION::UP);
+
+		return;
+	}
+	else
+	{
+		// If there are no good options then just choose another direction to go
+		if (canMoveRight)
+			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
+		else if (canMoveLeft)
+			SetToMoveInDirection(FACING_DIRECTION::LEFT);
+		else if (canMoveUp)
+			SetToMoveInDirection(FACING_DIRECTION::UP);
+		else if (canMoveDown)
+			SetToMoveInDirection(FACING_DIRECTION::DOWN);
+
+		return;
+	}
+
+	return;
+}
+
+// -------------------------------------------------------------------- //
+
+void Ghost::HandleInput()
+{
+	// Reset the requested direction
+	mRequestedFacingDirection = FACING_DIRECTION::NONE;
+
+	// Gets the current state of the keyboard
+	S2D::Input::KeyboardState* keyboardState = S2D::Input::Keyboard::GetState();
+
+	// Horizontal movement first 
+	if (mCurrentFacingDirection == FACING_DIRECTION::NONE || mCurrentFacingDirection == FACING_DIRECTION::RIGHT || mCurrentFacingDirection == FACING_DIRECTION::LEFT)
+	{
+		// Can swap to the other axis just fine
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanTurnToDirection(FACING_DIRECTION::UP))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanTurnToDirection(FACING_DIRECTION::DOWN))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+			return;
+		}
+
+		// Now check for the same axis
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && !keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanTurnToDirection(FACING_DIRECTION::RIGHT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && !keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanTurnToDirection(FACING_DIRECTION::LEFT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			return;
+		}
+	}
+
+	if (mCurrentFacingDirection == FACING_DIRECTION::NONE || mCurrentFacingDirection == FACING_DIRECTION::UP || mCurrentFacingDirection == FACING_DIRECTION::DOWN)// Horizontal movement
+	{
+		// Can swap to the other axis just fine
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::A) && mCurrentFacingDirection != FACING_DIRECTION::LEFT && CanTurnToDirection(FACING_DIRECTION::LEFT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::LEFT;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::D) && mCurrentFacingDirection != FACING_DIRECTION::RIGHT && CanTurnToDirection(FACING_DIRECTION::RIGHT))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::RIGHT;
+			return;
+		}
+
+		// Now check for the same axis
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && !keyboardState->IsKeyDown(S2D::Input::Keys::S) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanTurnToDirection(FACING_DIRECTION::UP))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::UP;
+			return;
+		}
+		else if (keyboardState->IsKeyDown(S2D::Input::Keys::S) && !keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::DOWN && CanTurnToDirection(FACING_DIRECTION::DOWN))
+		{
+			mRequestedFacingDirection = FACING_DIRECTION::DOWN;
+			return;
 		}
 	}
 }
@@ -469,7 +625,7 @@ void Ghost::ResetGhostFromDeath()
 	mCurrentFrame         = mStartFrame;
 	
 	// Reset the movement speed
-	mMovementSpeed  = GHOST_MOVEMENT_SPEED;
+	mMovementSpeed  = GHOST_BASE_MOVEMENT_SPEED;
 
 	mIsAlive	    = true;
 	mIsHome         = mStartAtHome;
@@ -534,10 +690,20 @@ bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
 	}
 
 	// Check if the position is open, or if we are in certain states then we can move through collision marked with a '2', or if we are player controlled
-	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0' || 
-		(mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '2' && (mIsPlayerControlled || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::EXIT_HOME || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::RETURN_HOME)))
+	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '0')
 	{
 		return true;
+	}
+	
+	if (mCollisionMap[(unsigned int)(int(mCentrePosition.Y) + offset.Y)][(unsigned int)(int(mCentrePosition.X) + offset.X)] == '2')
+	{
+		if (mIsPlayerControlled && (mGhostIsEaten || mIsHome))
+			return true;
+		else if (!mIsPlayerControlled)
+		{
+			if(mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::EXIT_HOME || mStateMachine->PeekStack()->GetType() == GHOST_STATE_TYPE::RETURN_HOME)
+				return true;
+		}
 	}
 
 	return false;
@@ -548,7 +714,10 @@ bool Ghost::CanTurnToDirection(const FACING_DIRECTION newDir)
 void Ghost::IncreaseGhostMovementSpeedToNextLevel()
 {
 	if (GameManager::Instance()->GetCurrentLevel() < AMOUNT_OF_LEVELS_GHOSTS_INCREASE_SPEED)
+	{
 		mMovementSpeed += GHOST_SPEED_INCREASE_PER_LEVEL;
+		mGhostSetSpeed += GHOST_SPEED_INCREASE_PER_LEVEL;
+	}
 }
 
 // ------------------------------------------------------------------------------------------------------------------------- //

@@ -173,7 +173,7 @@ void BaseCharacter::HandleInput()
 	if (mCurrentFacingDirection == FACING_DIRECTION::NONE || mCurrentFacingDirection == FACING_DIRECTION::RIGHT || mCurrentFacingDirection == FACING_DIRECTION::LEFT)
 	{
 		// Can swap to the other axis just fine
-		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && CanMoveInDirection(FACING_DIRECTION::UP))
+		if (keyboardState->IsKeyDown(S2D::Input::Keys::W) && mCurrentFacingDirection != FACING_DIRECTION::UP && this->CanMoveInDirection(FACING_DIRECTION::UP))
 		{
 			mRequestedFacingDirection = FACING_DIRECTION::UP;
 			return;
@@ -435,7 +435,7 @@ void BaseCharacter::SetIsAlive(const bool newVal)
 	mIsAlive = newVal; 
 
 	if (mIsAlive) 
-		mMovementSpeed = GHOST_MOVEMENT_SPEED; 
+		mMovementSpeed = GHOST_BASE_MOVEMENT_SPEED; 
 	else 
 		mMovementSpeed = GHOST_EYE_MOVEMENT_SPEED;
 }
@@ -486,7 +486,7 @@ void BaseCharacter::CalculateAIMovementDirection()
 	bool canMoveLeft  = CanTurnToDirection(FACING_DIRECTION::LEFT)  && mCurrentFacingDirection != FACING_DIRECTION::RIGHT;
 
 	// So that you only consider the alternate axis if beyond a certain amount
-	float accuracy = 0.5f;
+	float accuracy = 0.3f;
 
 	bool validVertical = false, validHorizontal = false;
 
@@ -544,14 +544,14 @@ void BaseCharacter::CalculateAIMovementDirection()
 	else
 	{
 		// If there are no good options then just choose another direction to go
-		if(canMoveLeft)
-			SetToMoveInDirection(FACING_DIRECTION::LEFT);
-		else if (canMoveDown)
-			SetToMoveInDirection(FACING_DIRECTION::DOWN);
-		else if (canMoveRight)
+		if (canMoveRight)
 			SetToMoveInDirection(FACING_DIRECTION::RIGHT);
+		else if(canMoveLeft)
+			SetToMoveInDirection(FACING_DIRECTION::LEFT);
 		else if (canMoveUp)
 			SetToMoveInDirection(FACING_DIRECTION::UP);
+		else if (canMoveDown)
+			SetToMoveInDirection(FACING_DIRECTION::DOWN);
 
 		return;
 	}

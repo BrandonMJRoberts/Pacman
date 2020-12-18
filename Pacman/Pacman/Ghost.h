@@ -10,21 +10,56 @@
 
 #include "Stack_FiniteStateMachine.h"
 
+// ------------------------------------------------------------------------------- //
+
+struct GhostCreationData
+{
+	GhostCreationData(const S2D::Vector2 startPos,
+		              char** const       collisionMap,
+		              const GHOST_TYPE   ghostType,
+		              const char*        filePathForColoured,
+		              const char*        filePathForFlee,
+		              const unsigned int spritesOnWidthMain,
+		              const unsigned int spritesOnHeightMain,
+		              const unsigned int spritesOnWidthAlternate,
+		              const unsigned int spritesOnHeightAlternate,
+		              const bool         startsAtHome) : mStartPos(startPos), 
+		                                                 mCollisionMap(collisionMap),              
+		                                                 mGhostType(ghostType), 
+		                                                 mFilePathForColoured(filePathForColoured), 
+		                                                 mFilePathForFlee(filePathForFlee),
+		                                                 mSpritesOnWidthMain(spritesOnWidthMain),
+														 mSpritesOnHeightMain(spritesOnHeightMain),
+														 mSpritesOnHeightAlternate(spritesOnHeightAlternate),
+														 mSpritesOnWidthAlternate(spritesOnWidthAlternate),
+														 mStartsAtHome(startsAtHome)
+
+	{
+
+	}
+
+	S2D::Vector2       mStartPos;
+	char** const       mCollisionMap;
+	GHOST_TYPE         mGhostType;
+	const char*        mFilePathForColoured;
+	const char*        mFilePathForFlee;
+	const unsigned int mSpritesOnWidthMain;
+	const unsigned int mSpritesOnHeightMain;
+	const unsigned int mSpritesOnWidthAlternate;
+	const unsigned int mSpritesOnHeightAlternate;
+	bool               mStartsAtHome;
+
+	~GhostCreationData() { ; }
+
+};
+
+// ------------------------------------------------------------------------------- //
+
 class Ghost final : public BaseCharacter
 {
 public:
 	Ghost() = delete; // Make it so you cannot create a default ghost type
-	Ghost(const S2D::Vector2 startPos,
-		  char** const       collisionMap,
-		  const GHOST_TYPE   ghostType,
-		  const bool		 isAIControlled,
-		  const char*        filePathForColoured,
-		  const char*        filePathForFlee,
-		  const unsigned int spritesOnWidthMain,
-		  const unsigned int spritesOnHeightMain,
-		  const unsigned int spritesOnWidthAlternate,
-		  const unsigned int spritesOnHeightAlternate,
-		  const bool         startsAtHome);
+	Ghost(GhostCreationData creationData, const bool isAIControlled);
 	~Ghost() override;
 
 	void Render(const unsigned int frameCount) override;
@@ -54,12 +89,18 @@ private:
 
 	void							 ResetGhostFromDeath();
 
+	void                             HandleInput() override;
+
+	void                             CalculateAIMovementDirection() override;
+
 	const S2D::Vector2               mHomePosition;
 
 	Stack_FiniteStateMachine_Ghost*  mStateMachine; // Each ghost has a state machine if it is AI controlled
 
 	unsigned int                     mColourBaseStartFrame;
 	unsigned int                     mColourBaseEndFrame;
+
+	float                            mGhostSetSpeed;
 
 	GHOST_TYPE			             mThisGhostType;
 	bool                             mIsHome;

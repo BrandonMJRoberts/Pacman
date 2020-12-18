@@ -38,6 +38,8 @@ public:
 	std::vector<S2D::Vector2> GetLargeDotPositions() { return mLargeDotsPositions; }
 	S2D::Vector2              GetRandomDotPosition();
 
+	unsigned int GetRemainingDotsCount() { return mDots.size(); }
+
 private:
 	void LoadInDotData();
 

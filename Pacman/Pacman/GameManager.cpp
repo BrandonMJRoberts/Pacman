@@ -64,7 +64,6 @@ void GameManager::SetVariablesToStartingValues(bool resettingLevel)
 		mDotsCollectedThisGame         = 0;
 		mGhostsEatenThisGame           = 0;
 
-		mRemainingDots                 = 0;
 		mAmountOfPacmanDeathsThisGame  = 0;
 
 		mExtraLifeCount                = STARTING_LIFE_COUNT;
@@ -86,13 +85,6 @@ void GameManager::SetVariablesToStartingValues(bool resettingLevel)
 		mInPreGameState				   = true;
 		mAmountOfGhostsReleased        = 1;
 	}
-}
-
-// ---------------------------------------------------------------- //
-
-void GameManager::SetDotCounts()
-{
-	mRemainingDots = 0;
 }
 
 // ---------------------------------------------------------------- //

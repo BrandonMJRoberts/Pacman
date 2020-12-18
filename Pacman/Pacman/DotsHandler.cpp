@@ -129,8 +129,6 @@ void DotsHandler::LoadInDotData()
 			continue;
 	}
 
-	GameManager::Instance()->SetCurrentDotCount(mDots.size());
-
 	delete[] charLine;
 }
 
@@ -188,7 +186,6 @@ void DotsHandler::Update(const S2D::Vector2 pacmanCentrePosition, const float pa
 				delete mDots[i];
 				mDots.erase(mDots.begin() + i);
 
-				GameManager::Instance()->DecreaseRemainingDots(1);
 				GameManager::Instance()->IncrementDotsEatenCount();
 
 				AudioManager::GetInstance()->PlayDotCollectionSFX();

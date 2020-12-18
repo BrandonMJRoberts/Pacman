@@ -23,7 +23,7 @@ void ReturnHomeState_Ghost::OnEnter()
 	mGoingToEntrance = true;
 	mGoingIntoHome   = false;
 
-	mType = GHOST_STATE_TYPE::RETURN_HOME;
+	mType            = GHOST_STATE_TYPE::RETURN_HOME;
 }
 
 // ---------------------------------------------------------------- //
@@ -54,15 +54,18 @@ void ReturnHomeState_Ghost::CheckTransitions(Ghost* ghost)
 	// First check if the ghost exists
 	if (ghost)
 	{
+		float accuracy = 0.2f;
+
 		// If the ghost is going to the entrance of the home
 		if (mGoingToEntrance)
 		{
 			S2D::Vector2 centrePos = ghost->GetCentrePosition();
+			float accuracy = 0.2f;
 
 			// If the ghost is in the correct position then tell them enter the home 
 			if ((int(centrePos.X) == mHomeEntrancePosLeft.X &&
 				 int(centrePos.Y) == mHomeEntrancePosLeft.Y) || 
-				(int(centrePos.X) == mHomeEntrancePosRight.X &&
+				 (int(centrePos.X) == mHomeEntrancePosRight.X &&
 			     int(centrePos.Y) == mHomeEntrancePosRight.Y))
 			{
 				// Set we are not going to the entrance anymore

@@ -17,12 +17,7 @@ public:
 	 
 	void                  Update(const float deltaTime);
 
-	// Dot count
-	unsigned int          GetRemainingDots()			                const { return mRemainingDots; }
-	void                  SetCurrentDotCount(const unsigned int count)        { mRemainingDots = count; }
-	void                  DecreaseRemainingDots(const unsigned int amount)    { mRemainingDots -= amount; }
-
-	// Dots collected and ghosts eaten
+	// Dots collected and ghosts eaten for the pause menu stats
 	unsigned int         GetCurrentAmountOfDotsEaten()                  const { return mDotsCollectedThisGame; }
 	void                 IncrementDotsEatenCount()                            { mDotsCollectedThisGame++; }
 	void                 ResetDotsEatenCount()                                { mDotsCollectedThisGame = 0; }
@@ -109,7 +104,6 @@ public:
 
 private:
 	GameManager();
-	void                SetDotCounts();
 	unsigned int        LoadInCurrentHighScore();
 	void                SetVariablesToStartingValues(bool resettingLevel);
 
@@ -123,7 +117,7 @@ private:
 	unsigned int        mCurrentScore;
 	unsigned int        mCurrentHighScore;
 	int                 mExtraLifeCount;
-	unsigned int	    mRemainingDots;
+	//unsigned int	    mRemainingDots;
 
 	unsigned int        mAmountOfGhostsReleased;
 

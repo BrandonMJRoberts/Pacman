@@ -44,6 +44,7 @@ MainGameScreen::~MainGameScreen()
 	delete mDotHandler;
 	mDotHandler = nullptr;
 
+	// Delete all UI displays of collectables
 	UIManager::GetInstance()->RemoveAllCollectedPickups();
 	
 	delete mPacman;
@@ -89,63 +90,43 @@ void MainGameScreen::Render(const unsigned int frameCount)
 
 SCREENS MainGameScreen::Update(const float deltaTime)
 {
+	// Always update the Audio Manager regardless of the game state we are in
 	AudioManager::GetInstance()->Update();
 
+	// If we are actually in game then update the gameplay elements
 	if (!GameManager::Instance()->GetIsInPreGameState())
 	{
-		// Update the dots in the level
-		if (mPacman)
-		{
-			// Get all of the ghosts positions to pass to pacmans
-			std::vector<S2D::Vector2> ghostPositions;
-			for (unsigned int i = 0; i < mGhosts.size(); i++)
-			{
-				if (mGhosts[i] && mGhosts[i]->GetCanLeaveHome())
-					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
-			}
-
-			mPacman->Update(deltaTime, ghostPositions, *mDotHandler);
-
-			if(mDotHandler)
-				mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
-		}
-
 		// First check if the level is over
-		if (GameManager::Instance()->GetRemainingDots() == 0)
+		if (mDotHandler && mDotHandler->GetRemainingDotsCount() == 0)
 		{
 			LoadNextLevel();
 		}
 
-		// Update all ghosts
+		// Get all of the ghosts positions to pass to pacman, and update the ghosts at the same time
+		std::vector<S2D::Vector2> ghostPositions;
 		for (unsigned int i = 0; i < mGhosts.size(); i++)
 		{
 			if (mGhosts[i])
-				mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
-		}
-
-		// Remove the time passed for a ghost release
-		mTimeRemainingForGhostRelease -= deltaTime;
-
-		// Check if enough time has passed for another ghost to be released
-		if (mAmountOfGhostsReleased < NUMBER_OF_GHOSTS_IN_LEVEL && mTimeRemainingForGhostRelease < 0.0f)
-		{
-			// Then release a ghost
-
-			// Loop through all the ghosts and release the next one that has not been released
-			for (unsigned int i = 0; i < mGhosts.size(); i++)
 			{
-				if (!mGhosts[i]->GetCanLeaveHome())
-				{
-					mGhosts[i]->SetCanLeaveHome(true);
-					mAmountOfGhostsReleased++;
-					break;
-				}
-			}
+				mGhosts[i]->Update(deltaTime, mPacman->GetCentrePosition(), mPacman->GetFacingDirection());
 
-			// Reset the time remaining
-			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+				if(mGhosts[i]->GetCanLeaveHome())
+					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
+
+			}
 		}
 
+		// Update pacman and the dots in the level
+		if (mPacman && mDotHandler)
+		{
+			mPacman->Update(deltaTime, ghostPositions, *mDotHandler);
+			mDotHandler->Update(mPacman->GetCentrePosition(), 0.5f);
+		}
+
+		// See if any ghosts should be released
+		HandleGhostRelease(deltaTime);
+
+		// Now handle the collectable
 		HandleCollectable(deltaTime);
 
 		// Now check if pacman has collided with any of the ghosts
@@ -154,30 +135,66 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 		// Now check if the game is over due to death counter
 		if (GameManager::Instance()->GetExtraLivesCount() < 0)
 		{
-			UIManager::GetInstance()->ResetForStartOfGame();
-
-			mAmountOfGhostsReleased       = 1;
-			mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
-
-			// Save the current score to the highscore table
-			GameManager::Instance()->SaveOutScoreToLeaderboard();
-
-			// Reset the current score to zero
-			GameManager::Instance()->SetCurrentScore(0);
-
-			AudioManager::GetInstance()->StopAllAudio();
+			// Reset the variables needed for the end of the game
+			ResetForEndOfGame();
 
 			return SCREENS::MAIN_MENU;
 		}
 
-		// Update the game manager
+		// Update the UI manager
 		UIManager::GetInstance()->Update(deltaTime);
 	}
 
+	// Make sure to update the gameManager
 	GameManager::Instance()->Update(deltaTime);
 
 	// Input
 	return InGameInputCheck();
+}
+
+// ------------------------------------------------------------------------------ //
+
+void MainGameScreen::HandleGhostRelease(const float deltaTime)
+{
+	// Remove the time passed for a ghost release
+	mTimeRemainingForGhostRelease -= deltaTime;
+
+	// Check if enough time has passed for another ghost to be released
+	if (mAmountOfGhostsReleased < NUMBER_OF_GHOSTS_IN_LEVEL && mTimeRemainingForGhostRelease < 0.0f)
+	{
+		// Loop through all the ghosts and release the next one that has not been released
+		for (unsigned int i = 0; i < mGhosts.size(); i++)
+		{
+			if (!mGhosts[i]->GetCanLeaveHome())
+			{
+				mGhosts[i]->SetCanLeaveHome(true);
+				mAmountOfGhostsReleased++;
+				break;
+			}
+		}
+
+		// Reset the time remaining
+		mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+	}
+}
+
+// ------------------------------------------------------------------------------ //
+
+void MainGameScreen::ResetForEndOfGame()
+{
+	// As the game screen is not actually destroyed we need to reset these variables here
+	mAmountOfGhostsReleased       = 1;
+	mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+
+	// Make sure that the UI manager stops what it is doing
+	UIManager::GetInstance()->ResetForStartOfGame();
+
+	// Save the current score to the highscore table and then reset the current score to zero
+	GameManager::Instance()->SaveOutScoreToLeaderboard();
+	GameManager::Instance()->SetCurrentScore(0);
+
+	// Stop all audio that is currently playing
+	AudioManager::GetInstance()->StopAllAudio();
 }
 
 // ------------------------------------------------------------------------------ //
@@ -195,16 +212,19 @@ void MainGameScreen::LoadInDataForLevel()
 	// Load in pacman
 	if (!mPacman)
 	{
+		PacmanCreationData pacmanCreationData(mBackground->GetCollisionMap(), 3, 3, 3, 5, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png");
+
 		if (GameManager::Instance()->GetPlayerCharacterType() == PLAYER_CHARACTER_TYPE::PACMAN)
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 5, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", false);
+			mPacman = new PacmanCharacter(pacmanCreationData, false);
 		else
-			mPacman = new PacmanCharacter(mBackground->GetCollisionMap(), 3, 3, 3, 5, S2D::Vector2(14.0f, 23.5f), "Textures/Pacman/PacmanSprites.png", "Textures/Pacman/PacmanDeathAnimation.png", true);
+			mPacman = new PacmanCharacter(pacmanCreationData, true);
 	}
 
 	// Create the ghosts 
 	if (mGhosts.size() == 0)
 	{
-		S2D::Vector2 outSideHomeSpawn = S2D::Vector2(14.0f, 11.5f);
+		S2D::Vector2      outSideHomeSpawn = S2D::Vector2(14.0f, 11.5f);
+		GhostCreationData ghostCreationData(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::RED, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false);
 
 		// First make sure that the player always spawns as the first ghost in the maze
 		if (GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
@@ -212,19 +232,23 @@ void MainGameScreen::LoadInDataForLevel()
 			switch (GameManager::Instance()->GetPlayerCharacterType())
 			{
 			case PLAYER_CHARACTER_TYPE::RED_GHOST:
-				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::RED, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+				ghostCreationData.mGhostType = GHOST_TYPE::RED;
+				mGhosts.push_back(new Ghost(ghostCreationData, false));
 			break;
 
 			case PLAYER_CHARACTER_TYPE::BLUE_GHOST:
-				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::BLUE, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+				ghostCreationData.mGhostType = GHOST_TYPE::BLUE;
+				mGhosts.push_back(new Ghost(ghostCreationData, false));
 			break;
 
 			case PLAYER_CHARACTER_TYPE::ORANGE_GHOST:
-				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::ORANGE, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+				ghostCreationData.mGhostType = GHOST_TYPE::ORANGE;
+				mGhosts.push_back(new Ghost(ghostCreationData, false));
 			break;
 
 			case PLAYER_CHARACTER_TYPE::PINK_GHOST:
-				mGhosts.push_back(new Ghost(outSideHomeSpawn, mBackground->GetCollisionMap(), GHOST_TYPE::PINK, false, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
+				ghostCreationData.mGhostType = GHOST_TYPE::PINK;
+				mGhosts.push_back(new Ghost(ghostCreationData, false));
 			break;
 
 			default: break;
@@ -238,7 +262,11 @@ void MainGameScreen::LoadInDataForLevel()
 					continue;
 				else
 				{
-					mGhosts.push_back(new Ghost(S2D::Vector2(12.0f + (GhostSpawnID * 2.0f), 14.5f), mBackground->GetCollisionMap(), (GHOST_TYPE)(i), true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
+					ghostCreationData.mStartPos     = S2D::Vector2(12.0f + (GhostSpawnID * 2.0f), 14.5f);
+					ghostCreationData.mGhostType    = (GHOST_TYPE)(i);
+					ghostCreationData.mStartsAtHome = true;
+
+					mGhosts.push_back(new Ghost(ghostCreationData, true));
 					GhostSpawnID++;
 				}
 			}
@@ -246,10 +274,25 @@ void MainGameScreen::LoadInDataForLevel()
 		else
 		{
 			// Just create the ghosts normally - with the red ghost on the outside first
-			mGhosts.push_back(new Ghost(outSideHomeSpawn,           mBackground->GetCollisionMap(), GHOST_TYPE::RED,    true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, false));
-			mGhosts.push_back(new Ghost(S2D::Vector2(12.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::BLUE,   true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
-			mGhosts.push_back(new Ghost(S2D::Vector2(14.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::ORANGE, true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
-			mGhosts.push_back(new Ghost(S2D::Vector2(16.0f, 14.5f), mBackground->GetCollisionMap(), GHOST_TYPE::PINK,   true, "Textures/Ghosts/Ghosts.png", "Textures/Ghosts/SpecialStates.png", 8, 4, 4, 2, true));
+			ghostCreationData.mStartsAtHome = false;
+
+			ghostCreationData.mStartPos = outSideHomeSpawn;
+			ghostCreationData.mGhostType = GHOST_TYPE::RED;
+			mGhosts.push_back(new Ghost(ghostCreationData, true));
+
+			ghostCreationData.mStartsAtHome = true;
+
+			ghostCreationData.mStartPos = S2D::Vector2(12.0f, 14.5f);
+			ghostCreationData.mGhostType = GHOST_TYPE::BLUE;
+			mGhosts.push_back(new Ghost(ghostCreationData, true));
+
+			ghostCreationData.mStartPos = S2D::Vector2(14.0f, 14.5f);
+			ghostCreationData.mGhostType = GHOST_TYPE::ORANGE;
+			mGhosts.push_back(new Ghost(ghostCreationData, true));
+
+			ghostCreationData.mStartPos = S2D::Vector2(16.0f, 14.5f);
+			ghostCreationData.mGhostType = GHOST_TYPE::PINK;
+			mGhosts.push_back(new Ghost(ghostCreationData, true));
 		}
 	}
 
@@ -300,11 +343,18 @@ SCREENS MainGameScreen::InGameInputCheck()
 		gm->ResetGhostsEatenCount();					   // Reset the ghosts eaten count
 		gm->ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
 		gm->ResetAmountOfGhostsReleased();
-		 
+
+		for (unsigned int i = 0; i < mGhosts.size(); i++)
+		{
+			if (mGhosts[i])
+				mGhosts[i]->SetGhostsShouldReset();
+		}
+
 		mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
 		mAmountOfGhostsReleased       = 1;
 
 		AudioManager::GetInstance()->StopAllAudio();
+		UIManager::GetInstance()->ResetForStartOfGame();
 
 		return SCREENS::MAIN_MENU;
 	}

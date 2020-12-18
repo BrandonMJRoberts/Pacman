@@ -30,17 +30,17 @@ public:
 	void             ResetCharacter();
 
 protected:
-	void                             HandleInput();
+	virtual void                     HandleInput();
 	bool                             EdgeCheck();
-
-	bool		                     CanMoveInDirection(FACING_DIRECTION direction);
 	void                             MoveInCurrentDirection(const float deltaTime);
+
+	bool					         CanMoveInDirection(const FACING_DIRECTION dir);
 
 	virtual bool					 CanTurnToDirection(const FACING_DIRECTION newDir);
 	virtual	void                     CheckForDirectionChange(); // This function is for setting start and end frames for specific directional sprites
 
-	void SetToMoveInDirection(FACING_DIRECTION direction);
-	void CalculateAIMovementDirection();
+	void                             SetToMoveInDirection(FACING_DIRECTION direction);
+	virtual void                     CalculateAIMovementDirection();
 
 	S2D::Vector2                     mCentrePosition;        // Current position
 	S2D::Vector2                     mStartPosition;         // Position to be reset to if the level restarts

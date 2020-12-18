@@ -11,42 +11,30 @@
 
 // ------------------------------------------------------------- //
 
-PacmanCharacter::PacmanCharacter(char** const       collisionMap, 
-	                             const unsigned int spritesOnWidthMain, 
-	                             const unsigned int spritesOnHeightMain, 
-								 const unsigned int spritesOnWidthAlternate,
-								 const unsigned int spritesOnHeightAlternate,
-	                             const S2D::Vector2 startPositon, 
-	                             const char*        filePathForMainSpriteSheet, 
-	                             const char*        filePathForAlternateSpriteSheet, 
-	                             bool               isAIControlled) : BaseCharacter(collisionMap,
-													                                startPositon,
-									                                                isAIControlled, 
-									                                                filePathForMainSpriteSheet, 
-									                                                filePathForAlternateSpriteSheet, 
-									                                                spritesOnWidthMain, 
-									                                                spritesOnHeightMain,
-																					spritesOnWidthAlternate,
-																					spritesOnHeightAlternate)
+PacmanCharacter::PacmanCharacter(PacmanCreationData creationData, bool isAIControlled) : BaseCharacter(creationData.mCollisionMap,
+																									   creationData.mStartPositon,
+																									   isAIControlled, 
+																									   creationData.mFilePathForMainSpriteSheet,
+																						               creationData.mFilePathForAlternateSpriteSheet,
+																									   creationData.mSpritesOnWidthMain,
+																									   creationData.mSpritesOnHeightMain,
+																									   creationData.mSpritesOnWidthAlternate,
+																								       creationData.mSpritesOnHeightAlternate)
 {
 	// Setup the state machine that is needed for the AI controls - just disable it if the player is controlling pacman - to avoid any nullptr references
-	mStateMachine = new Stack_FiniteStateMachine_Pacman(isAIControlled);
+	mStateMachine               = new Stack_FiniteStateMachine_Pacman(isAIControlled);
 
-	mCurrentFrame       = 8;
-	mStartFrame         = 8;
-	mEndFrame           = 8;
+	mCurrentFrame               = 8;
+	mStartFrame                 = 8;
+	mEndFrame                   = 8;
 
-	mMovementSpeed      = PACMAN_MOVEMENT_SPEED;
+	mMovementSpeed              = PACMAN_BASE_MOVEMENT_SPEED;
+	mFramesPerAnimation         = FRAMES_PER_ANIMATION_PACMAN;
 
-	mFramesPerAnimation       = 6;
+	mCurrentFacingDirection     = FACING_DIRECTION::NONE;
+	mRequestedFacingDirection   = FACING_DIRECTION::NONE;
 
-	if (isAIControlled)
-	{
-		mMoveToPos = mCentrePosition;	
-
-		mCurrentFacingDirection   = FACING_DIRECTION::NONE;
-		mRequestedFacingDirection = FACING_DIRECTION::NONE;
-	}
+	mMoveToPos                  = mCentrePosition;
 }
 
 // ------------------------------------------------------------- //
