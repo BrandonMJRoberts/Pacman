@@ -23,8 +23,8 @@ Ghost::Ghost(GhostCreationData creationData, const bool isAIControlled) : BaseCh
 
 	mIsAlive                  = true; // Default alive
 	mIsHome                   = creationData.mStartsAtHome;
-	mGhostIsFleeing           = false;
-	mGhostIsEaten             = false;
+	SetGhostIsFleeing(false);
+	SetGhostIsEaten(false);
 
 	// Create the state machine needed
 	mStateMachine             = new Stack_FiniteStateMachine_Ghost(creationData.mGhostType, isAIControlled);
@@ -660,9 +660,9 @@ void Ghost::ResetGhostFromDeath()
 
 void Ghost::SetGhostsShouldReset()
 {
-	mResetting                = true;
-	mGhostIsFleeing           = false;
-	mGhostIsEaten             = false;
+	mResetting = true;
+	SetGhostIsFleeing(false);
+	SetGhostIsEaten(false);
 
 	mCurrentFacingDirection   = FACING_DIRECTION::NONE;
 	mRequestedFacingDirection = FACING_DIRECTION::NONE;

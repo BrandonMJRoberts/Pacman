@@ -363,6 +363,9 @@ void GameManager::ReturnToMainMenuReset()
 	ResetGhostsEatenCount();					   // Reset the ghosts eaten count
 	ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
 	ResetAmountOfGhostsReleased();
+
+	mPlayerIsPoweredUp = false;
+	mTimeRemainingInPoweredUpState = 0.0f;
 }
 
 // --------------------------------------------------------------------------------- //
