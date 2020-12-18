@@ -102,6 +102,8 @@ public:
 
 	void                  ResetGhostsEatenStreak()                            { mGhostsEatenStreak = 0; }
 
+	void                  ReturnToMainMenuReset();
+
 private:
 	GameManager();
 	unsigned int        LoadInCurrentHighScore();

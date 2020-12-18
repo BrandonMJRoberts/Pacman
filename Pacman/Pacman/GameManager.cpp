@@ -350,3 +350,19 @@ void GameManager::ResetScoreForExtraLife()
 }
 
 // --------------------------------------------------------------------------------- //
+
+void GameManager::ReturnToMainMenuReset()
+{
+	SetCurrentLevel(0);                            // Reset the level ID
+	SetLevelPickupType(PICKUP_TYPES::CHERRY);      // Set the starting collectable type
+	SetCurrentExtraLifeCount(STARTING_LIFE_COUNT); // Reset the starting life count
+	ResetScoreForExtraLife();                      // Reset the points required for another life
+	SaveOutScoreToLeaderboard();                   // Save the player's score out
+	SetCurrentScore(0);                            // Reset the player's current score
+	ResetDotsEatenCount();                         // Reset the dots eaten count
+	ResetGhostsEatenCount();					   // Reset the ghosts eaten count
+	ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
+	ResetAmountOfGhostsReleased();
+}
+
+// --------------------------------------------------------------------------------- //

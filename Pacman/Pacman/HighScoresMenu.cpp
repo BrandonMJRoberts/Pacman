@@ -10,14 +10,10 @@
 
 // ---------------------------------------------------------------- //
 
-HighScoresMenu::HighScoresMenu() : BaseMenu()
+HighScoresMenu::HighScoresMenu() : BaseMenu(), mHighScoresTextRenderPosition(S2D::Vector2(330, 50)), mScoresRenderOffset(S2D::Vector2(330, 100)), mNamesRenderOffset(S2D::Vector2(180, 100))
 {
 	// Setup the text renderer
 	mTextRenderer                 = new TextRenderer("Textures/UI/Font.png", 15, 21);
-
-	mHighScoresTextRenderPosition = S2D::Vector2(330, 50);
-	mScoresRenderOffset           = S2D::Vector2(330, 100);
-	mNamesRenderOffset            = S2D::Vector2(180, 100);
 
 	mGapBetweenScores             = 50.0f;
 
