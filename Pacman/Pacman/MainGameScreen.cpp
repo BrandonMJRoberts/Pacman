@@ -112,7 +112,6 @@ SCREENS MainGameScreen::Update(const float deltaTime)
 
 				if(mGhosts[i]->GetCanLeaveHome())
 					ghostPositions.push_back(mGhosts[i]->GetCentrePosition());
-
 			}
 		}
 
@@ -406,8 +405,9 @@ void MainGameScreen::CheckForCharacterCollisions()
 					GameManager* GM = GameManager::Instance();
 
 					// If the player is powered up
-					if (GM->GetIsPlayerPoweredUp())
+					if (GM->GetIsPlayerPoweredUp() && mGhosts[i]->GetGhostIsFleeing())
 					{
+
 						// If there is a collision between this ghost and pacman, and the player is not playing as pacman, and this ghost is alive
 						if (mGhosts[i]->IsAlive() && GameManager::Instance()->GetPlayerCharacterType() != PLAYER_CHARACTER_TYPE::PACMAN)
 						{
@@ -449,9 +449,6 @@ void MainGameScreen::CheckForCharacterCollisions()
 								// Reset the needed game mamager variables
 								gm->ResetGhostsEatenStreak();                      // Reset the ghosts eaten streak
 								gm->ResetAmountOfGhostsReleased();
-
-								mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
-								mAmountOfGhostsReleased = 1;
 							}
 							else
 							{
@@ -462,6 +459,9 @@ void MainGameScreen::CheckForCharacterCollisions()
 
 						// Kill pacman
 						mPacman->SetIsAlive(false);
+
+						mTimeRemainingForGhostRelease = TIME_PER_GHOST_RELEASE;
+						mAmountOfGhostsReleased       = 1;
 
 						// We also need to make sure that the ghosts are reset when pacman dies
 						for (unsigned int i = 0; i < mGhosts.size(); i++)

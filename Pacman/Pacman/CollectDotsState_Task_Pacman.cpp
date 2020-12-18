@@ -48,7 +48,7 @@ void CollectDotsGhostsState_Pacman::CheckTransitions(PacmanCharacter& pacman, st
 	{
 		if ((pacman.GetCentrePosition() - ghostPositions[i]).Length() < DISTANCE_FROM_GHOST_BEFORE_FLEE)
 		{
-			//pacman.GetStateMachine().PushToStack(PACMAN_STATE_TYPES::FLEE);
+			pacman.GetStateMachine().PushToStack(PACMAN_STATE_TYPES::FLEE);
 			return;
 		}
 	}

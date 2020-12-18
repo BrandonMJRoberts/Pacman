@@ -9,6 +9,8 @@ FleeState_Ghost::FleeState_Ghost(GHOST_TYPE colourOfGhost) : BaseState_Ghost()
 {
 	mGhostColour = colourOfGhost;
 
+	mPacmanPreviousPowerupState = false;
+
 	//OnEnter();
 }
 
@@ -66,8 +68,10 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 {
 	if (ghost)
 	{
+		bool playerIsPoweredUp = GameManager::Instance()->GetIsPlayerPoweredUp();
+
 		// From this state we could go back to CHASE, or into GO TO HOME state
-		if (!GameManager::Instance()->GetIsPlayerPoweredUp())
+		if (!playerIsPoweredUp)
 		{
 			ghost->GetStateMachine()->PopStack();
 			ghost->SetGhostIsFleeing(false);
@@ -75,7 +79,7 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 		}
 
 		// Pacman must have eaten this ghost then
-		if (GameManager::Instance()->GetIsPlayerPoweredUp() && !ghost->IsAlive())
+		if (playerIsPoweredUp && !ghost->IsAlive())
 		{
 			// Tell the ghost to return to its home
 			ghost->GetStateMachine()->PopStack(); // Remove the flee task 
@@ -84,7 +88,12 @@ void FleeState_Ghost::CheckTransitions(Ghost* ghost)
 			return;
 		}
 
-		ghost->SetGhostIsFleeing(true);
+		// If pacman's powerup state has changed then update the ghost's flee state
+		if (mPacmanPreviousPowerupState != playerIsPoweredUp)
+		{
+			ghost->SetGhostIsFleeing(playerIsPoweredUp);
+			mPacmanPreviousPowerupState = playerIsPoweredUp;
+		}
 	}
 	else
 		return;

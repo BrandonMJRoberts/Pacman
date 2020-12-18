@@ -22,6 +22,8 @@ private:
 
 	PacmanCharacter* mPacman;
 	GHOST_TYPE       mColourOfGhost;
+
+	bool             mPreviousPoweredUpState;
 };
 
 #endif

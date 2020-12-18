@@ -19,6 +19,7 @@ private:
 	void OnExit() override;
 
 	GHOST_TYPE mGhostColour;
+	bool       mPacmanPreviousPowerupState;
 };
 
 #endif

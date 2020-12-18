@@ -24,7 +24,8 @@ ChaseState_Ghost::~ChaseState_Ghost()
 
 void ChaseState_Ghost::OnEnter()
 {
-	mType = GHOST_STATE_TYPE::CHASE;
+	mType                   = GHOST_STATE_TYPE::CHASE;
+	mPreviousPoweredUpState = false;
 }
 
 // ---------------------------------------------------------------- //
@@ -78,7 +79,7 @@ void ChaseState_Ghost::OnUpdate(S2D::Vector2& targetPositionRef, S2D::Vector2 pa
 	case GHOST_TYPE::ORANGE:
 		// In actual pacman the orange ghost moves randomly until it goes within a range of pacman, but for simplicity ive left it to just chase pacman directly
 
-		targetPositionRef = S2D::Vector2((int)pacmanPos.X, (int)pacmanPos.Y);
+		targetPositionRef = S2D::Vector2((float)((int)pacmanPos.X), (float)((int)pacmanPos.Y));
 	return;
 
 	case GHOST_TYPE::BLUE:
@@ -121,12 +122,17 @@ void ChaseState_Ghost::CheckTransitions(Ghost* ghost)
 	// If the ghost passed in is valid
 	if (ghost)
 	{
-		// From here we can transition into FLEE only
-		if (GameManager::Instance()->GetIsPlayerPoweredUp())
+		bool currentPoweredUpState = GameManager::Instance()->GetIsPlayerPoweredUp();
+
+		// From here we can transition into FLEE, but only if this is a fresh power-up collected
+		if (currentPoweredUpState && currentPoweredUpState != mPreviousPoweredUpState)
 		{
 			ghost->GetStateMachine()->PushToStack(GHOST_STATE_TYPE::FLEE);	
 			ghost->SetTargetPosition(ghost->GetCentrePosition());
 		}
+
+		// Make sure to save the new state
+		mPreviousPoweredUpState = currentPoweredUpState;
 	}
 	else
 		return;

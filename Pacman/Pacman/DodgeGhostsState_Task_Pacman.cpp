@@ -24,6 +24,7 @@ DodgeGhostsState_Pacman::~DodgeGhostsState_Pacman()
 
 void DodgeGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector2& targetPositionRef, std::vector<S2D::Vector2> ghostPositions, DotsHandler& dotManager)
 {
+	/*
 	// We need to dodge the ghosts so lets first check if there are any power-ups remaining
 	if (dotManager.GetLargeDotPositions().size() > 0)
 	{
@@ -97,6 +98,7 @@ void DodgeGhostsState_Pacman::OnUpdate(S2D::Vector2 currentPosition, S2D::Vector
 			}
 		}
 	}
+	*/
 
 	// There are no power-ups remaining so we just need to dodge the ghosts as well as we can
 	unsigned int directionBias[4] = { 0,0,0,0 }; // In the same order of FACING_DIRECTION, up, down, left, right

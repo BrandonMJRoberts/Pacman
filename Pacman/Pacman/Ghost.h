@@ -67,7 +67,6 @@ public:
 
 	Stack_FiniteStateMachine_Ghost*  GetStateMachine() { return mStateMachine; }
 
-
 	bool GetIsHome()                             const { return mIsHome; }
 	void SetIsHome(bool newVal)                        { mIsHome = newVal; }
 
@@ -75,6 +74,7 @@ public:
 	void SetCanLeaveHome(bool newVal)                  { mCanLeaveHome = newVal; }
 
 	void SetGhostIsFleeing(bool newVal);
+	bool GetGhostIsFleeing()                    const  { return mGhostIsFleeing; }
 
 	void SetGhostIsEaten(bool newVal);
 	bool GetIfGhostIsEaten()                    const { return mGhostIsEaten; }
@@ -110,7 +110,6 @@ private:
 	bool							 mCanLeaveHome;
 	bool                             mResetting;
 	bool                             mStartAtHome;
-
 };
 
 

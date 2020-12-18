@@ -121,12 +121,13 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 				if ((int)mCentrePosition.X == (int)mHomePosition.X &&
 					(int)mCentrePosition.Y == (int)mHomePosition.Y)
 				{
-					mIsAlive        = true;
 					mIsHome         = true;
-					mGhostIsEaten   = false;
-					mGhostIsFleeing = false;
 
-					mMovementSpeed = mGhostSetSpeed;
+					mMovementSpeed  = mGhostSetSpeed;
+
+					SetIsAlive(true);
+					SetGhostIsEaten(false);
+					SetGhostIsFleeing(false);
 				}
 			}
 
@@ -169,11 +170,9 @@ void Ghost::Update(const float deltaTime, const S2D::Vector2 pacmanPos, const FA
 	}
 	else
 	{ 
-		// Take time off the delay
-
 		if (AudioManager::GetInstance()->GetPacmanDeathSFXFinishedPlaying())
 		{
-			mResetting = false;
+			mResetting      = false;
 
 			ResetGhostFromDeath();
 		}
@@ -629,8 +628,8 @@ void Ghost::ResetGhostFromDeath()
 
 	mIsAlive	    = true;
 	mIsHome         = mStartAtHome;
-	mGhostIsFleeing = false;
-	mGhostIsEaten   = false;
+	SetGhostIsFleeing(false);
+	SetGhostIsEaten(false);
 	mCanLeaveHome   = !mStartAtHome;
 
 	// If it is AI controlled then reset the state machine
